@@ -61,7 +61,7 @@ const LoginButton = () => {
            disabled:hover:bg-white
            `}
     >
-      <Image src='/assets/icon.svg' width={100} height={100} /> Ingresar con metamask
+      <Image src='/assets/icon.svg' className='w-auto h-auto' width={100} height={100} /> Ingresar con metamask
     </button>
   );
 };
