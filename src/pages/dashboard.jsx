@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
+import Topbar from "@/components/Topbar";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -12,10 +13,10 @@ const Dashboard = () => {
   const session = useSession();
   console.log(session);
   return (
-    <>
-      <h1>DASHBOARD</h1>
+    <div>
       <Sidebar />
-    </>
+      <Topbar />
+    </div>
   );
 };
 
