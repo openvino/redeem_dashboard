@@ -51,7 +51,7 @@ const Topbar = () => {
 
         <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2]  w-full border p-4 rounded-lg flex justify-end items-center">
           <Link href="/">
-            <div className=" cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-8">
+            <div className=" cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4">
               <BsBellFill className="hover:bg-gray-200 " size={20} />
             </div>
           </Link>
