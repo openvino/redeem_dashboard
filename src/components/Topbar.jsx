@@ -9,9 +9,9 @@ const Topbar = () => {
   const inputRef = useRef(null);
   return (
     <div className="fixed left-[6rem] top-4">
-      <div className="grid lg:grid-cols-5 gap-4 p-4">
-        <div className="lg:col-span-3 col-span-1 bg-[#F1EDE2] flex justify-between w-full border p-4 rounded-lg">
-          <div className="flex flex-col w-full pb-4">
+      <div className="grid lg:grid-cols-5 gap-4 p-4 ">
+        <div className="lg:col-span-3 col-span-1 bg-[#F1EDE2] flex justify-between w-full border p-4 rounded-lg h-[6rem]">
+          <div className="flex flex-col w-full  pb-4">
             <p className="text-2xl font-bold">0.1 ETH</p>
             <p className="text-gray-600">
               Deuda total de OPENVINO redeeem wallet.
@@ -21,7 +21,7 @@ const Topbar = () => {
             <span className="text-green-700 text-lg">+18%</span>
           </p> */}
         </div>
-        <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2] flex justify-between w-full border p-4 rounded-lg items-center">
+        <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2] flex justify-between w-full border p-4 rounded-lg items-center h-[6rem]">
           <div className="relative inline-block">
             <input
               type="text"
@@ -49,7 +49,7 @@ const Topbar = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2]  w-full border p-4 rounded-lg flex justify-end items-center">
+        <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2]  w-full border p-4 rounded-lg flex justify-end items-center h-[6rem]">
           <Link href="/">
             <div className=" cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4">
               <BsBellFill className="hover:bg-gray-200 " size={20} />
