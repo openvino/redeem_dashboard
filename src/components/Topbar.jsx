@@ -8,7 +8,7 @@ const Topbar = () => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   return (
-    <div className="fixed left-[6rem] top-4">
+    <div>
       <div className="grid lg:grid-cols-5 gap-4 p-4 ">
         <div className="lg:col-span-3 col-span-1 bg-[#F1EDE2] flex justify-between w-full border p-4 rounded-lg h-[6rem]">
           <div className="flex flex-col w-full  pb-4">
@@ -52,15 +52,15 @@ const Topbar = () => {
         <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2]  w-full border p-4 rounded-lg flex justify-end items-center h-[6rem]">
           <Link href="/">
             <div className=" cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4">
-              <BsBellFill className="hover:bg-gray-200 " size={20} />
+              <BsBellFill className="hover:bg-gray-200 " size={15} />
             </div>
           </Link>
           <Link href="/">
             <div className="bg-white hover:bg-gray-200 cursor-pointer p-3 rounded-full inline-block text-[#840C4A] mr-8">
               <Image
                 src={"/assets/costafloresLogo.png"}
-                width={55}
-                height={55}
+                width={30}
+                height={30}
                 alt="wineryLogo"
               />
             </div>
