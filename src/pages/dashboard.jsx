@@ -5,8 +5,10 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import Table from "@/components/Table";
+import clientAxios from "@/config/clientAxios";
 
-const Dashboard = () => {
+const Dashboard = ({ redeems }) => {
+  console.log("*/*/*/*/*/*/*/*/*/*/*/*/*                       :", redeems);
   const router = useRouter();
 
   const [{ data: accountData }, disconnect] = useAccount();
@@ -39,8 +41,9 @@ export async function getServerSideProps(context) {
       },
     };
   }
+  const redeems = await clientAxios.get("/redeemRoute");
 
   return {
-    props: {},
+    props: { redeems: redeems.data },
   };
 }
