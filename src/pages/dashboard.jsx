@@ -8,13 +8,12 @@ import Table from "@/components/Table";
 import clientAxios from "@/config/clientAxios";
 
 const Dashboard = ({ redeems }) => {
-  console.log("*/*/*/*/*/*/*/*/*/*/*/*/*                       :", redeems);
   const router = useRouter();
 
+  console.log(redeems)
   const [{ data: accountData }, disconnect] = useAccount();
 
   const session = useSession();
-  console.log(session);
   return (
     <div>
       <Sidebar />
@@ -41,9 +40,15 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const redeems = await clientAxios.get("/redeemRoute");
+  const { req } = context;
+  const { cookie } = req.headers;
 
+  const response = await clientAxios.get('/redeemRoute', {
+    headers: {
+      Cookie: cookie,
+    },
+  });
   return {
-    props: { redeems: redeems.data },
+    props: {redeems: response.data},
   };
 }
