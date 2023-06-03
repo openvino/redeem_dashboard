@@ -1,584 +1,18 @@
 import React from "react";
 import { FaPencilAlt } from "react-icons/fa";
+import {
+  MdSkipNext,
+  MdSkipPrevious,
+  MdNavigateNext,
+  MdNavigateBefore,
+} from "react-icons/md";
 import { useState } from "react";
 
-const Table = () => {
-  const columnas = [
-    {
-      title: "",
-      field: "acciones",
-    },
-    {
-      title: "Artista",
-      field: "artista",
-    },
-    {
-      title: "País de origen",
-      field: "pais",
-    },
-    {
-      title: "Géneros",
-      field: "genero",
-    },
-    {
-      title: "Ventas estimadas en millones",
-      field: "ventas",
-      type: "numeric",
-    },
-    {
-      title: "Status",
-      field: "status",
-    },
-  ];
-
-  const data = [
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-  ];
+const Table = ({ data, columnas }) => {
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [ordenColumna, setOrdenColumna] = useState(null);
+  const [ordenAscendente, setOrdenAscendente] = useState(true);
+  const elementosPorPagina = 10;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -593,11 +27,6 @@ const Table = () => {
     }
   };
 
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [ordenColumna, setOrdenColumna] = useState(null);
-  const [ordenAscendente, setOrdenAscendente] = useState(true);
-  const elementosPorPagina = 10;
-
   const handlePaginaAnterior = () => {
     if (paginaActual > 1) {
       setPaginaActual(paginaActual - 1);
@@ -609,6 +38,10 @@ const Table = () => {
     if (paginaActual < totalPaginas) {
       setPaginaActual(paginaActual + 1);
     }
+  };
+
+  const handleSeleccionarPagina = (pagina) => {
+    setPaginaActual(pagina);
   };
 
   const handleOrdenarColumna = (columna) => {
@@ -644,6 +77,87 @@ const Table = () => {
     const indiceInicial = (paginaValida - 1) * elementosPorPagina;
     const indiceFinal = indiceInicial + elementosPorPagina;
     return datosOrdenados.slice(indiceInicial, indiceFinal);
+  };
+
+  const renderBotonesPaginas = () => {
+    const totalPaginas = Math.ceil(data.length / elementosPorPagina);
+    const botones = [];
+    const inicio = Math.max(paginaActual - 4, 1);
+    const fin = Math.min(paginaActual + 4, totalPaginas);
+
+    botones.push(
+      <MdSkipPrevious
+        key="primera"
+        size={40}
+        onClick={() => handleSeleccionarPagina(1)}
+        className={`mx-1 px-2 py-1 rounded ${
+          paginaActual === 1
+            ? "bg-gray-200 text-gray-500"
+            : "bg-gray-200 text-[#840C4A]"
+        }`}
+        disabled={paginaActual === 1}
+      />
+    );
+
+    botones.push(
+      <MdNavigateBefore
+        size={40}
+        key="anterior"
+        onClick={handlePaginaAnterior}
+        className={`mx-1 px-2 py-1 rounded ${
+          paginaActual === 1
+            ? "bg-gray-200 text-gray-500"
+            : "bg-gray-200 text-[#840C4A]"
+        }`}
+        disabled={paginaActual === 1}
+      />
+    );
+
+    for (let i = inicio; i <= fin; i++) {
+      botones.push(
+        <button
+          key={i}
+          onClick={() => handleSeleccionarPagina(i)}
+          className={`mx-1 px-2 py-1 rounded ${
+            i === paginaActual
+              ? "bg-gray-200 text-[#840C4A]"
+              : "bg-gray-200 text-gray-500"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    botones.push(
+      <MdNavigateNext
+        size={40}
+        key="siguiente"
+        onClick={handlePaginaSiguiente}
+        className={`mx-1 px-2 py-1 rounded ${
+          paginaActual === totalPaginas
+            ? "bg-gray-200 text-gray-500"
+            : "bg-gray-200 text-[#840C4A]"
+        }`}
+        disabled={paginaActual === totalPaginas}
+      />
+    );
+
+    botones.push(
+      <MdSkipNext
+        size={40}
+        key="ultima"
+        onClick={() => handleSeleccionarPagina(totalPaginas)}
+        className={`mx-1 px-2 py-1 rounded ${
+          paginaActual === totalPaginas
+            ? "bg-gray-200 text-gray-500"
+            : "bg-gray-200 text-[#840C4A]"
+        }`}
+        disabled={paginaActual === totalPaginas}
+      />
+    );
+
+    return botones;
   };
 
   return (
@@ -706,18 +220,8 @@ const Table = () => {
           ))}
         </tbody>
       </table>
-      <div>
-        <button onClick={handlePaginaAnterior} disabled={paginaActual === 1}>
-          Anterior
-        </button>
-        <button
-          onClick={handlePaginaSiguiente}
-          disabled={
-            paginaActual === Math.ceil(data.length / elementosPorPagina)
-          }
-        >
-          Siguiente
-        </button>
+      <div className="mt-4 flex justify-center relative bottom left-0 w-full">
+        {renderBotonesPaginas()}
       </div>
     </div>
   );
