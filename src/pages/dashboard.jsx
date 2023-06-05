@@ -5,586 +5,91 @@ import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import Table from "@/components/Table";
+import { dataFormater } from "../utils/dataFormater.js";
+
 import clientAxios from "@/config/clientAxios";
 
 const Dashboard = ({ redeems }) => {
-  // console.log("*/*/*/*/*/*/*/*/*/*/*/*/*                       :", redeems);
   const columnas = [
     {
       title: "",
       field: "acciones",
     },
+    // {
+    //   title: "Id",
+    //   field: "id",
+    // },
+    // {
+    //   title: "Cliente",
+    //   field: "customer_id",
+    // },
     {
-      title: "Artista",
-      field: "artista",
+      title: "Nombre",
+      field: "name",
     },
     {
-      title: "País de origen",
-      field: "pais",
+      title: "Monto",
+      field: "amount",
     },
     {
-      title: "Géneros",
-      field: "genero",
+      title: "País",
+      field: "country_id",
     },
     {
-      title: "Ventas estimadas en millones",
-      field: "ventas",
-      type: "numeric",
+      title: "Provincia",
+      field: "province_id",
+    },
+
+    // {
+    //   title: "Actualizado",
+    //   field: "updated_at",
+    // },
+    // {
+    //   title: "Borrado",
+    //   field: "deleted_at",
+    // },
+    {
+      title: "Email",
+      field: "email",
+    },
+
+    // {
+    //   title: "Calle",
+    //   field: "street",
+    // },
+    // {
+    //   title: "Número",
+    //   field: "number",
+    // },
+
+    // {
+    //   title: "Telegram_ID",
+    //   field: "telegram_id",
+    // },
+
+    // {
+    //   title: "Vinería",
+    //   field: "winerie_id",
+    // },
+    {
+      title: "Año",
+      field: "year",
     },
     {
-      title: "Status",
+      title: "CP",
+      field: "zip",
+    },
+    {
+      title: "Creado",
+      field: "created_at",
+    },
+    {
+      title: "Estado",
       field: "status",
     },
   ];
 
-  const data = [
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-    {
-      artista: "Charly Garcia",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 100,
-      status: "success",
-    },
-    {
-      artista: "The Beatles",
-      pais: "England",
-      genero: "Rock",
-      ventas: 1000,
-      status: "pending",
-    },
-    {
-      artista: "Fito Paez",
-      pais: "Argentina",
-      genero: "Rock",
-      ventas: 500,
-      status: "rejected",
-    },
-  ];
+  const data = dataFormater(redeems);
   const router = useRouter();
 
   const [{ data: accountData }, disconnect] = useAccount();
@@ -596,7 +101,7 @@ const Dashboard = ({ redeems }) => {
       <Sidebar />
       <div className="fixed left-[6rem] top-4 flex flex-col ">
         <Topbar />
-        <div className="w-[75%] mx-auto">
+        <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} />
         </div>
       </div>
@@ -617,9 +122,16 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const redeems = await clientAxios.get("/redeemRoute");
+  const { req } = context;
+  const { cookie } = req.headers;
+
+  const response = await clientAxios.get("/redeemRoute", {
+    headers: {
+      Cookie: cookie,
+    },
+  });
 
   return {
-    props: { redeems: redeems.data },
+    props: { redeems: response.data },
   };
 }

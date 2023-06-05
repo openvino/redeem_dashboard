@@ -9,10 +9,10 @@ import {
 import { useState } from "react";
 
 const Table = ({ data, columnas }) => {
-  const [paginaActual, setPaginaActual] = useState(1);
-  const [ordenColumna, setOrdenColumna] = useState(null);
-  const [ordenAscendente, setOrdenAscendente] = useState(true);
-  const elementosPorPagina = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [columnOrder, setColumnOrder] = useState(null);
+  const [ascOrder, setAscOrder] = useState(true);
+  const elementsPerPage = 5;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -27,42 +27,42 @@ const Table = ({ data, columnas }) => {
     }
   };
 
-  const handlePaginaAnterior = () => {
-    if (paginaActual > 1) {
-      setPaginaActual(paginaActual - 1);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
-  const handlePaginaSiguiente = () => {
-    const totalPaginas = Math.ceil(data.length / elementosPorPagina);
-    if (paginaActual < totalPaginas) {
-      setPaginaActual(paginaActual + 1);
+  const handleNextPage = () => {
+    const totalPages = Math.ceil(data.length / elementsPerPage);
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  const handleSeleccionarPagina = (pagina) => {
-    setPaginaActual(pagina);
+  const handleSelectPage = (pagina) => {
+    setCurrentPage(pagina);
   };
 
   const handleOrdenarColumna = (columna) => {
-    if (ordenColumna === columna) {
-      setOrdenAscendente(!ordenAscendente);
+    if (columnOrder === columna) {
+      setAscOrder(!ascOrder);
     } else {
-      setOrdenColumna(columna);
-      setOrdenAscendente(true);
+      setColumnOrder(columna);
+      setAscOrder(true);
     }
   };
 
-  const ordenarDatos = () => {
-    if (ordenColumna) {
+  const orderData = () => {
+    if (columnOrder) {
       return [...data].sort((a, b) => {
-        const valorA = a[ordenColumna];
-        const valorB = b[ordenColumna];
+        const valorA = a[columnOrder];
+        const valorB = b[columnOrder];
         if (valorA < valorB) {
-          return ordenAscendente ? -1 : 1;
+          return ascOrder ? -1 : 1;
         }
         if (valorA > valorB) {
-          return ordenAscendente ? 1 : -1;
+          return ascOrder ? 1 : -1;
         }
         return 0;
       });
@@ -70,56 +70,56 @@ const Table = ({ data, columnas }) => {
     return data;
   };
 
-  const ordenarDatosPaginados = () => {
-    const datosOrdenados = ordenarDatos();
-    const totalPaginas = Math.ceil(datosOrdenados.length / elementosPorPagina);
-    const paginaValida = Math.max(1, Math.min(paginaActual, totalPaginas));
-    const indiceInicial = (paginaValida - 1) * elementosPorPagina;
-    const indiceFinal = indiceInicial + elementosPorPagina;
-    return datosOrdenados.slice(indiceInicial, indiceFinal);
+  const orderPagedData = () => {
+    const orderedData = orderData();
+    const totalPages = Math.ceil(orderedData.length / elementsPerPage);
+    const validPage = Math.max(1, Math.min(currentPage, totalPages));
+    const initIndex = (validPage - 1) * elementsPerPage;
+    const indiceFinal = initIndex + elementsPerPage;
+    return orderedData.slice(initIndex, indiceFinal);
   };
 
-  const renderBotonesPaginas = () => {
-    const totalPaginas = Math.ceil(data.length / elementosPorPagina);
-    const botones = [];
-    const inicio = Math.max(paginaActual - 4, 1);
-    const fin = Math.min(paginaActual + 4, totalPaginas);
+  const renderbuttonsPages = () => {
+    const totalPages = Math.ceil(data.length / elementsPerPage);
+    const buttons = [];
+    const inicio = Math.max(currentPage - 4, 1);
+    const fin = Math.min(currentPage + 4, totalPages);
 
-    botones.push(
+    buttons.push(
       <MdSkipPrevious
         key="primera"
         size={40}
-        onClick={() => handleSeleccionarPagina(1)}
+        onClick={() => handleSelectPage(1)}
         className={`mx-1 px-2 py-1 rounded ${
-          paginaActual === 1
+          currentPage === 1
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[#840C4A]"
         }`}
-        disabled={paginaActual === 1}
+        disabled={currentPage === 1}
       />
     );
 
-    botones.push(
+    buttons.push(
       <MdNavigateBefore
         size={40}
         key="anterior"
-        onClick={handlePaginaAnterior}
+        onClick={handlePrevPage}
         className={`mx-1 px-2 py-1 rounded ${
-          paginaActual === 1
+          currentPage === 1
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[#840C4A]"
         }`}
-        disabled={paginaActual === 1}
+        disabled={currentPage === 1}
       />
     );
 
     for (let i = inicio; i <= fin; i++) {
-      botones.push(
+      buttons.push(
         <button
           key={i}
-          onClick={() => handleSeleccionarPagina(i)}
+          onClick={() => handleSelectPage(i)}
           className={`mx-1 px-2 py-1 rounded ${
-            i === paginaActual
+            i === currentPage
               ? "bg-gray-200 text-[#840C4A]"
               : "bg-gray-200 text-gray-500"
           }`}
@@ -129,46 +129,52 @@ const Table = ({ data, columnas }) => {
       );
     }
 
-    botones.push(
+    buttons.push(
       <MdNavigateNext
         size={40}
         key="siguiente"
-        onClick={handlePaginaSiguiente}
+        onClick={handleNextPage}
         className={`mx-1 px-2 py-1 rounded ${
-          paginaActual === totalPaginas
+          currentPage === totalPages
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[#840C4A]"
         }`}
-        disabled={paginaActual === totalPaginas}
+        disabled={currentPage === totalPages}
       />
     );
 
-    botones.push(
+    buttons.push(
       <MdSkipNext
         size={40}
         key="ultima"
-        onClick={() => handleSeleccionarPagina(totalPaginas)}
+        onClick={() => handleSelectPage(totalPages)}
         className={`mx-1 px-2 py-1 rounded ${
-          paginaActual === totalPaginas
+          currentPage === totalPages
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[#840C4A]"
         }`}
-        disabled={paginaActual === totalPaginas}
+        disabled={currentPage === totalPages}
       />
     );
 
-    return botones;
+    return buttons;
   };
-
   return (
-    <div className="overflow-x-auto rounded-lg">
-      <table className="min-w-full divide-y divide-gray-200 border border-gray-100">
+    <div className="overflow-x-auto rounded-lg w-[95%]">
+      <table
+        className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed"
+        style={{ padding: "2px" }}
+      >
         <thead>
           <tr>
             {columnas.map((columna) => (
               <th
                 key={columna.field}
-                className="px-6 py-3 bg-[#840C4A] text-left text-xs text-white font-medium uppercase tracking-wider"
+                className={`px-1 py-1 bg-[#840C4A] text-left text-xs text-white font-medium uppercase tracking-wider justify-center ${
+                  columna.field === "acciones" || columna.field === "pais"
+                    ? "w-12 sm:w-16"
+                    : ""
+                }`}
                 onClick={() => handleOrdenarColumna(columna.field)}
               >
                 {columna.title}
@@ -177,7 +183,7 @@ const Table = ({ data, columnas }) => {
           </tr>
         </thead>
         <tbody>
-          {ordenarDatosPaginados().map((fila, index) => (
+          {orderPagedData().map((fila, index) => (
             <tr
               key={index}
               className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
@@ -187,9 +193,16 @@ const Table = ({ data, columnas }) => {
                   return (
                     <td
                       key={columna.field}
-                      className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      className="px-2 py-1 text-xs text-gray-900"
+                      style={{
+                        width: "1rem",
+                        maxWidth: "1rem",
+                      }}
                     >
-                      <FaPencilAlt className="h-5 w-5 text-gray-500 cursor-pointer hover:text-gray-700" />
+                      <FaPencilAlt
+                        size={5}
+                        className="h-5 w-3 text-gray-400 cursor-pointer hover:text-gray-700"
+                      />
                     </td>
                   );
                 }
@@ -198,7 +211,7 @@ const Table = ({ data, columnas }) => {
                   return (
                     <td
                       key={columna.field}
-                      className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getStatusColor(
+                      className={`px-2 py-1 text-sm font-medium ${getStatusColor(
                         fila[columna.field]
                       )}`}
                     >
@@ -207,12 +220,35 @@ const Table = ({ data, columnas }) => {
                   );
                 }
 
+                if (columna.field === "pais") {
+                  return (
+                    <td
+                      key={columna.field}
+                      className="px-2 py-1 text-sm text-gray-900"
+                      style={{
+                        maxWidth: "2rem",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <div>{fila[columna.field]}</div>
+                    </td>
+                  );
+                }
+
                 return (
                   <td
                     key={columna.field}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                    className="px-2 py-1 text-sm text-gray-900"
+                    style={{
+                      maxWidth: "5rem",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
                   >
-                    {fila[columna.field]}
+                    <div>{fila[columna.field]}</div>
                   </td>
                 );
               })}
@@ -221,7 +257,7 @@ const Table = ({ data, columnas }) => {
         </tbody>
       </table>
       <div className="mt-4 flex justify-center relative bottom left-0 w-full">
-        {renderBotonesPaginas()}
+        {renderbuttonsPages()}
       </div>
     </div>
   );

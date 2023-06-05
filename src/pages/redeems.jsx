@@ -579,7 +579,7 @@ const redeems = () => {
     },
   ];
   return (
-    <div className="mx-auto p-10">
+    <div className="">
       <Table data={data} columnas={columnas} />
     </div>
   );
