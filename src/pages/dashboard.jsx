@@ -102,7 +102,7 @@ const Dashboard = ({ redeems }) => {
       <div className="fixed left-[6rem] top-4 flex flex-col ">
         <Topbar />
         <div className="mx-auto p-4 flex justify-center">
-          <Table data={data} columnas={columnas} />
+          <Table data={data} columnas={columnas} n={5} />
         </div>
       </div>
     </div>

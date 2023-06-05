@@ -1,4 +1,4 @@
-import React from "react";
+import Link from "next/link";
 import { FaPencilAlt } from "react-icons/fa";
 import {
   MdSkipNext,
@@ -8,11 +8,12 @@ import {
 } from "react-icons/md";
 import { useState } from "react";
 
-const Table = ({ data, columnas }) => {
+const Table = ({ data, columnas, n }) => {
+  console.log(n);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
   const [ascOrder, setAscOrder] = useState(true);
-  const elementsPerPage = 5;
+  const elementsPerPage = n;
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -199,10 +200,12 @@ const Table = ({ data, columnas }) => {
                         maxWidth: "1rem",
                       }}
                     >
-                      <FaPencilAlt
-                        size={5}
-                        className="h-5 w-3 text-gray-400 cursor-pointer hover:text-gray-700"
-                      />
+                      <Link href={`/detail/${index}`}>
+                        <FaPencilAlt
+                          size={5}
+                          className="h-5 w-3 text-gray-400 cursor-pointer hover:text-gray-700"
+                        />
+                      </Link>
                     </td>
                   );
                 }
