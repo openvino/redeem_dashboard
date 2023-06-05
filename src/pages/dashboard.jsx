@@ -1,5 +1,5 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
@@ -11,9 +11,7 @@ import clientAxios from "@/config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 
 const Dashboard = ({ redeems }) => {
-  // const dispatch = useDispatch();
   const filters = useSelector((state) => state.filter);
-  useEffect(() => {}, [filters]);
 
   const columnas = [
     {
@@ -116,9 +114,7 @@ const Dashboard = ({ redeems }) => {
 
   const session = useSession();
   console.log(session);
-  const handleLog = () => {
-    console.log("*-*-*-*-*-*-*-*-*-*-*-*", filter);
-  };
+
   return (
     <div>
       <Sidebar />
@@ -127,9 +123,6 @@ const Dashboard = ({ redeems }) => {
         <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} n={5} />
         </div>
-        <button className="bg-green" onClick={handleLog}>
-          dispatchar{" "}
-        </button>
       </div>
     </div>
   );

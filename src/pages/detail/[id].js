@@ -19,34 +19,42 @@ function Detail({ redeems }) {
   const redeem = redeems[id];
 
   return (
-    <div className="overflow-x-auto rounded-lg lg:w-[50%] p-4 lg:translate-x-[50%]">
+    <div
+      className="
+    overflow-x-auto
+    rounded-lg lg:w-[60%]
+    p-4
+    lg:translate-x-[40%]
+    "
+    >
       <h1 className="text-2xl font-bold mb-4">Detalle del Redeem</h1>
 
       <form className="space-y-2" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Id:</label>
-          <input
-            type="text"
-            id="id"
-            name="id"
-            defaultValue={redeem.id}
-            {...register("id")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
+        <div className="flex flex-row w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Id:</label>
+            <input
+              type="text"
+              id="id"
+              name="id"
+              defaultValue={redeem.id}
+              {...register("id")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Monto:</label>
-          <input
-            type="text"
-            id="amount"
-            name="amount"
-            value={redeem.amount}
-            {...register("amount")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Monto:</label>
+            <input
+              type="text"
+              id="amount"
+              name="amount"
+              value={redeem.amount}
+              {...register("amount")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
         </div>
-
         <div className="flex items-center">
           <label className="w-24 font-bold">Nombre:</label>
           <input
@@ -96,120 +104,125 @@ function Detail({ redeems }) {
           />
         </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">País:</label>
-          <input
-            type="text"
-            id="country_id"
-            name="country_id"
-            value={redeem.country_id}
-            {...register("country_id")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
+        <div className="flex flex-row w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold pr-2">País:</label>
+            <input
+              type="text"
+              id="country_id"
+              name="country_id"
+              value={redeem.country_id}
+              {...register("country_id")}
+              className="w-32 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Provincia:</label>
-          <input
-            type="text"
-            id="country_id"
-            name="country_id"
-            value={redeem.province_id}
-            {...register("province_id")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
+          <div className="flex items-center">
+            <label className="w-24 font-bold pr-2">Provincia:</label>
+            <input
+              type="text"
+              id="province_id"
+              name="province_id"
+              value={redeem.province_id}
+              {...register("province_id")}
+              className="w-36 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
         </div>
+        <div className="flex flex-row w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Calle:</label>
+            <input
+              type="text"
+              id="street"
+              name="street"
+              value={redeem.street}
+              {...register("street")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Calle:</label>
-          <input
-            type="text"
-            id="street"
-            name="street"
-            value={redeem.street}
-            {...register("street")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Número:</label>
+            <input
+              type="text"
+              id="number"
+              name="number"
+              value={redeem.number}
+              {...register("number")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
         </div>
+        <div className="flex flex-row w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Código postal:</label>
+            <input
+              type="text"
+              id="zip"
+              name="zip"
+              value={redeem.zip}
+              {...register("zip")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Número:</label>
-          <input
-            type="text"
-            id="number"
-            name="number"
-            value={redeem.number}
-            {...register("number")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Año:</label>
+            <input
+              type="text"
+              id="year"
+              name="year"
+              value={redeem.year}
+              {...register("year")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
         </div>
+        <div className="flex flex-row w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Creado:</label>
+            <input
+              type="text"
+              id="created_at"
+              name="created_at"
+              value={redeem.created_at.substring(0, 10)}
+              {...register("created_at")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Código postal:</label>
-          <input
-            type="text"
-            id="zip"
-            name="zip"
-            value={redeem.zip}
-            {...register("zip")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
+          {/* <div className="flex">
+            <label className="w-26 font-bold">Actualizado:</label>
+            <input
+              type="text"
+              id="updated_at"
+              name="updated_at"
+              value={redeem.updated_at.substring(0, 10)}
+              {...register("updated_at")}
+              className="flex-1 px-2  py-1 border border-gray-300 rounded-md"
+            />
+          </div> */}
+          {/* </div> */}
+
+          <div className="flex items-center">
+            <label className="w-24 font-bold" htmlFor="status">
+              Estado:
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              {...register("status")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            >
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
         </div>
-
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Año:</label>
-          <input
-            type="text"
-            id="zip"
-            name="zip"
-            value={redeem.zip}
-            {...register("zip")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Creado:</label>
-          <input
-            type="text"
-            id="created_at"
-            name="created_at"
-            value={redeem.created_at}
-            {...register("created_at")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Actualizado:</label>
-          <input
-            type="text"
-            id="updated_at"
-            name="updated_at"
-            value={redeem.updated_at}
-            {...register("updated_at")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-24 font-bold" htmlFor="status">
-            Estado:
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            {...register("status")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          >
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="rejected">Rejected</option>
-          </select>
-        </div>
-
         <div className="flex justify-center">
           <button
             type="submit"
