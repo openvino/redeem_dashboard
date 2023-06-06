@@ -14,7 +14,7 @@ export default function filterReducer(state = initialState, action) {
     case GET_FILTER:
       // console.log(state);
       return {
-        ...state,
+        state,
       };
     default:
       return state;
