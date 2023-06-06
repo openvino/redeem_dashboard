@@ -30,7 +30,7 @@ function Detail({ redeems }) {
       <h1 className="text-2xl font-bold mb-4">Detalle del Redeem</h1>
 
       <form className="space-y-2" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-row w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-between">
           <div className="flex items-center">
             <label className="w-24 font-bold">Id:</label>
             <input
@@ -55,81 +55,87 @@ function Detail({ redeems }) {
             />
           </div>
         </div>
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Nombre:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={redeem.name}
-            {...register("name")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
 
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Customer_id:</label>
-          <input
-            type="text"
-            id="customer_id"
-            name="customer_id"
-            value={redeem.customer_id}
-            {...register("customer_id")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Email:</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            value={redeem.email}
-            {...register("email")}
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div className="flex items-center">
-          <label className="w-24 font-bold">Telegram:</label>
-          <input
-            type="text"
-            id="telegram_id"
-            name="telegram_id"
-            value={redeem.telegram_id}
-            {...register("telegram_id")}
-            l
-            className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-          />
-        </div>
-
-        <div className="flex flex-row w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-between">
           <div className="flex items-center">
-            <label className="w-24 font-bold pr-2">País:</label>
+            <label className="w-24 font-bold">Nombre:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={redeem.name}
+              {...register("name")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Customer_id:</label>
+            <input
+              type="text"
+              id="customer_id"
+              name="customer_id"
+              value={redeem.customer_id}
+              {...register("customer_id")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
+        </div>
+
+        <div className="flex lg:flex-row flex-col w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Email:</label>
+            <input
+              type="text"
+              id="email"
+              name="email"
+              value={redeem.email}
+              {...register("email")}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <label className="w-24 font-bold">Telegram:</label>
+            <input
+              type="text"
+              id="telegram_id"
+              name="telegram_id"
+              value={redeem.telegram_id}
+              {...register("telegram_id")}
+              l
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+            />
+          </div>
+        </div>
+
+        <div className="flex lg:flex-row flex-col w-full justify-between">
+          <div className="flex items-center">
+            <label className="w-24 font-bold">País:</label>
             <input
               type="text"
               id="country_id"
               name="country_id"
               value={redeem.country_id}
               {...register("country_id")}
-              className="w-32 px-2 py-1 border border-gray-300 rounded-md"
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             />
           </div>
 
           <div className="flex items-center">
-            <label className="w-24 font-bold pr-2">Provincia:</label>
+            <label className="w-24 font-bold">Provincia:</label>
             <input
               type="text"
               id="province_id"
               name="province_id"
               value={redeem.province_id}
               {...register("province_id")}
-              className="w-36 px-2 py-1 border border-gray-300 rounded-md"
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             />
           </div>
         </div>
-        <div className="flex flex-row w-full justify-between">
+
+        <div className="flex lg:flex-row flex-col w-full justify-between">
           <div className="flex items-center">
             <label className="w-24 font-bold">Calle:</label>
             <input
@@ -154,7 +160,8 @@ function Detail({ redeems }) {
             />
           </div>
         </div>
-        <div className="flex flex-row w-full justify-between">
+
+        <div className="flex lg:flex-row flex-col w-full justify-between">
           <div className="flex items-center">
             <label className="w-24 font-bold">Código postal:</label>
             <input
@@ -179,7 +186,8 @@ function Detail({ redeems }) {
             />
           </div>
         </div>
-        <div className="flex flex-row w-full justify-between">
+
+        <div className="flex lg:flex-row flex-col w-full justify-between">
           <div className="flex items-center">
             <label className="w-24 font-bold">Creado:</label>
             <input
@@ -225,12 +233,6 @@ function Detail({ redeems }) {
         </div>
         <div className="flex justify-center">
           <button
-            type="submit"
-            className="px-4 py-2 bg-[#840C4A] text-white rounded-md"
-          >
-            Guardar
-          </button>
-          <button
             type="button"
             onClick={() => {
               router.push("/");
@@ -238,6 +240,12 @@ function Detail({ redeems }) {
             className="px-4 py-2 ml-4 bg-gray-300 text-gray-800 rounded-md"
           >
             Volver
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 bg-[#840C4A] text-white rounded-md"
+          >
+            Guardar
           </button>
         </div>
       </form>
