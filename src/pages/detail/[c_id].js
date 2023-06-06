@@ -10,12 +10,16 @@ function Detail({ redeems }) {
   console.log(c_id);
   const [statusSelector, setStatusSelector] = useState("");
   const { register, handleSubmit, setValue } = useForm();
-  const id = redeems.findIndex((r) => r.id === c_id);
+
   console.log(redeems);
-  console.log(id);
+  const id = redeems.findIndex((r) => r.id === c_id);
   useEffect(() => {
+    console.log(
+      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
+      redeems[id].redeem_status
+    );
     setStatusSelector(redeems[id].redeem_status);
-  }, []);
+  }, [id]);
 
   const onSubmit = async (data) => {
     const redeemId = data.id;
@@ -235,10 +239,11 @@ function Detail({ redeems }) {
               id="status"
               name="status"
               onChange={(e) => {
-                setStatusSelector(e.target.value);
-                setValue("status", e.target.value);
+                const selectedStatus = e.target.value;
+                setStatusSelector(selectedStatus);
+                setValue("status", selectedStatus);
               }}
-              {...register("status")}
+              value={statusSelector} // Set the value here
               className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             >
               <option value="pending">Pending</option>
