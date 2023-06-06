@@ -9,9 +9,15 @@ import { dataFormater } from "../utils/dataFormater.js";
 import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
 import clientAxios from "@/config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  showNotification,
+  closeNotification,
+} from "@/redux/actions/notificationActions.js";
 
 const Dashboard = ({ redeems }) => {
   const filters = useSelector((state) => state.filter);
+  const notifications = useSelector((state) => state.notification);
+  const dispatch = useDispatch();
 
   const columnas = [
     {
@@ -114,12 +120,22 @@ const Dashboard = ({ redeems }) => {
 
   const session = useSession();
   console.log(session);
-
+  // const handleNoti = () => {
+  //   console.log(notifications);
+  //   if (notifications.notification) {
+  //     dispatch(closeNotification());
+  //   } else {
+  //     dispatch(showNotification());
+  //   }
+  // };
   return (
     <div>
       <Sidebar />
       <div className="fixed left-[6rem] top-4 flex flex-col ">
         <Topbar />
+        {/* <button className="bg-green-900" onClick={handleNoti}>
+          noti
+        </button> */}
         <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} n={5} />
         </div>

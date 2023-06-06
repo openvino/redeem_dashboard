@@ -6,13 +6,20 @@ import { useForm } from "react-hook-form";
 
 function Detail({ redeems }) {
   const router = useRouter();
-  const { id } = router.query;
+  const { c_id } = router.query;
+  console.log(c_id);
   const [statusSelector, setStatusSelector] = useState("");
   const { register, handleSubmit, setValue } = useForm();
 
+  console.log(redeems);
+  const id = redeems.findIndex((r) => r.id === c_id);
   useEffect(() => {
+    console.log(
+      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
+      redeems[id].redeem_status
+    );
     setStatusSelector(redeems[id].redeem_status);
-  }, []);
+  }, [id]);
 
   const onSubmit = async (data) => {
     const redeemId = data.id;
@@ -23,9 +30,10 @@ function Detail({ redeems }) {
         redeemId,
         status,
       });
-      console.log(response);
+      alert("Cambios guardados");
     } catch (error) {
       console.log(error.message);
+      alert("Error: No se pudo actualizar el Redeem");
     }
   };
   const redeem = redeems[id];
@@ -231,10 +239,11 @@ function Detail({ redeems }) {
               id="status"
               name="status"
               onChange={(e) => {
-                setStatusSelector(e.target.value);
-                setValue("status", e.target.value);
+                const selectedStatus = e.target.value;
+                setStatusSelector(selectedStatus);
+                setValue("status", selectedStatus);
               }}
-              {...register("status")}
+              value={statusSelector} // Set the value here
               className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             >
               <option value="pending">Pending</option>

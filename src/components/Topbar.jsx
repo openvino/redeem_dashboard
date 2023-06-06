@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useState, useRef } from "react";
 import Link from "next/link";
@@ -10,10 +10,15 @@ const Topbar = () => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const dispatch = useDispatch();
-  // const filter = useSelector((state) => state.filter);
+  const notification = useSelector((state) => state.notification);
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
+
+  // useEffect(() => {
+  //   // console.log("NOTINOTI", notification);
+  // }, [notification]);
+
   return (
     <div>
       <div className="grid lg:grid-cols-5 gap-4 p-4 ">
@@ -57,9 +62,19 @@ const Topbar = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-1 col-span-1 bg-[#F1EDE2]  w-full border p-4 rounded-lg flex justify-end items-center h-[6rem]">
+        <div
+          className={
+            "lg:col-span-1 col-span-1 bg-[#F1EDE2]  w-full border p-4 rounded-lg flex justify-end items-center h-[6rem]"
+          }
+        >
           <Link href="/">
-            <div className=" cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4">
+            <div
+              className={
+                notification.notification
+                  ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4"
+                  : "hidden"
+              }
+            >
               <BsBellFill className="hover:bg-gray-200 " size={15} />
             </div>
           </Link>
