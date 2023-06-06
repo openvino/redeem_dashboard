@@ -1,21 +1,33 @@
 import { useSession, signOut, getSession } from "next-auth/react";
 import { Router, useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
 import { useForm } from "react-hook-form";
 
 function Detail({ redeems }) {
   const router = useRouter();
   const { id } = router.query;
-  const [status, setStatus] = useState("pending");
+  const [statusSelector, setStatusSelector] = useState("");
   const { register, handleSubmit, setValue } = useForm();
 
-  const onSubmit = (data) => {
-    alert("TODO: guardar cambios");
-  };
+  useEffect(() => {
+    setStatusSelector(redeems[id].redeem_status);
+  }, []);
 
-  console.log(id);
-  console.log(redeems);
+  const onSubmit = async (data) => {
+    const redeemId = data.id;
+    const status = data.status;
+    console.log(data.status);
+    try {
+      const response = await clientAxios.put("/redeemRoute", {
+        redeemId,
+        status,
+      });
+      console.log(response);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   const redeem = redeems[id];
 
   return (
@@ -199,7 +211,6 @@ function Detail({ redeems }) {
               className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             />
           </div>
-
           {/* <div className="flex">
             <label className="w-26 font-bold">Actualizado:</label>
             <input
@@ -212,7 +223,6 @@ function Detail({ redeems }) {
             />
           </div> */}
           {/* </div> */}
-
           <div className="flex items-center">
             <label className="w-24 font-bold" htmlFor="status">
               Estado:
@@ -220,8 +230,10 @@ function Detail({ redeems }) {
             <select
               id="status"
               name="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => {
+                setStatusSelector(e.target.value);
+                setValue("status", e.target.value);
+              }}
               {...register("status")}
               className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             >
@@ -237,13 +249,13 @@ function Detail({ redeems }) {
             onClick={() => {
               router.push("/");
             }}
-            className="px-4 py-2 ml-4 bg-gray-300 text-gray-800 rounded-md"
+            className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
           >
             Volver
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-[#840C4A] text-white rounded-md"
+            className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
           >
             Guardar
           </button>

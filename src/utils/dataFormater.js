@@ -18,7 +18,7 @@ export const dataFormater = (redeems) => {
       winerie_id: item.winerie_id,
       year: item.year,
       zip: item.zip,
-      status: "pending",
+      status: item.redeem_status,
     });
   });
   return data;

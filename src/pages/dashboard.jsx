@@ -107,7 +107,7 @@ const Dashboard = ({ redeems }) => {
   };
 
   const data = filterData(dataFormater(redeems));
-  console.log("#######################", data);
+
   const router = useRouter();
 
   const [{ data: accountData }, disconnect] = useAccount();

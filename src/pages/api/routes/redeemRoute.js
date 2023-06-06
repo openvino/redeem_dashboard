@@ -26,6 +26,8 @@ export default async function handler(req, res) {
 
   //EDIT REDEEM STATUS
   if (req.method === "PUT") {
+    // const { redeemId, status } = req.body;
+    // console.log(redeemId, status);
     try {
       const { redeemId, status } = req.body;
 
