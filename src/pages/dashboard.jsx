@@ -1,15 +1,18 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-import { useEffect } from "react";
+// import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import Table from "@/components/Table";
 import { dataFormater } from "../utils/dataFormater.js";
-
+import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
 import clientAxios from "@/config/clientAxios";
+import { useDispatch, useSelector } from "react-redux";
 
 const Dashboard = ({ redeems }) => {
+  const filters = useSelector((state) => state.filter);
+
   const columnas = [
     {
       title: "",
@@ -89,13 +92,29 @@ const Dashboard = ({ redeems }) => {
     },
   ];
 
-  const data = dataFormater(redeems);
+  const filterData = (data) => {
+    if (filters.filter) {
+      const searchString = filters.filter.toLowerCase();
+
+      return data.filter((obj) =>
+        Object.values(obj).some((value) =>
+          String(value).toLowerCase().includes(searchString)
+        )
+      );
+    } else {
+      return data;
+    }
+  };
+
+  const data = filterData(dataFormater(redeems));
+
   const router = useRouter();
 
   const [{ data: accountData }, disconnect] = useAccount();
 
   const session = useSession();
   console.log(session);
+
   return (
     <div>
       <Sidebar />

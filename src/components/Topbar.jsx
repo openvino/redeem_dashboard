@@ -4,9 +4,16 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { BsBellFill } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { setFilter } from "@/redux/actions/filterActions.js";
 const Topbar = () => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
+  const dispatch = useDispatch();
+  // const filter = useSelector((state) => state.filter);
+  const handleFilter = (e) => {
+    dispatch(setFilter(e.target.value));
+  };
   return (
     <div>
       <div className="grid lg:grid-cols-5 gap-4 p-4 ">
@@ -34,6 +41,7 @@ const Topbar = () => {
                 setIsFocused(false);
               }}
               ref={inputRef}
+              onChange={handleFilter}
             />
             <span
               id="search-icon"

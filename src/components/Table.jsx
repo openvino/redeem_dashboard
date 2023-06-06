@@ -9,7 +9,6 @@ import {
 import { useState } from "react";
 
 const Table = ({ data, columnas, n }) => {
-  console.log(n);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
   const [ascOrder, setAscOrder] = useState(true);
@@ -161,19 +160,25 @@ const Table = ({ data, columnas, n }) => {
     return buttons;
   };
   return (
-    <div className="overflow-x-auto rounded-lg w-[95%]">
+    <div className="overflow-x-auto rounded-lg w-[auto] ">
       <table
-        className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed"
-        style={{ padding: "2px" }}
+        className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed overflow-scroll"
+        style={{}}
       >
         <thead>
           <tr>
             {columnas.map((columna) => (
               <th
                 key={columna.field}
-                className={`px-1 py-1 bg-[#840C4A] text-left text-xs text-white font-medium uppercase tracking-wider justify-center ${
-                  columna.field === "acciones" || columna.field === "pais"
-                    ? "w-12 sm:w-16"
+                className={`px-1 py-1 bg-[#840C4A]  text-[0.25rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
+                  columna.field === "acciones" ? "w-12 sm:w-16" : ""
+                } ${
+                  columna.field === "country_id" ||
+                  columna.field === "zip" ||
+                  columna.field === "email" ||
+                  columna.field === "created_at" ||
+                  columna.field === "year"
+                    ? "hidden md:table-cell"
                     : ""
                 }`}
                 onClick={() => handleOrdenarColumna(columna.field)}
@@ -194,17 +199,12 @@ const Table = ({ data, columnas, n }) => {
                   return (
                     <td
                       key={columna.field}
-                      className="px-2 py-1 text-xs text-gray-900"
-                      style={{
-                        width: "1rem",
-                        maxWidth: "1rem",
-                      }}
+                      className="px-0 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
                     >
                       <Link href={`/detail/${index}`}>
-                        <FaPencilAlt
-                          size={5}
-                          className="h-5 w-3 text-gray-400 cursor-pointer hover:text-gray-700"
-                        />
+                        <div className="inline-flex items-center px-0">
+                          <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+                        </div>
                       </Link>
                     </td>
                   );
@@ -214,7 +214,7 @@ const Table = ({ data, columnas, n }) => {
                   return (
                     <td
                       key={columna.field}
-                      className={`px-2 py-1 text-sm font-medium ${getStatusColor(
+                      className={`px-2 py-1 text-[0.5rem] text-center md:text-[0.75rem] font-medium ${getStatusColor(
                         fila[columna.field]
                       )}`}
                     >
@@ -223,11 +223,17 @@ const Table = ({ data, columnas, n }) => {
                   );
                 }
 
-                if (columna.field === "pais") {
+                if (
+                  columna.field === "country_id" ||
+                  columna.field === "zip" ||
+                  columna.field === "email" ||
+                  columna.field === "created_at" ||
+                  columna.field === "year"
+                ) {
                   return (
                     <td
                       key={columna.field}
-                      className="px-2 py-1 text-sm text-gray-900"
+                      className="px-2 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 hidden md:table-cell text-center"
                       style={{
                         maxWidth: "2rem",
                         overflow: "hidden",
@@ -243,7 +249,7 @@ const Table = ({ data, columnas, n }) => {
                 return (
                   <td
                     key={columna.field}
-                    className="px-2 py-1 text-sm text-gray-900"
+                    className="px-2 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
                     style={{
                       maxWidth: "5rem",
                       overflow: "hidden",
@@ -259,7 +265,7 @@ const Table = ({ data, columnas, n }) => {
           ))}
         </tbody>
       </table>
-      <div className="mt-4 flex justify-center relative bottom left-0 w-full">
+      <div className="mt-4 flex justify-center relative bottom left-0 w-full transform scale-75 ">
         {renderbuttonsPages()}
       </div>
     </div>
