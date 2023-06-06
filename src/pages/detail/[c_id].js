@@ -6,10 +6,13 @@ import { useForm } from "react-hook-form";
 
 function Detail({ redeems }) {
   const router = useRouter();
-  const { id } = router.query;
+  const { c_id } = router.query;
+  console.log(c_id);
   const [statusSelector, setStatusSelector] = useState("");
   const { register, handleSubmit, setValue } = useForm();
-
+  const id = redeems.findIndex((r) => r.id === c_id);
+  console.log(redeems);
+  console.log(id);
   useEffect(() => {
     setStatusSelector(redeems[id].redeem_status);
   }, []);
@@ -23,9 +26,10 @@ function Detail({ redeems }) {
         redeemId,
         status,
       });
-      console.log(response);
+      alert("Cambios guardados");
     } catch (error) {
       console.log(error.message);
+      alert("Error: No se pudo actualizar el Redeem");
     }
   };
   const redeem = redeems[id];

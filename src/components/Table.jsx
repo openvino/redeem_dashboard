@@ -161,10 +161,7 @@ const Table = ({ data, columnas, n }) => {
   };
   return (
     <div className="overflow-x-auto rounded-lg w-[auto] ">
-      <table
-        className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed overflow-scroll"
-        style={{}}
-      >
+      <table className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed overflow-scroll">
         <thead>
           <tr>
             {columnas.map((columna) => (
@@ -201,7 +198,9 @@ const Table = ({ data, columnas, n }) => {
                       key={columna.field}
                       className="px-0 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
                     >
-                      <Link href={`/detail/${index}`}>
+                      {/* {console.log(fila.id)} */}
+                      {/* <Link href={`/detail/${index}`}> */}
+                      <Link href={`/detail/${fila.id}`}>
                         <div className="inline-flex items-center px-0">
                           <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />
                         </div>
