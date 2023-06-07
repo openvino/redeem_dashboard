@@ -2,10 +2,6 @@ import { getProfile } from "../controllers/authContoller";
 import tokenVerify from "../helpers/tokenVerify";
 export default async function handler(req, res) {
 
-  const isValidJWT = await tokenVerify(req);
-  if (!isValidJWT) {
-    return res.json("INVALID CREDENTIALS");
-  }
       if(req.method == 'POST') {
         try {
           const {public_key} = req.body

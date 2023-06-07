@@ -6,7 +6,7 @@ import Image from "next/image";
 import { BsBellFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
-const Topbar = () => {
+const Topbar = ({profile}) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef(null);
   const dispatch = useDispatch();
@@ -18,7 +18,6 @@ const Topbar = () => {
   // useEffect(() => {
   //   // console.log("NOTINOTI", notification);
   // }, [notification]);
-
   return (
     <div>
       <div className="grid lg:grid-cols-5 gap-4 p-4 ">
@@ -81,9 +80,10 @@ const Topbar = () => {
           <Link href="/">
             <div className="bg-white hover:bg-gray-200 cursor-pointer p-3 rounded-full inline-block text-[#840C4A] mr-8">
               <Image
-                src={"/assets/costafloresLogo.png"}
-                width={30}
-                height={30}
+              className="rounded-2xl w-full h-full"
+                src={profile.image}
+                width={50}
+                height={50}
                 alt="wineryLogo"
               />
             </div>
