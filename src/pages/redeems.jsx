@@ -3,7 +3,12 @@ import { useSession, signOut, getSession } from "next-auth/react";
 import React from "react";
 import clientAxios from "@/config/clientAxios";
 import { dataFormater } from "../utils/dataFormater.js";
-const redeems = ({ redeems }) => {
+import Sidebar from "@/components/Sidebar.jsx";
+import Topbar from "@/components/Topbar.jsx";
+import { useSelector } from "react-redux";
+const redeems = ({ redeems, profile }) => {
+  const filters = useSelector((state) => state.filter);
+
   const columnas = [
     {
       title: "",
@@ -84,10 +89,30 @@ const redeems = ({ redeems }) => {
     },
   ];
 
-  const data = dataFormater(redeems);
+  const filterData = (data) => {
+    if (filters.filter) {
+      const searchString = filters.filter.toLowerCase();
+
+      return data.filter((obj) =>
+        Object.values(obj).some((value) =>
+          String(value).toLowerCase().includes(searchString)
+        )
+      );
+    } else {
+      return data;
+    }
+  };
+  const data = filterData(dataFormater(redeems));
+  
   return (
     <div className="">
+      <Sidebar />
+      <Topbar profile={profile} />
+
+      <div className="ml-20  min-w-fit top-4 ">
       <Table data={data} columnas={columnas} n={15} />
+      </div>
+     
     </div>
   );
 };
@@ -113,8 +138,14 @@ export async function getServerSideProps(context) {
       Cookie: cookie,
     },
   });
+  const profile = await clientAxios.post("/loginRoute", {
+    public_key: session.address,
+    headers: {
+      Cookie: cookie,
+    },
+  });
 
   return {
-    props: { redeems: response.data },
+    props: { redeems: response.data, profile: profile.data },
   };
 }

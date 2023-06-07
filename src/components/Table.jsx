@@ -93,7 +93,7 @@ const Table = ({ data, columnas, n }) => {
         className={`mx-1 px-2 py-1 rounded ${
           currentPage === 1
             ? "bg-gray-200 text-gray-500"
-            : "bg-gray-200 text-[#840C4A]"
+            : "bg-gray-200 text-[1C4A]"
         }`}
         disabled={currentPage === 1}
       />
@@ -107,7 +107,7 @@ const Table = ({ data, columnas, n }) => {
         className={`mx-1 px-2 py-1 rounded ${
           currentPage === 1
             ? "bg-gray-200 text-gray-500"
-            : "bg-gray-200 text-[#840C4A]"
+            : "bg-gray-200 text-[1C4A]"
         }`}
         disabled={currentPage === 1}
       />
@@ -120,7 +120,7 @@ const Table = ({ data, columnas, n }) => {
           onClick={() => handleSelectPage(i)}
           className={`mx-1 px-2 py-1 rounded ${
             i === currentPage
-              ? "bg-gray-200 text-[#840C4A]"
+              ? "bg-gray-200 text-[1C4A]"
               : "bg-gray-200 text-gray-500"
           }`}
         >
@@ -137,7 +137,7 @@ const Table = ({ data, columnas, n }) => {
         className={`mx-1 px-2 py-1 rounded ${
           currentPage === totalPages
             ? "bg-gray-200 text-gray-500"
-            : "bg-gray-200 text-[#840C4A]"
+            : "bg-gray-200 text-[1C4A]"
         }`}
         disabled={currentPage === totalPages}
       />
@@ -151,7 +151,7 @@ const Table = ({ data, columnas, n }) => {
         className={`mx-1 px-2 py-1 rounded ${
           currentPage === totalPages
             ? "bg-gray-200 text-gray-500"
-            : "bg-gray-200 text-[#840C4A]"
+            : "bg-gray-200 text-[1C4A]"
         }`}
         disabled={currentPage === totalPages}
       />
@@ -160,24 +160,25 @@ const Table = ({ data, columnas, n }) => {
     return buttons;
   };
   return (
-    <div className="overflow-x-auto rounded-lg w-[auto] ">
-      <table className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed overflow-scroll">
+    <div className="overflow-x-scroll rounded-lg  mt-[10rem] w-[2000px]">
+    <table className="  md:w-full divide-y divide-gray-200  border border-gray-100 md:table-fixed overflow-x-scroll" >
         <thead>
           <tr>
             {columnas.map((columna) => (
               <th
                 key={columna.field}
-                className={`px-1 py-1 bg-[#840C4A]  text-[0.25rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
-                  columna.field === "acciones" ? "w-12 sm:w-16" : ""
-                } ${
-                  columna.field === "country_id" ||
-                  columna.field === "zip" ||
-                  columna.field === "email" ||
-                  columna.field === "created_at" ||
-                  columna.field === "year"
-                    ? "hidden md:table-cell"
-                    : ""
-                }`}
+                className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
+                  columna.field === "acciones" ? "w-12 sm:w-16" : "" }
+                // 
+                //   columna.field === "country_id" ||
+                //   columna.field === "zip" ||
+                //   columna.field === "email" ||
+                //   columna.field === "created_at" ||
+                //   columna.field === "year"
+                //     ? "hidden md:table-cell"
+                //     : ""
+                // }`} 
+              
                 onClick={() => handleOrdenarColumna(columna.field)}
               >
                 {columna.title}
@@ -196,7 +197,7 @@ const Table = ({ data, columnas, n }) => {
                   return (
                     <td
                       key={columna.field}
-                      className="px-0 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
+                      className="px-0 py-1 text-[1em] md:text-[0.75rem] text-gray-900 text-center"
                     >
                       {/* {console.log(fila.id)} */}
                       {/* <Link href={`/detail/${index}`}> */}
@@ -213,7 +214,7 @@ const Table = ({ data, columnas, n }) => {
                   return (
                     <td
                       key={columna.field}
-                      className={`px-2 py-1 text-[0.5rem] text-center md:text-[0.75rem] font-medium ${getStatusColor(
+                      className={`px-2 py-1 text-[1em] text-center md:text-[0.75rem] font-medium ${getStatusColor(
                         fila[columna.field]
                       )}`}
                     >
@@ -222,33 +223,33 @@ const Table = ({ data, columnas, n }) => {
                   );
                 }
 
-                if (
-                  columna.field === "country_id" ||
-                  columna.field === "zip" ||
-                  columna.field === "email" ||
-                  columna.field === "created_at" ||
-                  columna.field === "year"
-                ) {
-                  return (
-                    <td
-                      key={columna.field}
-                      className="px-2 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 hidden md:table-cell text-center"
-                      style={{
-                        maxWidth: "2rem",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <div>{fila[columna.field]}</div>
-                    </td>
-                  );
-                }
+                // if (
+                //   columna.field === "country_id" ||
+                //   columna.field === "zip" ||
+                //   columna.field === "email" ||
+                //   columna.field === "created_at" ||
+                //   columna.field === "year"
+                // ) {
+                //   return (
+                //     <td
+                //       key={columna.field}
+                //       className="px-2 py-1 text-[1em] md:text-[0.75rem] text-gray-900 hidden md:table-cell text-center"
+                //       style={{
+                //         maxWidth: "2rem",
+                //         overflow: "hidden",
+                //         textOverflow: "ellipsis",
+                //         whiteSpace: "nowrap",
+                //       }}
+                //     >
+                //       <div>{fila[columna.field]}</div>
+                //     </td>
+                //   );
+                // }
 
                 return (
                   <td
                     key={columna.field}
-                    className="px-2 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
+                    className="px-2 py-1 text-[1em] md:text-[0.75rem] text-gray-900 text-center"
                     style={{
                       maxWidth: "5rem",
                       overflow: "hidden",
@@ -264,7 +265,7 @@ const Table = ({ data, columnas, n }) => {
           ))}
         </tbody>
       </table>
-      <div className="mt-4 flex justify-center relative bottom left-0 w-full transform scale-75 ">
+      <div className="mt-4 flex justify-center  bottom left-0 w-full transform scale-75 ">
         {renderbuttonsPages()}
       </div>
     </div>
