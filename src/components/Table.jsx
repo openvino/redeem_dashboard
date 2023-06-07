@@ -7,7 +7,7 @@ import {
   MdNavigateBefore,
 } from "react-icons/md";
 import { useState } from "react";
-
+import ScrollSection from "./ScrollSection";
 const Table = ({ data, columnas, n }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
@@ -160,81 +160,95 @@ const Table = ({ data, columnas, n }) => {
     return buttons;
   };
   return (
-    <div className="overflow-x-auto rounded-lg w-[auto] ">
-      <table className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed overflow-scroll">
-        <thead>
-          <tr>
-            {columnas.map((columna) => (
-              <th
-                key={columna.field}
-                className={`px-1 py-1 bg-[#840C4A]  text-[0.25rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
-                  columna.field === "acciones" ? "w-12 sm:w-16" : ""
-                } ${
-                  columna.field === "country_id" ||
-                  columna.field === "zip" ||
-                  columna.field === "email" ||
-                  columna.field === "created_at" ||
-                  columna.field === "year"
-                    ? "hidden md:table-cell"
-                    : ""
-                }`}
-                onClick={() => handleOrdenarColumna(columna.field)}
+    <div className="rounded-lg w-full">
+      {/* <ScrollSection> */}
+      <div className="overflow-x-scroll">
+        <table className="w-full divide-y divide-gray-200 border border-gray-100 table-fixed  ">
+          <thead>
+            <tr>
+              {columnas.map((columna) => (
+                <th
+                  key={columna.field}
+                  className={`px-1 py-1 bg-[#840C4A]  text-[1rem] text-white font-medium uppercase tracking-wider text-center min-w-[100px] ${
+                    columna.field === "acciones" ? "w-12 sm:w-16" : ""
+                  } ${
+                    // columna.field === "country_id" ||
+                    // columna.field === "zip" ||
+                    // columna.field === "email" ||
+                    // columna.field === "created_at" ||
+                    columna.field === "year" ? "hidden md:table-cell" : ""
+                  }`}
+                  onClick={() => handleOrdenarColumna(columna.field)}
+                >
+                  {columna.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {orderPagedData().map((fila, index) => (
+              <tr
+                key={index}
+                className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
               >
-                {columna.title}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {orderPagedData().map((fila, index) => (
-            <tr
-              key={index}
-              className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
-            >
-              {columnas.map((columna) => {
-                if (columna.field === "acciones") {
-                  return (
-                    <td
-                      key={columna.field}
-                      className="px-0 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
-                    >
-                      {/* {console.log(fila.id)} */}
-                      {/* <Link href={`/detail/${index}`}> */}
-                      <Link href={`/detail/${fila.id}`}>
-                        <div className="inline-flex items-center px-0">
-                          <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />
-                        </div>
-                      </Link>
-                    </td>
-                  );
-                }
+                {columnas.map((columna) => {
+                  if (columna.field === "acciones") {
+                    return (
+                      <td
+                        key={columna.field}
+                        className="px-0 py-1 text-[1rem] text-gray-900 text-center min-w-[100px]"
+                      >
+                        <Link href={`/detail/${fila.id}`}>
+                          <div className="inline-flex items-center px-0">
+                            <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+                          </div>
+                        </Link>
+                      </td>
+                    );
+                  }
 
-                if (columna.field === "status") {
-                  return (
-                    <td
-                      key={columna.field}
-                      className={`px-2 py-1 text-[0.5rem] text-center md:text-[0.75rem] font-medium ${getStatusColor(
-                        fila[columna.field]
-                      )}`}
-                    >
-                      {fila[columna.field]}
-                    </td>
-                  );
-                }
+                  if (columna.field === "status") {
+                    return (
+                      <td
+                        key={columna.field}
+                        className={`min-w-[100px] px-2 py-1  text-center text-[1rem] font-medium ${getStatusColor(
+                          fila[columna.field]
+                        )}`}
+                      >
+                        {fila[columna.field]}
+                      </td>
+                    );
+                  }
 
-                if (
-                  columna.field === "country_id" ||
-                  columna.field === "zip" ||
-                  columna.field === "email" ||
-                  columna.field === "created_at" ||
-                  columna.field === "year"
-                ) {
+                  if (
+                    // columna.field === "country_id" ||
+                    // columna.field === "zip" ||
+                    // columna.field === "email" ||
+                    // columna.field === "created_at" ||
+                    columna.field === "year"
+                  ) {
+                    return (
+                      <td
+                        key={columna.field}
+                        className="px-2 py-1 text-[1rem]  text-gray-900 hidden md:table-cell text-center min-w-[100px]"
+                        style={{
+                          maxWidth: "2rem",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <div>{fila[columna.field]}</div>
+                      </td>
+                    );
+                  }
+
                   return (
                     <td
                       key={columna.field}
-                      className="px-2 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 hidden md:table-cell text-center"
+                      className="px-2 py-1 text-[1rem] text-gray-900 text-center min-w-[100px]"
                       style={{
-                        maxWidth: "2rem",
+                        maxWidth: "5rem",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -243,27 +257,15 @@ const Table = ({ data, columnas, n }) => {
                       <div>{fila[columna.field]}</div>
                     </td>
                   );
-                }
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                return (
-                  <td
-                    key={columna.field}
-                    className="px-2 py-1 text-[0.5rem] md:text-[0.75rem] text-gray-900 text-center"
-                    style={{
-                      maxWidth: "5rem",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <div>{fila[columna.field]}</div>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* </ScrollSection> */}
+
       <div className="mt-4 flex justify-center relative bottom left-0 w-full transform scale-75 ">
         {renderbuttonsPages()}
       </div>

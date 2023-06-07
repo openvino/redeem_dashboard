@@ -14,10 +14,6 @@ function Detail({ redeems }) {
   console.log(redeems);
   const id = redeems.findIndex((r) => r.id === c_id);
   useEffect(() => {
-    console.log(
-      ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",
-      redeems[id].redeem_status
-    );
     setStatusSelector(redeems[id].redeem_status);
   }, [id]);
 
@@ -243,7 +239,7 @@ function Detail({ redeems }) {
                 setStatusSelector(selectedStatus);
                 setValue("status", selectedStatus);
               }}
-              value={statusSelector} // Set the value here
+              value={statusSelector}
               className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
             >
               <option value="pending">Pending</option>

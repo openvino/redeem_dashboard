@@ -22,8 +22,8 @@ const Topbar = () => {
   return (
     <div>
       <div className="grid lg:grid-cols-5 gap-4 p-4 ">
-        <div className="lg:col-span-3 col-span-1 bg-[#F1EDE2] flex justify-between w-full border p-4 rounded-lg h-[6rem]">
-          <div className="flex flex-col w-full  pb-4">
+        <div className="hidden  lg:col-span-3 col-span-1 bg-[#F1EDE2] lg:flex justify-between w-full border p-4 rounded-lg h-[6rem]">
+          <div className="flex flex-col w-full  pb-4 ">
             <p className="text-2xl font-bold">0.1 ETH</p>
             <p className="text-gray-600">
               Deuda total de OPENVINO redeeem wallet.
