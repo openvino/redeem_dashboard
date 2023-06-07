@@ -6,7 +6,7 @@ import Image from "next/image";
 const Sidebar = () => {
   return (
     <div className="flex">
-      <div className="fixed w-20 h-screen p-4 bg-[#F1EDE2] border-r-[1px] flex flex-col justify-between">
+      <div className="fixed z-40 w-20 h-screen p-4 bg-[#F1EDE2] border-r-[1px] flex flex-col justify-between">
         <div className="flex flex-col items-center">
           <Link href="/">
             <div className="bg-[#840C4A] hover:opacity-40 cursor-pointer text-white p-3 rounded-lg inline-block">
@@ -25,7 +25,7 @@ const Sidebar = () => {
             </div>
           </Link>
 
-          <Link href="/">
+          <Link href="/redeems">
             <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
               <FaWineBottle size={20} />
             </div>
