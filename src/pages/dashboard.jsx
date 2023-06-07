@@ -14,7 +14,7 @@ import {
   closeNotification,
 } from "@/redux/actions/notificationActions.js";
 
-const Dashboard = ({ redeems }) => {
+const Dashboard = ({ redeems, profile }) => {
   const filters = useSelector((state) => state.filter);
   const notifications = useSelector((state) => state.notification);
   const dispatch = useDispatch();
@@ -132,7 +132,7 @@ const Dashboard = ({ redeems }) => {
     <div>
       <Sidebar />
       <div className="fixed left-[6rem] top-4 flex flex-col ">
-        <Topbar />
+        <Topbar profile={profile} />
         {/* <button className="bg-green-900" onClick={handleNoti}>
           noti
         </button> */}
@@ -166,7 +166,14 @@ export async function getServerSideProps(context) {
     },
   });
 
+  const profile = await clientAxios.post("/loginRoute", {
+    public_key: session.address,
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
   return {
-    props: { redeems: response.data },
+    props: { redeems: response.data, profile: profile.data },
   };
 }
