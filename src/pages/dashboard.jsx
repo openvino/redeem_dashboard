@@ -1,20 +1,55 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
-import Sidebar from "@/components/Sidebar";
-import Topbar from "@/components/Topbar";
-import Table from "@/components/Table";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import Table from "../components/Table";
 import { dataFormater } from "../utils/dataFormater.js";
 import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
-import clientAxios from "@/config/clientAxios";
+import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 import {
   showNotification,
   closeNotification,
 } from "@/redux/actions/notificationActions.js";
+// import WebSocketComponent from "../components/WebSocketComponent.jsx";
+// import WebSocketSingleton from "../components/WebSocketSingleton.jsx";
 
 const Dashboard = ({ redeems, profile }) => {
+  useEffect(() => {
+    // Create a new WebSocket instance and specify the server URL
+    const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
+
+    // Connection opened
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
+    });
+
+    // Listen for messages from the server
+    socket.addEventListener("message", (event) => {
+      const message = event.data;
+      console.log("Received message from server:", message);
+      // Handle the incoming message from the server
+      if (message === "Notification updated!") {
+        dispatch(showNotification());
+      } else {
+        console.log("no se hizo");
+      }
+      // Update your state or perform any necessary actions
+    });
+
+    // Connection closed
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
+    });
+
+    // Clean up the WebSocket connection when the component unmounts
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   const filters = useSelector((state) => state.filter);
   const notifications = useSelector((state) => state.notification);
   const dispatch = useDispatch();
@@ -120,22 +155,95 @@ const Dashboard = ({ redeems, profile }) => {
 
   const session = useSession();
   console.log(session);
-  // const handleNoti = () => {
-  //   console.log(notifications);
-  //   if (notifications.notification) {
-  //     dispatch(closeNotification());
-  //   } else {
-  //     dispatch(showNotification());
+  const handleNoti = () => {
+    console.log(notifications);
+    if (notifications.notification) {
+      dispatch(closeNotification());
+    } else {
+      dispatch(showNotification());
+    }
+  };
+
+  // useEffect(() => {
+  //   const webSocketInstance = new WebSocketSingleton();
+  //   webSocketInstance.connect();
+
+  //   return () => {
+  //     webSocketInstance.disconnect();
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   const socket = new WebSocket("ws://localhost:8080");
+
+  //   socket.onmessage = (event) => {
+  //     const message = event.data;
+
+  //     if (
+  //       message === "Notificación del servidor: Se ha actualizado algo" ||
+  //       message === "¡Notificación actualizada!"
+  //     ) {
+  //       console.log("Mensaje del servidor:", message);
+  //       // Redirigir a la ruta "/redeems"
+  //       // router.push("/redeems");
+  //       dispatch(showNotification());
+  //     }
+  //   };
+
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, [router]);
+  // useEffect(() => {
+  //   // const socket = new WebSocket("ws://localhost:8080");
+
+  //   // Evento que se dispara cuando se establece la conexión WebSocket
+  //   socket.onopen = () => {
+  //     console.log("Conexión WebSocket establecida");
+  //   };
+
+  //   // Evento que se dispara cuando se recibe un mensaje del servidor WebSocket
+  //   socket.onmessage = (event) => {
+  //     const message = event.data;
+  //     console.log("Mensaje del servidor:", message);
+
+  //     // Realiza las acciones necesarias en el cliente según el mensaje recibido
+  //   };
+
+  //   // Evento que se dispara cuando se produce un error en la conexión WebSocket
+  //   socket.onerror = (error) => {
+  //     console.error("Error en la conexión WebSocket:", error);
+  //     setWebSocketError(true); // Establece el estado de error a true
+  //   };
+
+  //   // Evento que se dispara cuando se cierra la conexión WebSocket
+  //   socket.onclose = () => {
+  //     console.log("Conexión WebSocket cerrada");
+  //   };
+
+  //   // Cierra la conexión WebSocket cuando se desmonta el componente
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, []);
+
+  // // Agrega webSocketError al array de dependencias
+  // useEffect(() => {
+  //   if (webSocketError) {
+  //     // Realiza las acciones necesarias en el cliente cuando ocurre un error en la conexión WebSocket
+  //     // Por ejemplo, puedes forzar una actualización del componente
   //   }
-  // };
+  // }, [webSocketError]);
+
   return (
     <div>
       <Sidebar />
       <div className="fixed left-[6rem] top-4 flex flex-col ">
         <Topbar profile={profile} />
-        {/* <button className="bg-green-900" onClick={handleNoti}>
+        {/* <WebSocketSingleton /> */}
+        <button className="bg-green-900" onClick={handleNoti}>
           noti
-        </button> */}
+        </button>
         <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} n={5} />
         </div>
