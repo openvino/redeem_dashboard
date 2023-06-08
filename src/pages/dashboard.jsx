@@ -155,95 +155,24 @@ const Dashboard = ({ redeems, profile }) => {
 
   const session = useSession();
   console.log(session);
-  const handleNoti = () => {
-    console.log(notifications);
-    if (notifications.notification) {
-      dispatch(closeNotification());
-    } else {
-      dispatch(showNotification());
-    }
-  };
-
-  // useEffect(() => {
-  //   const webSocketInstance = new WebSocketSingleton();
-  //   webSocketInstance.connect();
-
-  //   return () => {
-  //     webSocketInstance.disconnect();
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   const socket = new WebSocket("ws://localhost:8080");
-
-  //   socket.onmessage = (event) => {
-  //     const message = event.data;
-
-  //     if (
-  //       message === "Notificación del servidor: Se ha actualizado algo" ||
-  //       message === "¡Notificación actualizada!"
-  //     ) {
-  //       console.log("Mensaje del servidor:", message);
-  //       // Redirigir a la ruta "/redeems"
-  //       // router.push("/redeems");
-  //       dispatch(showNotification());
-  //     }
-  //   };
-
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, [router]);
-  // useEffect(() => {
-  //   // const socket = new WebSocket("ws://localhost:8080");
-
-  //   // Evento que se dispara cuando se establece la conexión WebSocket
-  //   socket.onopen = () => {
-  //     console.log("Conexión WebSocket establecida");
-  //   };
-
-  //   // Evento que se dispara cuando se recibe un mensaje del servidor WebSocket
-  //   socket.onmessage = (event) => {
-  //     const message = event.data;
-  //     console.log("Mensaje del servidor:", message);
-
-  //     // Realiza las acciones necesarias en el cliente según el mensaje recibido
-  //   };
-
-  //   // Evento que se dispara cuando se produce un error en la conexión WebSocket
-  //   socket.onerror = (error) => {
-  //     console.error("Error en la conexión WebSocket:", error);
-  //     setWebSocketError(true); // Establece el estado de error a true
-  //   };
-
-  //   // Evento que se dispara cuando se cierra la conexión WebSocket
-  //   socket.onclose = () => {
-  //     console.log("Conexión WebSocket cerrada");
-  //   };
-
-  //   // Cierra la conexión WebSocket cuando se desmonta el componente
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
-
-  // // Agrega webSocketError al array de dependencias
-  // useEffect(() => {
-  //   if (webSocketError) {
-  //     // Realiza las acciones necesarias en el cliente cuando ocurre un error en la conexión WebSocket
-  //     // Por ejemplo, puedes forzar una actualización del componente
+  // const handleNoti = () => {
+  //   console.log(notifications);
+  //   if (notifications.notification) {
+  //     dispatch(closeNotification());
+  //   } else {
+  //     dispatch(showNotification());
   //   }
-  // }, [webSocketError]);
+  // };
 
   return (
     <div className="flex flex-col ">
       <Sidebar />
-      <Topbar  profile={profile} />
+      <Topbar profile={profile} />
 
       <div className="ml-20 top-4">
         {/* <button className="bg-green-900" onClick={handleNoti}>
           noti
-        </button>
+  </button>*/}
         <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} n={5} />
         </div>
