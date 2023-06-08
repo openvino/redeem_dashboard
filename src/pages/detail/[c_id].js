@@ -3,8 +3,9 @@ import { Router, useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
 import { useForm } from "react-hook-form";
-
-function Detail({ redeems }) {
+import Topbar from "@/components/Topbar";
+import Sidebar from "@/components/Sidebar";
+function Detail({ redeems, profile }) {
   const router = useRouter();
   const { c_id } = router.query;
   console.log(c_id);
@@ -35,27 +36,31 @@ function Detail({ redeems }) {
   const redeem = redeems[id];
 
   return (
+    <>
+    <Topbar profile={profile} />
+    <Sidebar />
     <div
       className="
-    overflow-x-auto
-    rounded-lg lg:w-[60%]
-    p-4
-    lg:translate-x-[40%]
+      z-1
+      mt-[8rem]
+      ml-[6rem]
+      overflow-x-scroll
     "
     >
-      <h1 className="text-2xl font-bold mb-4">Detalle del Redeem</h1>
+      <h1 className="text-2xl font-bold text-center mb-4">Detalle del Redeem</h1>
 
-      <form className="space-y-2" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+      <form className="space-y-2 flex justify-center flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
           <div className="flex items-center">
             <label className="w-24 font-bold">Id:</label>
             <input
+            disabled
               type="text"
               id="id"
               name="id"
               defaultValue={redeem.id}
               {...register("id")}
-              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
             />
           </div>
 
@@ -72,7 +77,7 @@ function Detail({ redeems }) {
           </div>
         </div>
 
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
           <div className="flex items-center">
             <label className="w-24 font-bold">Nombre:</label>
             <input
@@ -98,7 +103,7 @@ function Detail({ redeems }) {
           </div>
         </div>
 
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
           <div className="flex items-center">
             <label className="w-24 font-bold">Email:</label>
             <input
@@ -125,7 +130,7 @@ function Detail({ redeems }) {
           </div>
         </div>
 
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
           <div className="flex items-center">
             <label className="w-24 font-bold">País:</label>
             <input
@@ -151,7 +156,7 @@ function Detail({ redeems }) {
           </div>
         </div>
 
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
           <div className="flex items-center">
             <label className="w-24 font-bold">Calle:</label>
             <input
@@ -177,7 +182,7 @@ function Detail({ redeems }) {
           </div>
         </div>
 
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
           <div className="flex items-center">
             <label className="w-24 font-bold">Código postal:</label>
             <input
@@ -203,16 +208,17 @@ function Detail({ redeems }) {
           </div>
         </div>
 
-        <div className="flex lg:flex-row flex-col w-full justify-between">
+        <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
           <div className="flex items-center">
             <label className="w-24 font-bold">Creado:</label>
             <input
+            disabled
               type="text"
               id="created_at"
               name="created_at"
               value={redeem.created_at.substring(0, 10)}
               {...register("created_at")}
-              className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+              className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
             />
           </div>
           {/* <div className="flex">
@@ -267,6 +273,7 @@ function Detail({ redeems }) {
         </div>
       </form>
     </div>
+    </>
   );
 }
 
@@ -292,7 +299,21 @@ export async function getServerSideProps(context) {
     },
   });
 
+  const profile = await clientAxios.post("/loginRoute", {
+    public_key: session.address,
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
+  const countries = await clientAxios.post("/loginRoute", {
+    public_key: session.address,
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
   return {
-    props: { redeems: response.data },
+    props: { redeems: response.data, profile: profile.data },
   };
 }

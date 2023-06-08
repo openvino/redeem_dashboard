@@ -236,12 +236,12 @@ const Dashboard = ({ redeems, profile }) => {
   // }, [webSocketError]);
 
   return (
-    <div>
+    <div className="flex flex-col ">
       <Sidebar />
-      <div className="fixed left-[6rem] top-4 flex flex-col ">
-        <Topbar profile={profile} />
-        {/* <WebSocketSingleton /> */}
-        <button className="bg-green-900" onClick={handleNoti}>
+      <Topbar  profile={profile} />
+
+      <div className="ml-20 top-4">
+        {/* <button className="bg-green-900" onClick={handleNoti}>
           noti
         </button>
         <div className="mx-auto p-4 flex justify-center">
