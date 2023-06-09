@@ -22,9 +22,9 @@ const Topbar = ({ profile }) => {
   // }, [notification]);
   return (
     <>
-      <div className="fixed w-[90%] left-[5rem]">
-        <div className="  flex-col md:flex-row  gap-2 md:p-4  md:flex  ">
-          <div className=" bg-[#F1EDE2] w-full border p-4 hidden md:block md:rounded-lg h-[6rem]">
+      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem]  ">
+        <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
+          <div className=" bg-[#F1EDE2] w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
               <p className="text-2xl font-bold">0.1 ETH</p>
               <p className="text-gray-600">
@@ -35,7 +35,7 @@ const Topbar = ({ profile }) => {
             <span className="text-green-700 text-lg">+18%</span>
           </p> */}
           </div>
-          <div className="bg-[#F1EDE2] flex justify-evenly gap-2 w-full border p-4 md:rounded-lg items-center h-[6rem]">
+          <div className="bg-[#F1EDE2] shadow-xl flex justify-center gap-2 w-1/2 translate-x-[35%] md:translate-x-0  border p-4 rounded-lg items-center h-[6rem] ">
             <div className="relative inline-block">
               <input
                 type="text"
@@ -72,7 +72,7 @@ const Topbar = ({ profile }) => {
                   alt="wineryLogo"
                 />
                 {showMenu && (
-                <div className="absolute w-[112px] cursor-pointer right-[-25px] top-14 bg-white border rounded-lg shadow-lg text-center">
+                <div className="absolute w-[112px] cursor-pointer right-[-25px] top-14 bg-white border rounded-lg shadow-lg text-center ">
                   {/* <p className="m-0 p-2 cursor-pointer" >Perfil</p> */}
                   <p className="m-0 p-2 cursor-pointer" onClick={async() => await signOut({redirect:'/'})}>Cerrar Sesión</p>
                 </div>
