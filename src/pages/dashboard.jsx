@@ -9,6 +9,7 @@ import { dataFormater } from "../utils/dataFormater.js";
 import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
 import clientAxios from "@/config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
+import Head from "next/head.js";
 import {
   showNotification,
   closeNotification,
@@ -129,6 +130,10 @@ const Dashboard = ({ redeems, profile }) => {
   //   }
   // };
   return (
+    <>
+      <Head>
+        <title>OpenVino - Dashboard</title>
+      </Head>
     <div className="flex flex-col ">
       <Sidebar />
       <Topbar  profile={profile} />
@@ -142,6 +147,7 @@ const Dashboard = ({ redeems, profile }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
