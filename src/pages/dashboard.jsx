@@ -10,17 +10,56 @@ import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
 import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
-
 import Head from "next/head.js";
 import {
   showNotification,
   closeNotification,
 } from "@/redux/actions/notificationActions.js";
-import Image from "next/image";
 
 const Dashboard = ({ redeems, profile }) => {
+  const filters = useSelector((state) => state.filter);
+
+  const dispatch = useDispatch();
   const chartRef = useRef(null);
   const polarChartRef = useRef(null);
+
+  const router = useRouter();
+
+  // // Websocket
+  // useEffect(() => {
+  //   // Create a new WebSocket instance and specify the server URL
+  //   const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
+
+  //   // Connection opened
+  //   socket.addEventListener("open", () => {
+  //     console.log("WebSocket connection established");
+  //   });
+
+  //   // Listen for messages from the server
+  //   socket.addEventListener("message", (event) => {
+  //     const message = event.data;
+  //     console.log("Received message from server:", message);
+  //     // Handle the incoming message from the server
+  //     if (message === "Notification updated!") {
+  //       setReload(reload + 1);
+
+  //       router.reload();
+  //     } else {
+  //       console.log("no se hizo");
+  //     }
+  //     // Update your state or perform any necessary actions
+  //   });
+
+  //   // Connection closed
+  //   socket.addEventListener("close", () => {
+  //     console.log("WebSocket connection closed");
+  //   });
+
+  //   // Clean up the WebSocket connection when the component unmounts
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, []);
 
   useEffect(() => {
     const chartLabels = [];
@@ -139,44 +178,6 @@ const Dashboard = ({ redeems, profile }) => {
     };
   }, [redeems]);
 
-  useEffect(() => {
-    // Create a new WebSocket instance and specify the server URL
-    const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
-
-    // Connection opened
-    socket.addEventListener("open", () => {
-      console.log("WebSocket connection established");
-    });
-
-    // Listen for messages from the server
-    socket.addEventListener("message", (event) => {
-      const message = event.data;
-      console.log("Received message from server:", message);
-      // Handle the incoming message from the server
-      if (message === "Notification updated!") {
-        console.log("###########################3");
-        dispatch(showNotification());
-      } else {
-        console.log("no se hizo");
-      }
-      // Update your state or perform any necessary actions
-    });
-
-    // Connection closed
-    socket.addEventListener("close", () => {
-      console.log("WebSocket connection closed");
-    });
-
-    // Clean up the WebSocket connection when the component unmounts
-    return () => {
-      socket.close();
-    };
-  }, []);
-
-  const filters = useSelector((state) => state.filter);
-  const notifications = useSelector((state) => state.notification);
-  const dispatch = useDispatch();
-
   const columnas = [
     {
       title: "",
@@ -272,8 +273,6 @@ const Dashboard = ({ redeems, profile }) => {
 
   const data = filterData(dataFormater(redeems));
 
-  const router = useRouter();
-
   const [{ data: accountData }, disconnect] = useAccount();
 
   const session = useSession();
@@ -305,8 +304,6 @@ const Dashboard = ({ redeems, profile }) => {
               <h2 className="text-center">Estadistica Anuales</h2>
               <canvas ref={polarChartRef} />
             </div>
-
-            {/* Resto del contenido del componente */}
           </div>
         </div>
       </div>

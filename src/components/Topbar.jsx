@@ -7,7 +7,11 @@ import { BsBellFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
+import clientAxios from "@/config/clientAxios";
+
 const Topbar = ({ profile }) => {
+  const router = useRouter();
   const [isFocused, setIsFocused] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const inputRef = useRef(null);
@@ -17,9 +21,47 @@ const Topbar = ({ profile }) => {
     dispatch(setFilter(e.target.value));
   };
 
-  // useEffect(() => {
-  //   // console.log("NOTINOTI", notification);
-  // }, [notification]);
+  // Websocket
+  useEffect(() => {
+    // Create a new WebSocket instance and specify the server URL
+    const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
+
+    // Connection opened
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
+    });
+
+    // Listen for messages from the server
+    socket.addEventListener("message", async (event) => {
+      const message = event.data;
+      console.log("Received message from server:", message);
+      // Handle the incoming message from the server
+      if (message === "Notification updated!") {
+        // const response = await clientAxios.get("/redeemRoute", {
+        //   // headers: {
+        //   //   Cookie: cookie,
+        //   // },
+        // });
+        router.reload();
+        // console.log(response.data);
+        // console.log("HOLA");
+      } else {
+        console.log("no se hizo");
+      }
+      // Update your state or perform any necessary actions
+    });
+
+    // Connection closed
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
+    });
+
+    // Clean up the WebSocket connection when the component unmounts
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem]  ">

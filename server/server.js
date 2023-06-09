@@ -33,7 +33,7 @@ server.on("upgrade", (request, socket, head) => {
 });
 
 // Define a route to handle the POST request
-app.post("socket/newredeems", (req, res) => {
+app.post("/api/sendMessage", (req, res) => {
   try {
     const message = "Notification updated!";
 
