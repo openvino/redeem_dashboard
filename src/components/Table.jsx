@@ -7,7 +7,6 @@ import {
   MdNavigateBefore,
 } from "react-icons/md";
 import { useState } from "react";
-import ScrollSection from "./ScrollSection";
 const Table = ({ data, columnas, n }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);

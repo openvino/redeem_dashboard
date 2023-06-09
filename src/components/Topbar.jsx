@@ -6,8 +6,10 @@ import Image from "next/image";
 import { BsBellFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
+import {  signOut } from "next-auth/react";
 const Topbar = ({ profile }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [showMenu, setShowMenu] = useState(false)
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
@@ -60,17 +62,23 @@ const Topbar = ({ profile }) => {
                 <FaSearch />
               </span>
             </div>
-            <Link href="/">
-              <div className="bg-white hover:bg-gray-200 cursor-pointer p-3 rounded-full inline-block text-[#840C4A] mr-8">
+            
+              <div onClick={() => setShowMenu(!showMenu)} className=" relative">
                 <Image
-                  className="rounded-2xl w-full h-full"
+                  className="rounded-full w-full h-full"
                   src={profile.image}
                   width={50}
                   height={50}
                   alt="wineryLogo"
                 />
+                {showMenu && (
+                <div className="absolute w-[112px] cursor-pointer right-[-25px] top-14 bg-white border rounded-lg shadow-lg text-center">
+                  {/* <p className="m-0 p-2 cursor-pointer" >Perfil</p> */}
+                  <p className="m-0 p-2 cursor-pointer" onClick={async() => await signOut({redirect:'/'})}>Cerrar Sesión</p>
+                </div>
+              )}
               </div>
-            </Link>
+             
           </div>
         </div>
       </div>

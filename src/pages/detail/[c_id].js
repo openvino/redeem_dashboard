@@ -78,12 +78,13 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Monto:</label>
               <input
+              disabled
                 type="text"
                 id="amount"
                 name="amount"
                 value={redeem.amount}
                 {...register("amount")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                className="flex-1 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
               />
             </div>
           </div>
