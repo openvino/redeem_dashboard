@@ -7,7 +7,6 @@ import {
   MdNavigateBefore,
 } from "react-icons/md";
 import { useState } from "react";
-import ScrollSection from "./ScrollSection";
 const Table = ({ data, columnas, n }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
@@ -92,7 +91,7 @@ const Table = ({ data, columnas, n }) => {
         onClick={() => handleSelectPage(1)}
         className={`mx-1 px-2 py-1 rounded ${
           currentPage === 1
-            ? "bg-gray-200 text-gray-500"
+            ? "bg-gray-200 text-gray-500}"
             : "bg-gray-200 text-[1C4A]"
         }`}
         disabled={currentPage === 1}
@@ -161,7 +160,7 @@ const Table = ({ data, columnas, n }) => {
   };
   return (
     <div>
-      <div className="overflow-x-scroll ml-24 md:ml-0 w-screen md:w-full rounded-lg  mt-[10rem] md:overflow-x-hidden ">
+      <div className="overflow-x-scroll ml-10 md:ml-0 w-screen md:w-full rounded-lg  mt-[10rem] md:overflow-x-hidden ">
         <table className=" w-full  md:table-fixed divide-y divide-gray-200  border border-gray-100 overflow-x-scroll ">
           <thead>
             <tr>
@@ -268,7 +267,7 @@ const Table = ({ data, columnas, n }) => {
         </table>
       </div>
 
-      <div className="mt-4 flex justify-center  bottom left-0 w-full transform scale-50 md:scale-75  ">
+      <div className="mt-4 flex relative md:justify-center bottom translate-x-[30%] md:translate-x-0 w-full transform scale-50 md:scale-75  ">
         {renderbuttonsPages()}
       </div>
     </div>
