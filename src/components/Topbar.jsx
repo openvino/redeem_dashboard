@@ -20,7 +20,7 @@ const Topbar = ({ profile }) => {
   // }, [notification]);
   return (
     <>
-    <div className="fixed w-[90%] left-[5rem]">
+      <div className="fixed w-[90%] left-[5rem]">
         <div className="  flex-col md:flex-row  gap-2 md:p-4  md:flex  ">
           <div className=" bg-[#F1EDE2] w-full border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">

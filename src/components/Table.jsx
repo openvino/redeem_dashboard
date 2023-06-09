@@ -7,7 +7,7 @@ import {
   MdNavigateBefore,
 } from "react-icons/md";
 import { useState } from "react";
-
+import ScrollSection from "./ScrollSection";
 const Table = ({ data, columnas, n }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
@@ -90,10 +90,11 @@ const Table = ({ data, columnas, n }) => {
         key="primera"
         size={40}
         onClick={() => handleSelectPage(1)}
-        className={`mx-1 px-2 py-1 rounded ${currentPage === 1
+        className={`mx-1 px-2 py-1 rounded ${
+          currentPage === 1
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[1C4A]"
-          }`}
+        }`}
         disabled={currentPage === 1}
       />
     );
@@ -103,10 +104,11 @@ const Table = ({ data, columnas, n }) => {
         size={40}
         key="anterior"
         onClick={handlePrevPage}
-        className={`mx-1 px-2 py-1 rounded ${currentPage === 1
+        className={`mx-1 px-2 py-1 rounded ${
+          currentPage === 1
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[1C4A]"
-          }`}
+        }`}
         disabled={currentPage === 1}
       />
     );
@@ -116,10 +118,11 @@ const Table = ({ data, columnas, n }) => {
         <button
           key={i}
           onClick={() => handleSelectPage(i)}
-          className={`mx-1 px-2 py-1 rounded ${i === currentPage
+          className={`mx-1 px-2 py-1 rounded ${
+            i === currentPage
               ? "bg-gray-200 text-[1C4A]"
               : "bg-gray-200 text-gray-500"
-            }`}
+          }`}
         >
           {i}
         </button>
@@ -131,10 +134,11 @@ const Table = ({ data, columnas, n }) => {
         size={40}
         key="siguiente"
         onClick={handleNextPage}
-        className={`mx-1 px-2 py-1 rounded ${currentPage === totalPages
+        className={`mx-1 px-2 py-1 rounded ${
+          currentPage === totalPages
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[1C4A]"
-          }`}
+        }`}
         disabled={currentPage === totalPages}
       />
     );
@@ -144,10 +148,11 @@ const Table = ({ data, columnas, n }) => {
         size={40}
         key="ultima"
         onClick={() => handleSelectPage(totalPages)}
-        className={`mx-1 px-2 py-1 rounded ${currentPage === totalPages
+        className={`mx-1 px-2 py-1 rounded ${
+          currentPage === totalPages
             ? "bg-gray-200 text-gray-500"
             : "bg-gray-200 text-[1C4A]"
-          }`}
+        }`}
         disabled={currentPage === totalPages}
       />
     );
@@ -157,13 +162,15 @@ const Table = ({ data, columnas, n }) => {
   return (
     <div>
       <div className="overflow-x-scroll ml-24 md:ml-0 w-screen md:w-full rounded-lg  mt-[10rem] md:overflow-x-hidden ">
-        <table className=" w-full  md:table-fixed divide-y divide-gray-200  border border-gray-100 overflow-x-scroll " >
+        <table className=" w-full  md:table-fixed divide-y divide-gray-200  border border-gray-100 overflow-x-scroll ">
           <thead>
             <tr>
               {columnas.map((columna) => (
                 <th
                   key={columna.field}
-                  className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${columna.field === "acciones" ? "w-12 sm:w-16" : ""}
+                  className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
+                    columna.field === "acciones" ? "w-12 sm:w-16" : ""
+                  }
                 // 
                 //   columna.field === "country_id" ||
                 //   columna.field === "zip" ||
@@ -173,7 +180,6 @@ const Table = ({ data, columnas, n }) => {
                 //     ? "hidden md:table-cell"
                 //     : ""
                 // }`}
-
                   onClick={() => handleOrdenarColumna(columna.field)}
                 >
                   {columna.title}
@@ -260,7 +266,6 @@ const Table = ({ data, columnas, n }) => {
             ))}
           </tbody>
         </table>
-
       </div>
 
       <div className="mt-4 flex justify-center  bottom left-0 w-full transform scale-50 md:scale-75  ">

@@ -1,21 +1,56 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
-import Sidebar from "@/components/Sidebar";
-import Topbar from "@/components/Topbar";
-import Table from "@/components/Table";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import Table from "../components/Table";
 import { dataFormater } from "../utils/dataFormater.js";
 import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
-import clientAxios from "@/config/clientAxios";
+import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 import Head from "next/head.js";
 import {
   showNotification,
   closeNotification,
 } from "@/redux/actions/notificationActions.js";
+// import WebSocketComponent from "../components/WebSocketComponent.jsx";
+// import WebSocketSingleton from "../components/WebSocketSingleton.jsx";
 
 const Dashboard = ({ redeems, profile }) => {
+  useEffect(() => {
+    // Create a new WebSocket instance and specify the server URL
+    const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
+
+    // Connection opened
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
+    });
+
+    // Listen for messages from the server
+    socket.addEventListener("message", (event) => {
+      const message = event.data;
+      console.log("Received message from server:", message);
+      // Handle the incoming message from the server
+      if (message === "Notification updated!") {
+        dispatch(showNotification());
+      } else {
+        console.log("no se hizo");
+      }
+      // Update your state or perform any necessary actions
+    });
+
+    // Connection closed
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
+    });
+
+    // Clean up the WebSocket connection when the component unmounts
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   const filters = useSelector((state) => state.filter);
   const notifications = useSelector((state) => state.notification);
   const dispatch = useDispatch();
@@ -129,6 +164,7 @@ const Dashboard = ({ redeems, profile }) => {
   //     dispatch(showNotification());
   //   }
   // };
+
   return (
     <>
       <Head>
@@ -136,12 +172,12 @@ const Dashboard = ({ redeems, profile }) => {
       </Head>
     <div className="flex flex-col ">
       <Sidebar />
-      <Topbar  profile={profile} />
+      <Topbar profile={profile} />
 
       <div className="ml-20 top-4">
         {/* <button className="bg-green-900" onClick={handleNoti}>
           noti
-        </button> */}
+  </button>*/}
         <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} n={5} />
         </div>
