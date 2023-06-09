@@ -133,7 +133,7 @@ const Dashboard = ({ redeems, profile }) => {
       <Sidebar />
       <Topbar  profile={profile} />
 
-      <div className="ml-20  min-w-fit top-4">
+      <div className="ml-20 top-4">
         {/* <button className="bg-green-900" onClick={handleNoti}>
           noti
         </button> */}
