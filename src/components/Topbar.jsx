@@ -20,7 +20,7 @@ const Topbar = ({ profile }) => {
   // }, [notification]);
   return (
     <>
-      <div className="fixed w-[90%] left-[5rem]">
+      <div className="fixed w-[90%] left-[5rem] lg:w-[100vw]">
         <div className="  flex-col md:flex-row  gap-2 md:p-4  md:flex  ">
           <div className=" bg-[#F1EDE2] w-full border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
@@ -60,6 +60,17 @@ const Topbar = ({ profile }) => {
                 <FaSearch />
               </span>
             </div>
+            <Link href="/">
+              <div
+                className={
+                  notification.notification
+                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4"
+                    : "hidden"
+                }
+              >
+                <BsBellFill className="hover:bg-gray-200 " size={15} />
+              </div>
+            </Link>
             <Link href="/">
               <div className="bg-white hover:bg-gray-200 cursor-pointer p-3 rounded-full inline-block text-[#840C4A] mr-8">
                 <Image

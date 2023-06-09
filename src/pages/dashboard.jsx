@@ -13,8 +13,7 @@ import {
   showNotification,
   closeNotification,
 } from "@/redux/actions/notificationActions.js";
-// import WebSocketComponent from "../components/WebSocketComponent.jsx";
-// import WebSocketSingleton from "../components/WebSocketSingleton.jsx";
+import Image from "next/image";
 
 const Dashboard = ({ redeems, profile }) => {
   useEffect(() => {
@@ -32,6 +31,7 @@ const Dashboard = ({ redeems, profile }) => {
       console.log("Received message from server:", message);
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
+        console.log("###########################3");
         dispatch(showNotification());
       } else {
         console.log("no se hizo");
@@ -155,24 +155,19 @@ const Dashboard = ({ redeems, profile }) => {
 
   const session = useSession();
   console.log(session);
-  // const handleNoti = () => {
-  //   console.log(notifications);
-  //   if (notifications.notification) {
-  //     dispatch(closeNotification());
-  //   } else {
-  //     dispatch(showNotification());
-  //   }
-  // };
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
+      {/* <Image
+        src="/assets/background-login.png"
+        width={100}
+        height={100}
+        className="h-[100vh] w-[100vh] cover z-0"
+      /> */}
       <Sidebar />
       <Topbar profile={profile} />
 
       <div className="ml-20 top-4">
-        {/* <button className="bg-green-900" onClick={handleNoti}>
-          noti
-  </button>*/}
         <div className="mx-auto p-4 flex justify-center">
           <Table data={data} columnas={columnas} n={5} />
         </div>
