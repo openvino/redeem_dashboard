@@ -1,5 +1,7 @@
 import clientAxios from "@/config/clientAxios";
-import { AUTH_WINARY, LOGIN_METAMASK } from "../types";
+import { AUTH_WINARY, GET_REDEEMS, LOGIN_METAMASK } from "../types";
+
+
  function loginApp(public_key) {
 
     
@@ -17,4 +19,19 @@ import { AUTH_WINARY, LOGIN_METAMASK } from "../types";
     }
 }
 
-export {loginApp}
+function getRedeems() {
+    return async (dispatch) => {
+        try {
+          const response = await clientAxios.get("/redeemRoute",{
+            withCredentials:true
+          });
+          const redeems = response.data;
+            console.log(redeems)
+          dispatch({ type: GET_REDEEMS, payload: redeems });
+        } catch (error) {
+          console.log(error)
+        }
+      };
+}
+
+export {loginApp, getRedeems}

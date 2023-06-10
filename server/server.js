@@ -36,7 +36,7 @@ server.on("upgrade", (request, socket, head) => {
 app.post("/api/sendMessage", (req, res) => {
   try {
     const message = "Notification updated!";
-
+      
     // Send the message to all connected WebSocket clients
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {

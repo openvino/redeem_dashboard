@@ -9,6 +9,7 @@ import { setFilter } from "@/redux/actions/filterActions.js";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import clientAxios from "@/config/clientAxios";
+import { getRedeems } from "@/redux/actions/winaryActions";
 
 const Topbar = ({ profile }) => {
   const router = useRouter();
@@ -37,12 +38,7 @@ const Topbar = ({ profile }) => {
       console.log("Received message from server:", message);
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
-        // const response = await clientAxios.get("/redeemRoute", {
-        //   // headers: {
-        //   //   Cookie: cookie,
-        //   // },
-        // });
-        router.reload();
+          dispatch(getRedeems())  
         // console.log(response.data);
         // console.log("HOLA");
       } else {

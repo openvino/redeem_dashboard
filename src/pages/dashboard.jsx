@@ -6,60 +6,27 @@ import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Table from "../components/Table";
 import { dataFormater } from "../utils/dataFormater.js";
-import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
 import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
 import Head from "next/head.js";
-import {
-  showNotification,
-  closeNotification,
-} from "@/redux/actions/notificationActions.js";
 
-const Dashboard = ({ redeems, profile }) => {
+import { getRedeems } from "@/redux/actions/winaryActions";
+
+const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
+
+  useEffect(() => {
+    dispatch(getRedeems())
+  }, [])
+
 
   const dispatch = useDispatch();
   const chartRef = useRef(null);
   const polarChartRef = useRef(null);
 
-  const router = useRouter();
+  const redeems = useSelector(state => state.winaryAdress.redeems)
 
-  // // Websocket
-  // useEffect(() => {
-  //   // Create a new WebSocket instance and specify the server URL
-  //   const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
-
-  //   // Connection opened
-  //   socket.addEventListener("open", () => {
-  //     console.log("WebSocket connection established");
-  //   });
-
-  //   // Listen for messages from the server
-  //   socket.addEventListener("message", (event) => {
-  //     const message = event.data;
-  //     console.log("Received message from server:", message);
-  //     // Handle the incoming message from the server
-  //     if (message === "Notification updated!") {
-  //       setReload(reload + 1);
-
-  //       router.reload();
-  //     } else {
-  //       console.log("no se hizo");
-  //     }
-  //     // Update your state or perform any necessary actions
-  //   });
-
-  //   // Connection closed
-  //   socket.addEventListener("close", () => {
-  //     console.log("WebSocket connection closed");
-  //   });
-
-  //   // Clean up the WebSocket connection when the component unmounts
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
 
   useEffect(() => {
     const chartLabels = [];
@@ -341,6 +308,6 @@ export async function getServerSideProps(context) {
   });
 
   return {
-    props: { redeems: response.data, profile: profile.data },
+    props: { redeemsState: response.data, profile: profile.data },
   };
 }

@@ -1,19 +1,16 @@
-import { LOGIN_METAMASK } from "../types"
+import { GET_REDEEMS } from "../types"
 
 const initialState = {
-    winaryAdress:null,
-    winaryName: null
+    redeems:[]
 }
-
 
 export default function winaryReducer(state = initialState, action) {
 
     switch(action.type) {
-        case LOGIN_METAMASK:
+        case GET_REDEEMS:
             return {
                 ...state,
-                winaryAdress:action.payload,
-                winaryName: action.name
+                redeems: action.payload
             }
 
             default:

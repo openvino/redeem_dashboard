@@ -1,4 +1,4 @@
-export const LOGIN_METAMASK = "LOGIN_METAMASK";
+export const GET_REDEEMS = "GET_REDEEMS";
 export const AUTH_WINARY = "AUTH_WINARY";
 
 export const SHOW_ALERT = "SHOW_ALERT";
