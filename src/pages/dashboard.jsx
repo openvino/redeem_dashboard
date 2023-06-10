@@ -255,7 +255,7 @@ const Dashboard = ({ redeemsState, profile }) => {
         <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
           <Table data={data} columnas={columnas} n={5} />
 
-          <div className="flex mt-10 flex-col ml-10 lg:flex-row  pr-4 ">
+          <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
               <h2 className="text-center mt-20">Estadisticas mensuales</h2>
