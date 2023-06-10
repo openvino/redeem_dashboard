@@ -26,7 +26,7 @@ function getRedeems() {
             withCredentials:true
           });
           const redeems = response.data;
-            console.log(redeems)
+           // console.log(redeems)
           dispatch({ type: GET_REDEEMS, payload: redeems });
         } catch (error) {
           console.log(error)

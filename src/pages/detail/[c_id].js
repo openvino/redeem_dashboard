@@ -33,18 +33,20 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
+   
+    const toastId = toast("Updating Redeem...", {
+      position: "top-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      isLoading:true
+    });
     try {
-      const toastId = toast("Updating Redeem...", {
-        position: "top-right",
-        autoClose: false,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        isLoading:true
-      });
+      
 
       const response = await clientAxios.put("/redeemRoute", {
         data,
@@ -57,10 +59,17 @@ function Detail({ redeems, profile, countries, provinces }) {
         autoClose: 5000,
       });
     } catch (error) {
-      console.log(error.message);
-      alert("Error: No se pudo actualizar el Redeem");
+      toast.update(toastId, {
+        isLoading:false,
+        type: toast.TYPE.ERROR,
+        render: "Error ",
+        autoClose: 5000,
+      });
     }
+    
   };
+
+  
   const redeem = redeems[id];
 
   return (
@@ -186,7 +195,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 defaultValue={redeem.country_id}
                 onChange={(e) => {
-                  console.log(e.target.value);
+                  //console.log(e.target.value);
                   setCountrieSelector(e.target.value);
                   setValue("country_id", e.target.value);
                 }}

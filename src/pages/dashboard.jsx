@@ -241,7 +241,7 @@ const Dashboard = ({ redeemsState, profile }) => {
   const [{ data: accountData }, disconnect] = useAccount();
 
   const session = useSession();
-  console.log(session);
+  //console.log(session);
 
   return (
     <>

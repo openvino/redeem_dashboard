@@ -15,9 +15,9 @@ export const getRedeems = async (token) => {
 
 //TODO AGREGAR CAMPO STATUS
 export const updateRedeemStatus = async (req) => {
-  const { id, amount, customer_id, status, country_id, province_id, email,name } = req;
+  const { id, amount, customer_id, status, country_id, province_id, email,name, telegram_id } = req;
 
-  console.log(req);
+ // console.log(req);
 
   // Actualizar la tabla redeem_infos
   let redeemQuery = `UPDATE redeem_infos SET `;
@@ -27,11 +27,11 @@ export const updateRedeemStatus = async (req) => {
   if (status) redeemUpdateFields.push(`redeem_status = '${status}'`);
   if (country_id) redeemUpdateFields.push(`country_id = '${country_id}'`);
   if (province_id) redeemUpdateFields.push(`province_id = '${province_id}'`);
+  if (telegram_id) redeemUpdateFields.push(`telegram_id = '${telegram_id}'`);
+
 
   redeemQuery += redeemUpdateFields.join(', ');
   redeemQuery += ` WHERE id = '${id}'`;
-
-  const redeemUpdate = await conn.query(redeemQuery);
 
   
 
@@ -45,5 +45,4 @@ export const updateRedeemStatus = async (req) => {
 
   const userUpdate = await conn.query(userQuery);
 
-  console.log(userUpdate);
 };

@@ -1,0 +1,18 @@
+{
+    "actualizado":"actualizado",
+    "calle" : "calle",
+    "numero": "numero",
+    "buscar" : "buscar",
+    "nombre" : "nombre",
+    "monto" : "monto",
+    "name" : "nombre",
+    "pais": "país",
+    "provincia" : "provincia",
+    "año" : "año",
+    "cp" : "zip",
+    "creado": "creado",
+    "estado": "estado",
+    "estadisitcasMensuales": "Estadisticas mensuales",
+    "estadisitcasAnuales": "Estadisticas anuales",
+    "deuda" : "Deuda total de OPENVINO redeeem wallet"
+}

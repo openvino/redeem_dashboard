@@ -1,0 +1,18 @@
+{
+    "actualizado": "updated",
+    "calle": "street",
+    "numero": "number",
+    "buscar": "search",
+    "nombre": "name",
+    "monto": "amount",
+    "name": "name",
+    "pais": "country",
+    "provincia": "province",
+    "año": "year",
+    "cp": "zip",
+    "creado": "created",
+    "estado": "state",
+    "estadisitcasMensuales": "monthly statistics",
+    "estadisitcasAnuales": "annual statistics",
+    "deuda": "total debt of OPENVINO redeem wallet"
+    }
