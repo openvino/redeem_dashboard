@@ -3,13 +3,29 @@ import { FaSearch } from "react-icons/fa";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BsBellFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import clientAxios from "@/config/clientAxios";
 import { getRedeems } from "@/redux/actions/winaryActions";
+import redeems from "@/pages/redeems";
+import {
+  closeNotification,
+  showNotification,
+} from "@/redux/actions/notificationActions";
+import { FaBell } from "react-icons/fa";
+
+const BellIconWithNotification = ({ notificationCount }) => (
+  <div className="relative">
+    <FaBell className="text-2xl" />
+    {notificationCount > 0 && (
+      <span className="bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center absolute -top-1 -right-1">
+        {notificationCount}
+      </span>
+    )}
+  </div>
+);
 
 const Topbar = ({ profile }) => {
   const router = useRouter();
@@ -18,11 +34,12 @@ const Topbar = ({ profile }) => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
+  const allRedeems = useSelector((state) => state.winaryAdress.redeems);
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
 
-  // Websocket
+  // Socket
   useEffect(() => {
     // Create a new WebSocket instance and specify the server URL
     const socket = new WebSocket("ws://localhost:8080/api/sendMessage");
@@ -38,13 +55,10 @@ const Topbar = ({ profile }) => {
       console.log("Received message from server:", message);
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
-          dispatch(getRedeems())  
-        // console.log(response.data);
-        // console.log("HOLA");
+        dispatch(getRedeems());
       } else {
         console.log("no se hizo");
       }
-      // Update your state or perform any necessary actions
     });
 
     // Connection closed
@@ -58,11 +72,28 @@ const Topbar = ({ profile }) => {
     };
   }, []);
 
+  //Notifications
+  const [allNotifications, setAllnotifications] = useState([]);
+
+  useEffect(() => {
+    const unwatchedNotifications = allRedeems.filter(
+      (e) => e.watched === false
+    );
+    setAllnotifications(unwatchedNotifications);
+
+    if (unwatchedNotifications.length) {
+      dispatch(showNotification());
+    } else {
+      dispatch(closeNotification());
+    }
+  }, [allRedeems]);
+
+  let nCount;
   return (
     <>
-      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem]  ">
+      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
-          <div className=" bg-[#F1EDE2] w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
+          <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
               <p className="text-2xl font-bold">0.1 ETH</p>
               <p className="text-gray-600">
@@ -73,11 +104,12 @@ const Topbar = ({ profile }) => {
             <span className="text-green-700 text-lg">+18%</span>
           </p> */}
           </div>
-          <div className="bg-[#F1EDE2] shadow-xl flex justify-center gap-2 w-1/2 translate-x-[35%] md:translate-x-0  border p-4 rounded-lg items-center h-[6rem] ">
-            <div className="relative inline-block">
+
+          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center gap-2 w-1/2 translate-x-[10%] md:translate-x-[0] sm:translate-x-[40%]  border p-4 rounded-lg items-center h-[4rem] min-w-[20rem] md:h-[6rem] ">
+            <div className="relative inline-block ">
               <input
                 type="text"
-                className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78] `}
+                className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
                 placeholder="Buscar..."
                 onFocus={() => {
                   setIsFocused(true);
@@ -104,17 +136,22 @@ const Topbar = ({ profile }) => {
               <div
                 className={
                   notification.notification
-                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4"
+                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
                     : "hidden"
                 }
               >
-                <BsBellFill className="hover:bg-gray-200 " size={15} />
+                <BellIconWithNotification
+                  notificationCount={allNotifications.length}
+                />
               </div>
             </Link>
 
-            <div onClick={() => setShowMenu(!showMenu)} className=" relative">
+            <div
+              onClick={() => setShowMenu(!showMenu)}
+              className="relative shadow-xl rounded-full hover:transform hover:scale-110 transition-all duration-500"
+            >
               <Image
-                className="rounded-full w-full h-full"
+                className="rounded-full w-full h-full "
                 src={profile.image}
                 width={50}
                 height={50}

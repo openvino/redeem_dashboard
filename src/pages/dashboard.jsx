@@ -17,16 +17,14 @@ const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
 
   useEffect(() => {
-    dispatch(getRedeems())
-  }, [])
-
+    dispatch(getRedeems());
+  }, []);
 
   const dispatch = useDispatch();
   const chartRef = useRef(null);
   const polarChartRef = useRef(null);
 
-  const redeems = useSelector(state => state.winaryAdress.redeems)
-
+  const redeems = useSelector((state) => state.winaryAdress.redeems);
 
   useEffect(() => {
     const chartLabels = [];
@@ -250,28 +248,30 @@ const Dashboard = ({ redeemsState, profile }) => {
       <Head>
         <title>OpenVino - Dashboard</title>
       </Head>
-      <div className="flex flex-col ">
+      <div className="flex ">
         <Sidebar />
         <Topbar profile={profile} />
 
-        <div className=" ml-12 md:ml-24 top-4">
+        <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
           <Table data={data} columnas={columnas} n={5} />
-          {/* <button className="bg-green-900" onClick={handleNoti}>
-          noti
-  </button>*/}
-          <div className="flex flex-col lg:flex-row gap-2 min-h-screen">
+
+          <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
-            <div className="w-full ml-[6rem] mx-auto lg:w-1/2 ">
-              <h2 className="text-center">Estadisticas mensuales</h2>
+            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
+              <h2 className="text-center mt-20">Estadisticas mensuales</h2>
               <canvas ref={chartRef} />
             </div>
 
             {/* Gráfico de área polar */}
-            <div className="w-full ml-[6rem] mx-auto lg:w-1/2 ">
-              <h2 className="text-center">Estadistica Anuales</h2>
-              <canvas ref={polarChartRef} />
+            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mt-10 lg:mt-0 flex items-center flex-col">
+              <h2 className="text-center mt-20">Estadistica Anuales</h2>
+              <canvas
+                ref={polarChartRef}
+                className="transform scale-75 translate-y-[-45px]"
+              />
             </div>
           </div>
+          <div className="h-[200px]"></div>
         </div>
       </div>
     </>

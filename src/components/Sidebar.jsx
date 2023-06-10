@@ -6,7 +6,7 @@ import Image from "next/image";
 const Sidebar = () => {
   return (
     <div className="flex">
-      <div className="fixed z-41 w-20 h-full p-4 bg-[#F1EDE2] border-r-[1px] flex flex-col justify-between">
+      <div className="fixed z-41 w-20 h-full p-4 bg-[#F1EDE2] border-r-[1px] flex flex-col justify-between shadow-xl ">
         <div className="flex flex-col items-center">
           <Link href="/">
             <div className="bg-[#840C4A] hover:opacity-40 cursor-pointer text-white p-3 rounded-lg inline-block">
