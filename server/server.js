@@ -2,7 +2,7 @@ const express = require("express");
 const WebSocket = require("ws");
 
 const app = express();
-const port = 8081;
+const port = 8080;
 
 // Create a new WebSocket server
 const wss = new WebSocket.Server({ noServer: true });
