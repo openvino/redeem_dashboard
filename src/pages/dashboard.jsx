@@ -17,16 +17,14 @@ const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
 
   useEffect(() => {
-    dispatch(getRedeems())
-  }, [])
-
+    dispatch(getRedeems());
+  }, []);
 
   const dispatch = useDispatch();
   const chartRef = useRef(null);
   const polarChartRef = useRef(null);
 
-  const redeems = useSelector(state => state.winaryAdress.redeems)
-
+  const redeems = useSelector((state) => state.winaryAdress.redeems);
 
   useEffect(() => {
     const chartLabels = [];

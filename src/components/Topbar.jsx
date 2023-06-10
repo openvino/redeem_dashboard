@@ -10,6 +10,11 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import clientAxios from "@/config/clientAxios";
 import { getRedeems } from "@/redux/actions/winaryActions";
+import redeems from "@/pages/redeems";
+import {
+  closeNotification,
+  showNotification,
+} from "@/redux/actions/notificationActions";
 
 const Topbar = ({ profile }) => {
   const router = useRouter();
@@ -18,11 +23,12 @@ const Topbar = ({ profile }) => {
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
+  const allRedeems = useSelector((state) => state.winaryAdress.redeems);
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
 
-  // Websocket
+  // Socket
   useEffect(() => {
     // Create a new WebSocket instance and specify the server URL
     const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
@@ -38,13 +44,10 @@ const Topbar = ({ profile }) => {
       console.log("Received message from server:", message);
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
-          dispatch(getRedeems())  
-        // console.log(response.data);
-        // console.log("HOLA");
+        dispatch(getRedeems());
       } else {
         console.log("no se hizo");
       }
-      // Update your state or perform any necessary actions
     });
 
     // Connection closed
@@ -57,6 +60,38 @@ const Topbar = ({ profile }) => {
       socket.close();
     };
   }, []);
+  const [allnotifications, setAllnotifications] = useState([]);
+  // // Notifications
+  // const getNotifications = () => {
+  //   const unwatchedNotifications = allRedeems.filter(
+  //     (e) => e.watched === false
+  //   );
+
+  //   return unwatchedNotifications;
+  // };
+
+  // const [allnotifications, setAllnotifications] = useState([]);
+
+  // useEffect(() => {
+  //   setAllnotifications(getNotifications());
+  // }, [allRedeems]);
+
+  // useEffect(() => {
+  //   if (allnotifications.langth > 0) dispatch(showNotification());
+  //   else dispatch(closeNotification());
+  // }, [allnotifications]);
+  useEffect(() => {
+    const unwatchedNotifications = allRedeems.filter(
+      (e) => e.watched === false
+    );
+    setAllnotifications(unwatchedNotifications);
+
+    if (unwatchedNotifications.length) {
+      dispatch(showNotification());
+    } else {
+      dispatch(closeNotification());
+    }
+  }, [allRedeems]);
 
   return (
     <>
