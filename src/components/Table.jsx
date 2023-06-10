@@ -7,7 +7,9 @@ import {
   MdNavigateBefore,
 } from "react-icons/md";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 const Table = ({ data, columnas, n }) => {
+  const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
   const [ascOrder, setAscOrder] = useState(true);
@@ -158,6 +160,7 @@ const Table = ({ data, columnas, n }) => {
 
     return buttons;
   };
+
   return (
     <div>
       <div className="overflow-x-scroll ml-10 md:ml-0 w-screen md:w-full rounded-lg  mt-[10rem] md:overflow-x-hidden ">
@@ -267,7 +270,13 @@ const Table = ({ data, columnas, n }) => {
         </table>
       </div>
 
-      <div className="mt-4 flex relative md:justify-center bottom translate-x-[10%] md:translate-x-0 w-full transform scale-75  ">
+      <div
+        className={
+          !showModal
+            ? "mt-4 flex relative md:justify-center bottom translate-x-[10%] md:translate-x-0 w-full transform scale-75"
+            : "hidden"
+        }
+      >
         {renderbuttonsPages()}
       </div>
     </div>

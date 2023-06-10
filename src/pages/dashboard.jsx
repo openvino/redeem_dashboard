@@ -12,6 +12,11 @@ import Chart from "chart.js/auto";
 import Head from "next/head.js";
 
 import { getRedeems } from "@/redux/actions/winaryActions";
+import Modal from "@/components/Modal";
+import {
+  showNotificationModal,
+  collapseNotificationModal,
+} from "@/redux/actions/notificationActions";
 
 const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
@@ -274,6 +279,7 @@ const Dashboard = ({ redeemsState, profile }) => {
           <div className="h-[200px]"></div>
         </div>
       </div>
+      <div className="absolute top-[20%] left-[50%] fixed"></div>
     </>
   );
 };

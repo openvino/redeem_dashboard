@@ -15,7 +15,11 @@ import {
   showNotification,
 } from "@/redux/actions/notificationActions";
 import { FaBell } from "react-icons/fa";
-
+import Modal from "./Modal";
+import {
+  showNotificationModal,
+  collapseNotificationModal,
+} from "@/redux/actions/notificationActions";
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
     <FaBell className="text-2xl" />
@@ -35,6 +39,7 @@ const Topbar = ({ profile }) => {
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
+
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
@@ -88,7 +93,16 @@ const Topbar = ({ profile }) => {
     }
   }, [allRedeems]);
 
-  let nCount;
+  const showModal = useSelector((state) => state.notification.showModal);
+
+  const handleModal = () => {
+    if (showModal) {
+      dispatch(collapseNotificationModal());
+    } else {
+      dispatch(showNotificationModal());
+    }
+  };
+
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
@@ -132,19 +146,19 @@ const Topbar = ({ profile }) => {
                 <FaSearch />
               </span>
             </div>
-            <Link href="/">
-              <div
-                className={
-                  notification.notification
-                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
-                    : "hidden"
-                }
-              >
-                <BellIconWithNotification
-                  notificationCount={allNotifications.length}
-                />
-              </div>
-            </Link>
+
+            <div
+              className={
+                notification.notification
+                  ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
+                  : "hidden"
+              }
+              onClick={handleModal}
+            >
+              <BellIconWithNotification
+                notificationCount={allNotifications.length}
+              />
+            </div>
 
             <div
               onClick={() => setShowMenu(!showMenu)}
@@ -172,6 +186,7 @@ const Topbar = ({ profile }) => {
           </div>
         </div>
       </div>
+      <Modal data={allNotifications} />
     </>
   );
 };
