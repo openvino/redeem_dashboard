@@ -3,7 +3,6 @@ import { FaSearch } from "react-icons/fa";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { BsBellFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
 import { signOut } from "next-auth/react";
@@ -15,6 +14,18 @@ import {
   closeNotification,
   showNotification,
 } from "@/redux/actions/notificationActions";
+import { FaBell } from "react-icons/fa";
+
+const BellIconWithNotification = ({ notificationCount }) => (
+  <div className="relative">
+    <FaBell className="text-2xl" />
+    {notificationCount > 0 && (
+      <span className="bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center absolute -top-1 -right-1">
+        {notificationCount}
+      </span>
+    )}
+  </div>
+);
 
 const Topbar = ({ profile }) => {
   const router = useRouter();
@@ -60,26 +71,10 @@ const Topbar = ({ profile }) => {
       socket.close();
     };
   }, []);
-  const [allnotifications, setAllnotifications] = useState([]);
-  // // Notifications
-  // const getNotifications = () => {
-  //   const unwatchedNotifications = allRedeems.filter(
-  //     (e) => e.watched === false
-  //   );
 
-  //   return unwatchedNotifications;
-  // };
+  //Notifications
+  const [allNotifications, setAllnotifications] = useState([]);
 
-  // const [allnotifications, setAllnotifications] = useState([]);
-
-  // useEffect(() => {
-  //   setAllnotifications(getNotifications());
-  // }, [allRedeems]);
-
-  // useEffect(() => {
-  //   if (allnotifications.langth > 0) dispatch(showNotification());
-  //   else dispatch(closeNotification());
-  // }, [allnotifications]);
   useEffect(() => {
     const unwatchedNotifications = allRedeems.filter(
       (e) => e.watched === false
@@ -93,6 +88,7 @@ const Topbar = ({ profile }) => {
     }
   }, [allRedeems]);
 
+  let nCount;
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem]  ">
@@ -143,7 +139,9 @@ const Topbar = ({ profile }) => {
                     : "hidden"
                 }
               >
-                <BsBellFill className="hover:bg-gray-200 " size={15} />
+                <BellIconWithNotification
+                  notificationCount={allNotifications.length}
+                />
               </div>
             </Link>
 
