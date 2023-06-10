@@ -2,52 +2,83 @@ import { useSession, signOut, getSession } from "next-auth/react";
 import { Router, useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
-import { useForm } from "react-hook-form";
 import Topbar from "@/components/Topbar";
 import Sidebar from "@/components/Sidebar";
+import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function Detail({ redeems, profile, countries, provinces }) {
   const router = useRouter();
   const { c_id } = router.query;
-  const [statusSelector, setStatusSelector] = useState("");
   const { register, handleSubmit, setValue } = useForm();
-  const [countrieSelector, setCountrieSelector] = useState("")
-  const [provinceSelector, setProvinceSelector] = useState("")
+  const [countrieSelector, setCountrieSelector] = useState("");
+  const [provinceSelector, setProvinceSelector] = useState("");
 
   const id = redeems.findIndex((r) => r.id === c_id);
 
-
-  useEffect(() => {
-
-    setStatusSelector(redeems[id].redeem_status);
-
-  }, [id]);
-
   useEffect(() => {
     if (redeems.length > 0) {
+      setValue("id", redeems[id]?.id, { shouldDirty: false });
+      setValue("customer_id", redeems[id]?.customer_id, { shouldDirty: false });
+      setValue("amount", redeems[id]?.amount, { shouldDirty: false });
+      setValue("status", redeems[id]?.redeem_status, { shouldDirty: false });
+      setValue("country_id", redeems[id]?.country_id, { shouldDirty: false });
+      setValue("province_id", redeems[id]?.province_id, { shouldDirty: false });
       setCountrieSelector(redeems[id].country_id);
       setProvinceSelector(redeems[id].province_id);
+
+      // Establece los valores de los demás campos deshabilitados aquí
     }
   }, [redeems]);
 
-
   const onSubmit = async (data) => {
-    // const redeemId = data.id;
-    // const status = data.status;
-    // try {
-    //   const response = await clientAxios.put("/redeemRoute", {
-    //     redeemId,
-    //     status,
-    //   });
-    //   window.alert("Cambios guardados");
-    // } catch (error) {
-    //   console.log(error.message);
-    //   alert("Error: No se pudo actualizar el Redeem");
-    // }
+    try {
+      const toastId = toast("Updating Redeem...", {
+        position: "top-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        isLoading:true
+      });
+
+      const response = await clientAxios.put("/redeemRoute", {
+        data,
+      });
+
+      toast.update(toastId, {
+        isLoading:false,
+        type: toast.TYPE.SUCCESS,
+        render: "Redeem updated",
+        autoClose: 5000,
+      });
+    } catch (error) {
+      console.log(error.message);
+      alert("Error: No se pudo actualizar el Redeem");
+    }
   };
   const redeem = redeems[id];
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      {/* Same as */}
+      <ToastContainer />
       <Topbar profile={profile} />
       <Sidebar />
       <div
@@ -58,9 +89,14 @@ function Detail({ redeems, profile, countries, provinces }) {
       overflow-x-scroll
     "
       >
-        <h1 className="text-2xl font-bold text-center mb-4">Detalle del Redeem</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">
+          Detalle del Redeem
+        </h1>
 
-        <form className="space-y-2 flex justify-center flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="space-y-2 flex justify-center flex-col"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
@@ -69,7 +105,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="id"
                 name="id"
-                defaultValue={redeem.id}
+                value={redeem.id}
                 {...register("id")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
               />
@@ -78,7 +114,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Monto:</label>
               <input
-              disabled
+                disabled
                 type="text"
                 id="amount"
                 name="amount"
@@ -96,7 +132,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="name"
                 name="name"
-                value={redeem.name}
+                defaultValue={redeem.name}
                 {...register("name")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -109,7 +145,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="customer_id"
                 name="customer_id"
-                value={redeem.customer_id}
+                defaultValue={redeem.customer_id}
                 {...register("customer_id")}
                 className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
               />
@@ -123,7 +159,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="email"
                 name="email"
-                value={redeem.email}
+                defaultValue={redeem.email}
                 {...register("email")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -135,7 +171,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="telegram_id"
                 name="telegram_id"
-                value={redeem.telegram_id}
+                defaultValue={redeem.telegram_id}
                 {...register("telegram_id")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -148,13 +184,14 @@ function Detail({ redeems, profile, countries, provinces }) {
 
               <select
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
-                value={countrieSelector}
+                defaultValue={redeem.country_id}
                 onChange={(e) => {
-                  setCountrieSelector(e.target.value)
+                  console.log(e.target.value);
+                  setCountrieSelector(e.target.value);
+                  setValue("country_id", e.target.value);
                 }}
               >
                 {countries.map((country) => (
-
                   <option key={country.country_id} value={country.country_id}>
                     {country.place_description}
                   </option>
@@ -165,13 +202,19 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Provincia:</label>
               <select
+                name="province_id"
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 value={provinceSelector}
-                onChange={(e) => { console.log(e.target.value); setProvinceSelector(e.target.value) }}
+                onChange={(e) => {
+                  setValue("province_id", e.target.value);
+                  setProvinceSelector(e.target.value);
+                }}
               >
                 {provinces
-                  .filter((province) => province.province_id.startsWith(countrieSelector + "-"))
-                  .map((province,id) => (
+                  .filter((province) =>
+                    province.province_id.startsWith(countrieSelector + "-")
+                  )
+                  .map((province, id) => (
                     <option key={id} value={province.province_id}>
                       {province.place_description}
                     </option>
@@ -187,7 +230,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="street"
                 name="street"
-                value={redeem.street}
+                defaultValue={redeem.street}
                 {...register("street")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -199,7 +242,7 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="number"
                 name="number"
-                value={redeem.number}
+                defaultValue={redeem.number}
                 {...register("number")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -213,19 +256,19 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="zip"
                 name="zip"
-                value={redeem.zip}
+                defaultValue={redeem.zip}
                 {...register("zip")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Año:</label>
+              <label className="w-24 font-bold">Token:</label>
               <input
                 type="text"
                 id="year"
                 name="year"
-                value={redeem.year}
+                defaultValue={redeem.year}
                 {...register("year")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -240,23 +283,10 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="created_at"
                 name="created_at"
-                value={redeem.created_at.substring(0, 10)}
-                {...register("created_at")}
+                defaultValue={redeem.created_at.substring(0, 10)}
                 className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
               />
             </div>
-            {/* <div className="flex">
-            <label className="w-26 font-bold">Actualizado:</label>
-            <input
-              type="text"
-              id="updated_at"
-              name="updated_at"
-              value={redeem.updated_at.substring(0, 10)}
-              {...register("updated_at")}
-              className="flex-1 px-2  py-1 border border-gray-300 rounded-md"
-            />
-          </div> */}
-            {/* </div> */}
             <div className="flex items-center">
               <label className="w-24 font-bold" htmlFor="status">
                 Estado:
@@ -264,13 +294,9 @@ function Detail({ redeems, profile, countries, provinces }) {
               <select
                 id="status"
                 name="status"
-                onChange={(e) => {
-                  const selectedStatus = e.target.value;
-                  setStatusSelector(selectedStatus);
-                  setValue("status", selectedStatus);
-                }}
-                value={statusSelector} // Set the value here
+                defaultValue={redeem.redeem_status} // Set the value here
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                {...register("status")}
               >
                 <option value="pending">Pending</option>
                 <option value="completed">Completed</option>
@@ -335,18 +361,20 @@ export async function getServerSideProps(context) {
     headers: {
       Cookie: cookie,
     },
-
-
   });
   const provinces = await clientAxios.get("/provinceRoute", {
     public_key: session.address,
     headers: {
       Cookie: cookie,
-    }
-  })
-
+    },
+  });
 
   return {
-    props: { redeems: response.data, profile: profile.data, countries: countries.data, provinces: provinces.data },
+    props: {
+      redeems: response.data,
+      profile: profile.data,
+      countries: countries.data,
+      provinces: provinces.data,
+    },
   };
 }

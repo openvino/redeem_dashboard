@@ -28,15 +28,13 @@ export default async function handler(req, res) {
   if (req.method === "PUT") {
     // const { redeemId, status } = req.body;
     // console.log(redeemId, status);
-    try {
-      const { redeemId, status } = req.body;
 
-      const updateRedeem = await updateRedeemStatus(redeemId, status);
-
-      return res.status(200).json(updateRedeem);
-    } catch (error) {
-      console.log(error);
+       try {
+       const updateRedeem = await updateRedeemStatus(req.body.data);
+       return res.status(200).json(updateRedeem);
+     } catch (error) {
+       console.log(error);
       return res.status(500).json({ message: error.message });
-    }
+     }
   }
 }
