@@ -245,18 +245,8 @@ const Dashboard = ({ redeemsState, profile }) => {
 
   const [{ data: accountData }, disconnect] = useAccount();
 
-  const show = useSelector((state) => state.notification.showModal);
   const session = useSession();
   console.log(session);
-  // const handleModal = () => {
-  //   if (show) {
-  //     // Si show es true, despacha una acción para ocultar el modal de notificación
-  //     dispatch(collapseNotificationModal());
-  //   } else {
-  //     // Si show es false, despacha una acción para mostrar el modal de notificación
-  //     dispatch(showNotificationModal());
-  //   }
-  // };
 
   return (
     <>
@@ -289,13 +279,7 @@ const Dashboard = ({ redeemsState, profile }) => {
           <div className="h-[200px]"></div>
         </div>
       </div>
-      <div className="absolute top-[20%] left-[50%] fixed">
-        {/* <button onClick={handleModal} className="bg-green">
-          toggle modal
-        </button>
-        */}
-      </div>
-      {/* <Modal /> */}
+      <div className="absolute top-[20%] left-[50%] fixed"></div>
     </>
   );
 };
