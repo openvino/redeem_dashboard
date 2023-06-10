@@ -267,7 +267,7 @@ const Table = ({ data, columnas, n }) => {
         </table>
       </div>
 
-      <div className="mt-4 flex relative md:justify-center bottom translate-x-[30%] md:translate-x-0 w-full transform scale-50 md:scale-75  ">
+      <div className="mt-4 flex relative md:justify-center bottom translate-x-[10%] md:translate-x-0 w-full transform scale-75  ">
         {renderbuttonsPages()}
       </div>
     </div>
