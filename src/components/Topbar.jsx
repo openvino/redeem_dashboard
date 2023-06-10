@@ -25,7 +25,7 @@ const Topbar = ({ profile }) => {
   // Websocket
   useEffect(() => {
     // Create a new WebSocket instance and specify the server URL
-    const socket = new WebSocket("ws://localhost:8081/api/sendMessage");
+    const socket = new WebSocket("ws://localhost:8080/api/sendMessage");
 
     // Connection opened
     socket.addEventListener("open", () => {
