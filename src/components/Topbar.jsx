@@ -15,6 +15,7 @@ import {
   showNotification,
 } from "@/redux/actions/notificationActions";
 import { FaBell } from "react-icons/fa";
+import Modal from "./Modal";
 
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
@@ -88,7 +89,6 @@ const Topbar = ({ profile }) => {
     }
   }, [allRedeems]);
 
-  let nCount;
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
@@ -172,6 +172,7 @@ const Topbar = ({ profile }) => {
           </div>
         </div>
       </div>
+      <Modal isVisible={false} />
     </>
   );
 };
