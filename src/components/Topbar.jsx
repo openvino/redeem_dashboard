@@ -1,15 +1,13 @@
 import React, { useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useState, useRef } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
-import clientAxios from "@/config/clientAxios";
 import { getRedeems } from "@/redux/actions/winaryActions";
-import redeems from "@/pages/redeems";
+import { useTranslation } from "react-i18next";
 import {
   closeNotification,
   showNotification,
@@ -33,12 +31,26 @@ const BellIconWithNotification = ({ notificationCount }) => (
 
 const Topbar = ({ profile }) => {
   const router = useRouter();
+
+  const [selectLanguage, setSelectLanguage] = useState(false)
+
   const [isFocused, setIsFocused] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
+
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    setToggle(!toggle);
+    const language = toggle ? "es" : "en";
+    i18n.changeLanguage(language);
+    setSelectLanguage(!selectLanguage)
+  };
+
+  const [toggle, setToggle] = useState(false);
 
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
@@ -111,7 +123,7 @@ const Topbar = ({ profile }) => {
             <div className="flex flex-col w-full  pb-4">
               <p className="text-2xl font-bold">0.1 ETH</p>
               <p className="text-gray-600">
-                Deuda total de OPENVINO redeeem wallet.
+               {t('deuda')}
               </p>
             </div>
             {/* <p className="bg-green-200 flex justify-center items-center rounded-lg">
@@ -124,7 +136,7 @@ const Topbar = ({ profile }) => {
               <input
                 type="text"
                 className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
-                placeholder="Buscar..."
+                placeholder={t('buscar')}
                 onFocus={() => {
                   setIsFocused(true);
                 }}
@@ -180,6 +192,8 @@ const Topbar = ({ profile }) => {
                   >
                     Cerrar Sesión
                   </p>
+            <button onClick={toggleLanguage}>{t('idioma')} {selectLanguage? 'Español' : 'English'} </button>
+
                 </div>
               )}
             </div>

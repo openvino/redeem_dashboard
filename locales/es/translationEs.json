@@ -8,11 +8,15 @@
     "name" : "nombre",
     "pais": "país",
     "provincia" : "provincia",
-    "año" : "año",
+    "año" : "token",
     "cp" : "zip",
     "creado": "creado",
     "estado": "estado",
-    "estadisitcasMensuales": "Estadisticas mensuales",
-    "estadisitcasAnuales": "Estadisticas anuales",
-    "deuda" : "Deuda total de OPENVINO redeeem wallet"
+    "estadisiticasMensuales": "Estadisticas mensuales",
+    "estadisiticasAnuales": "Estadisticas anuales",
+    "deuda" : "Deuda total de OPENVINO redeeem wallet",
+    "idioma" :"Idioma",
+    "detalle" : "Detalle del redeem",
+    "guardar" : "Guardar",
+    "volver" : "Volver"
 }

@@ -1,7 +1,6 @@
 import { useSession, signOut, getSession } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/router";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Table from "../components/Table";
@@ -12,15 +11,11 @@ import Chart from "chart.js/auto";
 import Head from "next/head.js";
 
 import { getRedeems } from "@/redux/actions/winaryActions";
-import Modal from "@/components/Modal";
-import {
-  showNotificationModal,
-  collapseNotificationModal,
-} from "@/redux/actions/notificationActions";
+import { useTranslation } from "react-i18next";
 
 const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
-
+  const {t} = useTranslation()
   useEffect(() => {
     dispatch(getRedeems());
   }, []);
@@ -162,19 +157,19 @@ const Dashboard = ({ redeemsState, profile }) => {
     //   field: "customer_id",
     // },
     {
-      title: "Nombre",
+      title: t('nombre'),
       field: "name",
     },
     {
-      title: "Monto",
+      title: t('monto'),
       field: "amount",
     },
     {
-      title: "País",
+      title: t('pais'),
       field: "country_id",
     },
     {
-      title: "Provincia",
+      title: t('provincia'),
       field: "province_id",
     },
 
@@ -210,19 +205,19 @@ const Dashboard = ({ redeemsState, profile }) => {
     //   field: "winerie_id",
     // },
     {
-      title: "Año",
+      title: t('año'),
       field: "year",
     },
     {
-      title: "CP",
+      title: t('cp'),
       field: "zip",
     },
     {
-      title: "Creado",
+      title: t('creado'),
       field: "created_at",
     },
     {
-      title: "Estado",
+      title: t('estado'),
       field: "status",
     },
   ];
@@ -263,13 +258,13 @@ const Dashboard = ({ redeemsState, profile }) => {
           <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
-              <h2 className="text-center mt-20">Estadisticas mensuales</h2>
+              <h2 className="text-center mt-20">{t('estadisiticasMensuales')}</h2>
               <canvas ref={chartRef} />
             </div>
 
             {/* Gráfico de área polar */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mt-10 lg:mt-0 flex items-center flex-col">
-              <h2 className="text-center mt-20">Estadistica Anuales</h2>
+              <h2 className="text-center mt-20">{t('estadisiticasAnuales')}</h2>
               <canvas
                 ref={polarChartRef}
                 className="transform scale-75 translate-y-[-45px]"

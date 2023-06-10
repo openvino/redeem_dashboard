@@ -173,15 +173,7 @@ const Table = ({ data, columnas, n }) => {
                   className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
                     columna.field === "acciones" ? "w-12 sm:w-16" : ""
                   }
-                // 
-                //   columna.field === "country_id" ||
-                //   columna.field === "zip" ||
-                //   columna.field === "email" ||
-                //   columna.field === "created_at" ||
-                //   columna.field === "year"
-                //     ? "hidden md:table-cell"
-                //     : ""
-                // }`}
+                `}
                   onClick={() => handleOrdenarColumna(columna.field)}
                 >
                   {columna.title}
@@ -225,29 +217,6 @@ const Table = ({ data, columnas, n }) => {
                       </td>
                     );
                   }
-
-                  // if (
-                  //   columna.field === "country_id" ||
-                  //   columna.field === "zip" ||
-                  //   columna.field === "email" ||
-                  //   columna.field === "created_at" ||
-                  //   columna.field === "year"
-                  // ) {
-                  //   return (
-                  //     <td
-                  //       key={columna.field}
-                  //       className="px-2 py-1 text-[1em] md:text-[0.75rem] text-gray-900 hidden md:table-cell text-center"
-                  //       style={{
-                  //         maxWidth: "2rem",
-                  //         overflow: "hidden",
-                  //         textOverflow: "ellipsis",
-                  //         whiteSpace: "nowrap",
-                  //       }}
-                  //     >
-                  //       <div>{fila[columna.field]}</div>
-                  //     </td>
-                  //   );
-                  // }
 
                   return (
                     <td

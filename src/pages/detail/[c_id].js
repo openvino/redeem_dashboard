@@ -7,8 +7,10 @@ import Sidebar from "@/components/Sidebar";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useTranslation } from "react-i18next";
 function Detail({ redeems, profile, countries, provinces }) {
+  const { t } = useTranslation();
+
   const router = useRouter();
   const { c_id } = router.query;
   const { register, handleSubmit, setValue } = useForm();
@@ -99,7 +101,7 @@ function Detail({ redeems, profile, countries, provinces }) {
     "
       >
         <h1 className="text-2xl font-bold text-center mb-4">
-          Detalle del Redeem
+          {t('detalle')}
         </h1>
 
         <form
@@ -121,7 +123,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Monto:</label>
+              <label className="w-24 font-bold">{t('monto')}:</label>
               <input
                 disabled
                 type="text"
@@ -136,7 +138,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">Nombre:</label>
+              <label className="w-24 font-bold">{t('nombre')}:</label>
               <input
                 type="text"
                 id="name"
@@ -189,7 +191,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">País:</label>
+              <label className="w-24 font-bold">{t('pais')}:</label>
 
               <select
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
@@ -209,7 +211,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Provincia:</label>
+              <label className="w-24 font-bold">{t('provincia')}:</label>
               <select
                 name="province_id"
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
@@ -234,7 +236,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">Calle:</label>
+              <label className="w-24 font-bold">{t('calle')}:</label>
               <input
                 type="text"
                 id="street"
@@ -246,7 +248,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Número:</label>
+              <label className="w-24 font-bold">{t('numero')}:</label>
               <input
                 type="text"
                 id="number"
@@ -260,7 +262,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">Código postal:</label>
+              <label className="w-24 font-bold">{t('cp')}:</label>
               <input
                 type="text"
                 id="zip"
@@ -286,7 +288,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">Creado:</label>
+              <label className="w-24 font-bold">{t('creado')}:</label>
               <input
                 disabled
                 type="text"
@@ -298,7 +300,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
             <div className="flex items-center">
               <label className="w-24 font-bold" htmlFor="status">
-                Estado:
+              {t('estado')}
               </label>
               <select
                 id="status"
@@ -321,13 +323,13 @@ function Detail({ redeems, profile, countries, provinces }) {
               }}
               className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
             >
-              Volver
+             {t('volver')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
             >
-              Guardar
+              {t('guardar')}
             </button>
           </div>
         </form>

@@ -6,7 +6,9 @@ import { dataFormater } from "../utils/dataFormater.js";
 import Sidebar from "@/components/Sidebar.jsx";
 import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 const redeems = ({ redeems, profile }) => {
+  const {t} = useTranslation()
   const filters = useSelector((state) => state.filter);
 
   const columnas = [
@@ -23,24 +25,24 @@ const redeems = ({ redeems, profile }) => {
       field: "customer_id",
     },
     {
-      title: "Nombre",
+      title: t("nombre"),
       field: "name",
     },
     {
-      title: "Monto",
+      title: t("monto"),
       field: "amount",
     },
     {
-      title: "País",
+      title: t("pais"),
       field: "country_id",
     },
     {
-      title: "Provincia",
+      title: t('provincia'),
       field: "province_id",
     },
 
     {
-      title: "Actualizado",
+      title: t('actualizado'),
       field: "updated_at",
     },
     // {
@@ -53,11 +55,13 @@ const redeems = ({ redeems, profile }) => {
     },
 
     {
-      title: "Calle",
+      title: t('calle'),
+
       field: "street",
     },
     {
-      title: "Número",
+      title: t('numero'),
+
       field: "number",
     },
 
@@ -72,19 +76,23 @@ const redeems = ({ redeems, profile }) => {
     // },
 
     {
-      title: "CP",
+      title: t('cp'),
+
       field: "zip",
     },
     {
-      title: "Año",
+      title: t('año'),
+
       field: "year",
     },
     {
-      title: "Creado",
+      title: t('creado'),
+
       field: "created_at",
     },
     {
-      title: "Estado",
+      title: t('estado'),
+
       field: "status",
     },
   ];
@@ -103,16 +111,15 @@ const redeems = ({ redeems, profile }) => {
     }
   };
   const data = filterData(dataFormater(redeems));
-  
+
   return (
     <div className="">
       <Sidebar />
       <Topbar profile={profile} />
 
       <div className="ml-20  min-w-fit top-4 ">
-      <Table data={data} columnas={columnas} n={15} />
+        <Table data={data} columnas={columnas} n={15} />
       </div>
-     
     </div>
   );
 };
