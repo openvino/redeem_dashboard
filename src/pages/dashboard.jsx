@@ -252,20 +252,23 @@ const Dashboard = ({ redeemsState, profile }) => {
         <Sidebar />
         <Topbar profile={profile} />
 
-        <div className=" ml-8 md:ml-16 top-4 border rounded-lg shadow-xl">
+        <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
           <Table data={data} columnas={columnas} n={5} />
 
-          <div className="flex mt-10 flex-col ml-4 lg:flex-row  pr-4">
+          <div className="flex mt-10 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
-            <div className="w-[100vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mb-10">
-              <h2 className="text-center">Estadisticas mensuales</h2>
+            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
+              <h2 className="text-center mt-20">Estadisticas mensuales</h2>
               <canvas ref={chartRef} />
             </div>
 
             {/* Gráfico de área polar */}
-            <div className="w-[100vw] ml-[2rem] mx-auto lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg ">
-              <h2 className="text-center">Estadistica Anuales</h2>
-              <canvas ref={polarChartRef} />
+            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mt-10 lg:mt-0 flex items-center flex-col">
+              <h2 className="text-center mt-20">Estadistica Anuales</h2>
+              <canvas
+                ref={polarChartRef}
+                className="transform scale-75 translate-y-[-45px]"
+              />
             </div>
           </div>
           <div className="h-[200px]"></div>
