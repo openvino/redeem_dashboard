@@ -248,28 +248,27 @@ const Dashboard = ({ redeemsState, profile }) => {
       <Head>
         <title>OpenVino - Dashboard</title>
       </Head>
-      <div className="flex flex-col ">
+      <div className="flex ">
         <Sidebar />
         <Topbar profile={profile} />
 
-        <div className=" ml-12 md:ml-24 top-4">
+        <div className=" ml-8 md:ml-16 top-4 border rounded-lg shadow-xl">
           <Table data={data} columnas={columnas} n={5} />
-          {/* <button className="bg-green-900" onClick={handleNoti}>
-          noti
-  </button>*/}
-          <div className="flex flex-col lg:flex-row gap-2 min-h-screen">
+
+          <div className="flex mt-10 flex-col ml-4 lg:flex-row  pr-4">
             {/* Gráfico de barras */}
-            <div className="w-full ml-[6rem] mx-auto lg:w-1/2 ">
+            <div className="w-[100vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mb-10">
               <h2 className="text-center">Estadisticas mensuales</h2>
               <canvas ref={chartRef} />
             </div>
 
             {/* Gráfico de área polar */}
-            <div className="w-full ml-[6rem] mx-auto lg:w-1/2 ">
+            <div className="w-[100vw] ml-[2rem] mx-auto lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg ">
               <h2 className="text-center">Estadistica Anuales</h2>
               <canvas ref={polarChartRef} />
             </div>
           </div>
+          <div className="h-[200px]"></div>
         </div>
       </div>
     </>

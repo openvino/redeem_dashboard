@@ -91,9 +91,9 @@ const Topbar = ({ profile }) => {
   let nCount;
   return (
     <>
-      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem]  ">
+      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
-          <div className=" bg-[#F1EDE2] w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
+          <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
               <p className="text-2xl font-bold">0.1 ETH</p>
               <p className="text-gray-600">
@@ -104,11 +104,12 @@ const Topbar = ({ profile }) => {
             <span className="text-green-700 text-lg">+18%</span>
           </p> */}
           </div>
-          <div className="bg-[#F1EDE2] shadow-xl flex justify-center gap-2 w-1/2 translate-x-[35%] md:translate-x-0  border p-4 rounded-lg items-center h-[6rem] ">
-            <div className="relative inline-block">
+
+          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center gap-2 w-1/2 translate-x-[10%] md:translate-x-[0] sm:translate-x-[40%]  border p-4 rounded-lg items-center h-[4rem] min-w-[20rem] md:h-[6rem] ">
+            <div className="relative inline-block ">
               <input
                 type="text"
-                className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78] `}
+                className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
                 placeholder="Buscar..."
                 onFocus={() => {
                   setIsFocused(true);
@@ -135,7 +136,7 @@ const Topbar = ({ profile }) => {
               <div
                 className={
                   notification.notification
-                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4"
+                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
                     : "hidden"
                 }
               >
@@ -145,9 +146,12 @@ const Topbar = ({ profile }) => {
               </div>
             </Link>
 
-            <div onClick={() => setShowMenu(!showMenu)} className=" relative">
+            <div
+              onClick={() => setShowMenu(!showMenu)}
+              className="relative shadow-xl rounded-full hover:transform hover:scale-110 transition-all duration-500"
+            >
               <Image
-                className="rounded-full w-full h-full"
+                className="rounded-full w-full h-full "
                 src={profile.image}
                 width={50}
                 height={50}
