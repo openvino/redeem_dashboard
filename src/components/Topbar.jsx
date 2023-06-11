@@ -39,7 +39,27 @@ const Topbar = ({ profile }) => {
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
+  const [open, setOpen] = useState(0);
+  const showModal = useSelector((state) => state.notification.showModal);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showModal && !event.target.closest(".modal-content")) {
+        if (open > 0) {
+          dispatch(collapseNotificationModal());
+          setOpen(0);
+        } else {
+          setOpen(open + 1);
+        }
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [showModal, dispatch, open]);
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
@@ -93,7 +113,7 @@ const Topbar = ({ profile }) => {
     }
   }, [allRedeems]);
 
-  const showModal = useSelector((state) => state.notification.showModal);
+  // const showModal = useSelector((state) => state.notification.showModal);
 
   const handleModal = () => {
     if (showModal) {

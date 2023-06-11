@@ -1,25 +1,26 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
 import { useForm } from "react-hook-form";
 import Topbar from "@/components/Topbar";
 import Sidebar from "@/components/Sidebar";
+import { useDispatch } from "react-redux";
+import { getRedeems } from "@/redux/actions/winaryActions";
+
 function Detail({ redeems, profile, countries, provinces }) {
   const router = useRouter();
   const { c_id } = router.query;
   const [statusSelector, setStatusSelector] = useState("");
   const { register, handleSubmit, setValue } = useForm();
-  const [countrieSelector, setCountrieSelector] = useState("")
-  const [provinceSelector, setProvinceSelector] = useState("")
-
+  const [countrieSelector, setCountrieSelector] = useState("");
+  const [provinceSelector, setProvinceSelector] = useState("");
   const id = redeems.findIndex((r) => r.id === c_id);
-
+  const dispatch = useDispatch();
 
   useEffect(() => {
-
     setStatusSelector(redeems[id].redeem_status);
-
+    dispatch(getRedeems());
   }, [id]);
 
   useEffect(() => {
@@ -28,7 +29,6 @@ function Detail({ redeems, profile, countries, provinces }) {
       setProvinceSelector(redeems[id].province_id);
     }
   }, [redeems]);
-
 
   const onSubmit = async (data) => {
     // const redeemId = data.id;
@@ -58,9 +58,14 @@ function Detail({ redeems, profile, countries, provinces }) {
       overflow-x-scroll
     "
       >
-        <h1 className="text-2xl font-bold text-center mb-4">Detalle del Redeem</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">
+          Detalle del Redeem
+        </h1>
 
-        <form className="space-y-2 flex justify-center flex-col" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="space-y-2 flex justify-center flex-col"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
@@ -78,7 +83,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Monto:</label>
               <input
-              disabled
+                disabled
                 type="text"
                 id="amount"
                 name="amount"
@@ -150,11 +155,10 @@ function Detail({ redeems, profile, countries, provinces }) {
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 value={countrieSelector}
                 onChange={(e) => {
-                  setCountrieSelector(e.target.value)
+                  setCountrieSelector(e.target.value);
                 }}
               >
                 {countries.map((country) => (
-
                   <option key={country.country_id} value={country.country_id}>
                     {country.place_description}
                   </option>
@@ -167,11 +171,16 @@ function Detail({ redeems, profile, countries, provinces }) {
               <select
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 value={provinceSelector}
-                onChange={(e) => { console.log(e.target.value); setProvinceSelector(e.target.value) }}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setProvinceSelector(e.target.value);
+                }}
               >
                 {provinces
-                  .filter((province) => province.province_id.startsWith(countrieSelector + "-"))
-                  .map((province,id) => (
+                  .filter((province) =>
+                    province.province_id.startsWith(countrieSelector + "-")
+                  )
+                  .map((province, id) => (
                     <option key={id} value={province.province_id}>
                       {province.place_description}
                     </option>
@@ -335,18 +344,20 @@ export async function getServerSideProps(context) {
     headers: {
       Cookie: cookie,
     },
-
-
   });
   const provinces = await clientAxios.get("/provinceRoute", {
     public_key: session.address,
     headers: {
       Cookie: cookie,
-    }
-  })
-
+    },
+  });
 
   return {
-    props: { redeems: response.data, profile: profile.data, countries: countries.data, provinces: provinces.data },
+    props: {
+      redeems: response.data,
+      profile: profile.data,
+      countries: countries.data,
+      provinces: provinces.data,
+    },
   };
 }

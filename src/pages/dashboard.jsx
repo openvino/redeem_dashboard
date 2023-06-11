@@ -1,7 +1,6 @@
 import { useSession, signOut, getSession } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/router";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Table from "../components/Table";
@@ -12,11 +11,6 @@ import Chart from "chart.js/auto";
 import Head from "next/head.js";
 
 import { getRedeems } from "@/redux/actions/winaryActions";
-import Modal from "@/components/Modal";
-import {
-  showNotificationModal,
-  collapseNotificationModal,
-} from "@/redux/actions/notificationActions";
 
 const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
