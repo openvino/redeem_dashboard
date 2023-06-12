@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 
 const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
-  const {t} = useTranslation()
+  const {t} = useTranslation()  const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
     dispatch(getRedeems());
   }, []);
@@ -267,7 +267,11 @@ const Dashboard = ({ redeemsState, profile }) => {
               <h2 className="text-center mt-20">{t('estadisiticasAnuales')}</h2>
               <canvas
                 ref={polarChartRef}
-                className="transform scale-75 translate-y-[-45px]"
+                className={
+                  !showModal
+                    ? "transform scale-75 translate-y-[-45px]"
+                    : "hidden"
+                }
               />
             </div>
           </div>

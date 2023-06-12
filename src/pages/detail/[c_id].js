@@ -1,5 +1,5 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-import { Router, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
 import Topbar from "@/components/Topbar";
@@ -8,6 +8,9 @@ import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { getRedeems } from "@/redux/actions/winaryActions";
+
 function Detail({ redeems, profile, countries, provinces }) {
   const { t } = useTranslation();
 
@@ -18,6 +21,12 @@ function Detail({ redeems, profile, countries, provinces }) {
   const [provinceSelector, setProvinceSelector] = useState("");
 
   const id = redeems.findIndex((r) => r.id === c_id);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    setStatusSelector(redeems[id].redeem_status);
+    dispatch(getRedeems());
+  }, [id]);
 
   useEffect(() => {
     if (redeems.length > 0) {
@@ -108,6 +117,10 @@ function Detail({ redeems, profile, countries, provinces }) {
           className="space-y-2 flex justify-center flex-col"
           onSubmit={handleSubmit(onSubmit)}
         >
+        <form
+          className="space-y-2 flex justify-center flex-col"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
@@ -125,6 +138,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t('monto')}:</label>
               <input
+                disabled
                 disabled
                 type="text"
                 id="amount"
@@ -222,6 +236,10 @@ function Detail({ redeems, profile, countries, provinces }) {
                 }}
               >
                 {provinces
+                  .filter((province) =>
+                    province.province_id.startsWith(countrieSelector + "-")
+                  )
+                  .map((province, id) => (
                   .filter((province) =>
                     province.province_id.startsWith(countrieSelector + "-")
                   )

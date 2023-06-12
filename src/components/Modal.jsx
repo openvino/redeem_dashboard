@@ -1,6 +1,6 @@
 import { collapseNotificationModal } from "@/redux/actions/notificationActions";
-import Link from "next/link";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -30,20 +30,20 @@ const Modal = ({ data }) => {
 
   const filterData = () => {
     let filteredData;
-    if (data.length > 5) {
-      filteredData = data.slice(data.length - 5, 5);
-    } else {
-      filteredData = data;
-    }
+
+    filteredData = data.length > 5 ? data.slice(-5) : data;
+
     return filteredData;
   };
+
   data = filterData(data);
   const showModal = useSelector((state) => state.notification.showModal);
+
   if (!showModal) return null;
   else
     return (
       <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur flex justify-center items-center shadow-xl ">
-        <div className="fixed top-20 right-5 bg-opacity-25 md:right[10%] md:top-[8rem]">
+        <div className="fixed top-20 right-8 bg-opacity-25 md:right[10%] md:top-[8rem]">
           <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl p-2 rounded-lg">
             {data.map((e) => (
               <p
