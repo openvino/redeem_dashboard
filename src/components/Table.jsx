@@ -8,7 +8,10 @@ import {
 } from "react-icons/md";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-const Table = ({ data, columnas, n }) => {
+import { useRouter } from "next/router";
+
+const Table = ({ data, columnas, n, route = "/detail" }) => {
+  const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
@@ -196,7 +199,7 @@ const Table = ({ data, columnas, n }) => {
                       >
                         {/* {console.log(fila.id)} */}
                         {/* <Link href={`/detail/${index}`}> */}
-                        <Link href={`/detail/${fila.id}`}>
+                        <Link href={`${route}/${fila.id}`}>
                           <div className="inline-flex items-center px-0">
                             <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />
                           </div>
@@ -247,6 +250,14 @@ const Table = ({ data, columnas, n }) => {
         }
       >
         {renderbuttonsPages()}
+        {route !== "/detail" ? (
+          <button
+            className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
+            onClick={() => router.push("/winaryDetail/newWinary")}
+          >
+            Crear Bodega
+          </button>
+        ) : null}
       </div>
     </div>
   );

@@ -2,12 +2,13 @@ import Table from "@/components/Table";
 import { useSession, signOut, getSession } from "next-auth/react";
 import React from "react";
 import clientAxios from "@/config/clientAxios";
-import { dataFormater } from "../utils/dataFormater.js";
+import { dataFormater } from "../utils/winaryDataFormater.js";
 import Sidebar from "@/components/Sidebar.jsx";
 import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-const redeems = ({ redeems, profile }) => {
+
+const Winarys = ({ winarys, profile }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
 
@@ -20,80 +21,48 @@ const redeems = ({ redeems, profile }) => {
       title: "Id",
       field: "id",
     },
+
     {
-      title: "Cliente",
-      field: "customer_id",
-    },
-    {
-      title: t("nombre"),
+      title: t("Nombre"),
       field: "name",
     },
     {
-      title: t("monto"),
-      field: "amount",
+      title: t("Website"),
+      field: "website",
     },
     {
-      title: t("pais"),
-      field: "country_id",
+      title: t("Imagen"),
+      field: "image",
     },
     {
-      title: t("provincia"),
-      field: "province_id",
+      title: t("Color Primario"),
+      field: "primary_color",
     },
 
     {
-      title: t("actualizado"),
+      title: t("Actualizado"),
       field: "updated_at",
     },
-    // {
-    //   title: "Borrado",
-    //   field: "deleted_at",
-    // },
+
     {
       title: "Email",
       field: "email",
     },
 
     {
-      title: t("calle"),
+      title: t("Secret"),
 
-      field: "street",
+      field: "secret",
     },
     {
-      title: t("numero"),
+      title: t("Clave Pública"),
 
-      field: "number",
+      field: "public_key",
     },
 
     {
-      title: "Telegram_ID",
-      field: "telegram_id",
-    },
-
-    // {
-    //   title: "Vinería",
-    //   field: "winerie_id",
-    // },
-
-    {
-      title: t("cp"),
-
-      field: "zip",
-    },
-    {
-      title: t("año"),
-
-      field: "year",
-    },
-    {
-      title: t("creado"),
-
-      field: "created_at",
-    },
-    {
-      title: t("estado"),
-
-      field: "status",
+      title: "Es Admin",
+      field: "isAdmin",
     },
   ];
 
@@ -110,21 +79,22 @@ const redeems = ({ redeems, profile }) => {
       return data;
     }
   };
-  const data = filterData(dataFormater(redeems));
-
+  const data = filterData(dataFormater(winarys));
+  // const data = dataFormater(winarys);
+  console.log(data);
   return (
     <div className="">
+      <h1>winarys</h1>
       <Sidebar />
       <Topbar profile={profile} />
-
       <div className="ml-20  min-w-fit top-4 ">
-        <Table data={data} columnas={columnas} n={15} />
+        <Table data={data} columnas={columnas} route="/winarys" n={15} />
       </div>
     </div>
   );
 };
 
-export default redeems;
+export default Winarys;
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
@@ -140,7 +110,7 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const { cookie } = req.headers;
 
-  const response = await clientAxios.get("/redeemRoute", {
+  const response = await clientAxios.get("/winarysRoute", {
     params: {
       isAdmin: session.isAdmin,
     },
@@ -156,6 +126,6 @@ export async function getServerSideProps(context) {
   });
 
   return {
-    props: { redeems: response.data, profile: profile.data },
+    props: { winarys: response.data, profile: profile.data },
   };
 }

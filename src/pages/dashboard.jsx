@@ -12,21 +12,20 @@ import Head from "next/head.js";
 
 import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
-let flag = true
+let flag = true;
 
 const Dashboard = ({ redeemsState, profile }) => {
   const session = useSession();
 
-  const {t} = useTranslation() 
+  const { t } = useTranslation();
 
   const filters = useSelector((state) => state.filter);
-   const showModal = useSelector((state) => state.notification.showModal);
+  const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
-    if(session.status === 'authenticated' && flag) {
+    if (session.status === "authenticated" && flag) {
       dispatch(getRedeems(session.data.isAdmin));
-      flag = false
+      flag = false;
     }
-  
   }, [session]);
 
   const dispatch = useDispatch();
@@ -166,19 +165,19 @@ const Dashboard = ({ redeemsState, profile }) => {
     //   field: "customer_id",
     // },
     {
-      title: t('nombre'),
+      title: t("nombre"),
       field: "name",
     },
     {
-      title: t('monto'),
+      title: t("monto"),
       field: "amount",
     },
     {
-      title: t('pais'),
+      title: t("pais"),
       field: "country_id",
     },
     {
-      title: t('provincia'),
+      title: t("provincia"),
       field: "province_id",
     },
 
@@ -214,19 +213,19 @@ const Dashboard = ({ redeemsState, profile }) => {
     //   field: "winerie_id",
     // },
     {
-      title: t('año'),
+      title: t("año"),
       field: "year",
     },
     {
-      title: t('cp'),
+      title: t("cp"),
       field: "zip",
     },
     {
-      title: t('creado'),
+      title: t("creado"),
       field: "created_at",
     },
     {
-      title: t('estado'),
+      title: t("estado"),
       field: "status",
     },
   ];
@@ -245,11 +244,10 @@ const Dashboard = ({ redeemsState, profile }) => {
     }
   };
 
-  const data = filterData(dataFormater(redeems));
+  const data = filterData(dataFormater(redeems, []));
 
   return (
     <>
-    
       <Head>
         <title>OpenVino - Dashboard</title>
       </Head>
@@ -259,17 +257,18 @@ const Dashboard = ({ redeemsState, profile }) => {
 
         <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
           <Table data={data} columnas={columnas} n={5} />
-
           <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
-              <h2 className="text-center mt-20">{t('estadisiticasMensuales')}</h2>
+              <h2 className="text-center mt-20">
+                {t("estadisiticasMensuales")}
+              </h2>
               <canvas ref={chartRef} />
             </div>
 
             {/* Gráfico de área polar */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mt-10 lg:mt-0 flex items-center flex-col">
-              <h2 className="text-center mt-20">{t('estadisiticasAnuales')}</h2>
+              <h2 className="text-center mt-20">{t("estadisiticasAnuales")}</h2>
               <canvas
                 ref={polarChartRef}
                 className={
@@ -293,7 +292,6 @@ export default Dashboard;
 export async function getServerSideProps(context) {
   const session = await getSession(context);
 
-
   if (!session) {
     return {
       redirect: {
@@ -305,10 +303,9 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const { cookie } = req.headers;
 
-    
   const response = await clientAxios.get("/redeemRoute", {
     params: {
-      isAdmin: session.isAdmin
+      isAdmin: session.isAdmin,
     },
     headers: {
       Cookie: cookie,

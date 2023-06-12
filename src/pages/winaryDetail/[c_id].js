@@ -10,42 +10,49 @@ import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { getRedeems } from "@/redux/actions/winaryActions";
-
-function Detail({ redeems, profile, countries, provinces }) {
+let winary;
+function Detail({ winarys, profile }) {
   const { t } = useTranslation();
 
   const router = useRouter();
-  const { c_id } = router.query;
+  let { c_id } = router.query;
+  // useEffect(() => {
+  //   if (c_id === "newWinary") winary.id = "nueva bodega";
+  // });
+  c_id = "costaflores";
   const { register, handleSubmit, setValue } = useForm();
-  const [countrieSelector, setCountrieSelector] = useState("");
-  const [provinceSelector, setProvinceSelector] = useState("");
-  const [statusSelector, setStatusSelector] = useState("");
-  const id = redeems.findIndex((r) => r.id === c_id);
+  // const [countrieSelector, setCountrieSelector] = useState("");
+  // const [provinceSelector, setProvinceSelector] = useState("");
+  // const [statusSelector, setStatusSelector] = useState("");
+  if (c_id === "newWinary") {
+  } else {
+    const id = winarys.findIndex((r) => r.id === c_id);
+  }
+
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getRedeems());
-  }, [id]);
+  // useEffect(() => {
+  //   // dispatch(getRedeems());
+  // }, [id]);
 
   useEffect(() => {
-    if (redeems.length > 0) {
-      setValue("id", redeems[id]?.id, { shouldDirty: false });
-      setValue("customer_id", redeems[id]?.customer_id, { shouldDirty: false });
-      setValue("amount", redeems[id]?.amount, { shouldDirty: false });
-      setValue("status", redeems[id]?.redeem_status, { shouldDirty: false });
-      setValue("country_id", redeems[id]?.country_id, { shouldDirty: false });
-      setValue("province_id", redeems[id]?.province_id, { shouldDirty: false });
-      setCountrieSelector(redeems[id].country_id);
-      setProvinceSelector(redeems[id].province_id);
-      setStatusSelector(redeems[id].redeem_status);
+    if (winarys.length > 0) {
+      setValue("id", winarys[id]?.id, { shouldDirty: false });
+      setValue("created_at", winarys[id]?.created_at, { shouldDirty: false });
+      setValue("updated_at", winarys[id]?.updated_at, { shouldDirty: false });
+      setValue("name", winarys[id]?.name, { shouldDirty: false });
+      setValue("website", winarys[id]?.website, { shouldDirty: false });
+      setValue("image", winarys[id]?.image, { shouldDirty: false });
+      setValue("primary_color", winarys[id]?.primary_color, {
+        shouldDirty: false,
+      });
 
-      // Establece los valores de los demás campos deshabilitados aquí
+      setValue("isAdmin", winarys[id]?.isAdmin, { shouldDirty: false });
     }
-  }, [redeems]);
+  }, [winarys]);
 
   const onSubmit = async (data) => {
-
-      console.log(data)
+    console.log(data);
 
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
@@ -79,18 +86,36 @@ function Detail({ redeems, profile, countries, provinces }) {
     }
   };
 
-  const redeem = redeems[id];
+  if (c_id === "newWinary") {
+    winary = {
+      id: "",
+      created_at: "",
+      amount: "",
+      country_id: "",
+      deleted_at: "",
+      name: "",
+      email: "",
+      website: "",
+      image: "",
+      primary_color: "",
+      secret: "",
+      public_key: "",
+      isAdmin: false,
+    };
+  } else {
+    winary = winarys[c_id];
+  }
 
-  useEffect(() => {
-      const setTrue = async  () => {
-            await clientAxios.post('/notificationRoute', {
-               id : redeem.id
-             })
-           dispatch(getRedeems())
-        }
-        setTrue()
-  }, [redeem])
-
+  // useEffect(() => {
+  //   const setTrue = async () => {
+  //     await clientAxios.post("/notificationRoute", {
+  //       id: redeem.id,
+  //     });
+  //     dispatch(getRedeems());
+  //   };
+  //   setTrue();
+  // }, [redeem]);
+  console.log(winary);
   return (
     <>
       <ToastContainer
@@ -112,12 +137,14 @@ function Detail({ redeems, profile, countries, provinces }) {
       <div
         className="
       z-1
-      mt-[8rem]
+      mt-[10rem]
       ml-[6rem]
       overflow-x-scroll
     "
       >
-        <h1 className="text-2xl font-bold text-center mb-4">{t("detalle")}</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">
+          {t("Detalle de la vinería")}
+        </h1>
 
         <form
           className="space-y-2 flex justify-center flex-col"
@@ -131,21 +158,21 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="id"
                 name="id"
-                value={redeem.id}
+                value={winary?.id}
                 {...register("id")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("monto")}:</label>
+              <label className="w-24 font-bold">{t("Nombre")}:</label>
               <input
                 disabled
                 type="text"
-                id="amount"
-                name="amount"
-                value={redeem.amount}
-                {...register("amount")}
+                id="name"
+                name="name"
+                value={winary?.name}
+                {...register("name")}
                 className="flex-1 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
               />
             </div>
@@ -153,26 +180,26 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("nombre")}:</label>
+              <label className="w-24 font-bold">{t("Sitio web")}:</label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                defaultValue={redeem.name}
-                {...register("name")}
+                id="website"
+                name="website"
+                defaultValue={winary?.website}
+                {...register("website")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Customer_id:</label>
+              <label className="w-24 font-bold">Imagen:</label>
               <input
                 disabled
                 type="text"
-                id="customer_id"
-                name="customer_id"
-                defaultValue={redeem.customer_id}
-                {...register("customer_id")}
+                id="image"
+                name="image"
+                defaultValue={winary?.image}
+                {...register("image")}
                 className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
               />
             </div>
@@ -185,20 +212,20 @@ function Detail({ redeems, profile, countries, provinces }) {
                 type="text"
                 id="email"
                 name="email"
-                defaultValue={redeem.email}
+                defaultValue={winary?.email}
                 {...register("email")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Telegram:</label>
+              <label className="w-24 font-bold">Clor Primario:</label>
               <input
                 type="text"
-                id="telegram_id"
-                name="telegram_id"
-                defaultValue={redeem.telegram_id}
-                {...register("telegram_id")}
+                id="primary_color"
+                name="primary_color"
+                defaultValue={winary?.primary_color}
+                {...register("primary_color")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
@@ -206,147 +233,45 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("pais")}:</label>
-
-              <select
-                className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
-                defaultValue={redeem.country_id}
-                onChange={(e) => {
-                  //console.log(e.target.value);
-                  setCountrieSelector(e.target.value);
-                  setValue("country_id", e.target.value);
-                }}
-              >
-                {countries.map((country) => (
-                  <option key={country.country_id} value={country.country_id}>
-                    {country.place_description}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center">
+                <label className="w-24 font-bold">Secret</label>
+                <input
+                  type="text"
+                  id="secret"
+                  name="secret"
+                  defaultValue={winary?.secret}
+                  {...register("secret")}
+                  className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                />
+              </div>
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("provincia")}:</label>
-              <select
-                className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
-                value={provinceSelector}
-                onChange={(e) => {
-                  console.log(e.target.value);
-                  setProvinceSelector(e.target.value);
-                  setValue("province_id", e.target.value);
-
-                }}
-              >
-                {provinces
-                  .filter((province) =>
-                    province.province_id.startsWith(countrieSelector + "-")
-                  )
-                  .map((province, id) => (
-                    <option key={id} value={province.province_id}>
-                      {province.place_description}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("calle")}:</label>
+              <label className="w-24 font-bold">Clave pública</label>
               <input
                 type="text"
-                id="street"
-                name="street"
-                defaultValue={redeem.street}
-                {...register("street")}
+                id="public_key"
+                name="public_key"
+                defaultValue={winary?.public_key}
+                {...register("public_key")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("numero")}:</label>
-              <input
-                type="text"
-                id="number"
-                name="number"
-                defaultValue={redeem.number}
-                {...register("number")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("cp")}:</label>
-              <input
-                type="text"
-                id="zip"
-                name="zip"
-                defaultValue={redeem.zip}
-                {...register("zip")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">Token:</label>
-              <input
-                type="text"
-                id="year"
-                name="year"
-                defaultValue={redeem.year}
-                {...register("year")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("creado")}:</label>
-              <input
-                disabled
-                type="text"
-                id="created_at"
-                name="created_at"
-                defaultValue={redeem.created_at.substring(0, 10)}
-                className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="flex items-center">
-              <label className="w-24 font-bold" htmlFor="status">
-                {t("estado")}
+            <div className="flex items-center left-[50%]">
+              <label className="w-24 font-bold" htmlFor="isAdmin">
+                {t("Es admin")}
               </label>
               <select
-                id="status"
-                name="status"
-                defaultValue={redeem.redeem_status} // Set the value here
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-                {...register("status")}
+                id="isAdmin"
+                name="isAdmin"
+                defaultValue={winary?.isAdmin}
+                className=" px-2 py-1 border border-gray-300 rounded-md w-[2rem]"
+                {...register("isAdmin")}
               >
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="rejected">Rejected</option>
+                <option value="true">Si</option>
+                <option value="false">No</option>
               </select>
             </div>
-          </div>
-          <div className="flex justify-center">
-            <button
-              type="button"
-              onClick={() => {
-                router.push("/");
-              }}
-              className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
-            >
-              {t("volver")}
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
-            >
-              {t("guardar")}
-            </button>
           </div>
         </form>
       </div>
@@ -370,15 +295,14 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const { cookie } = req.headers;
 
-  const response = await clientAxios.get("/redeemRoute", {
+  const response = await clientAxios.get("/winarysRoute", {
     params: {
-      isAdmin: session.isAdmin
+      isAdmin: session.isAdmin,
     },
     headers: {
       Cookie: cookie,
     },
   });
-
   const profile = await clientAxios.post("/loginRoute", {
     public_key: session.address,
     headers: {
@@ -386,25 +310,7 @@ export async function getServerSideProps(context) {
     },
   });
 
-  const countries = await clientAxios.get("/countriesRoute", {
-    public_key: session.address,
-    headers: {
-      Cookie: cookie,
-    },
-  });
-  const provinces = await clientAxios.get("/provinceRoute", {
-    public_key: session.address,
-    headers: {
-      Cookie: cookie,
-    },
-  });
-
   return {
-    props: {
-      redeems: response.data,
-      profile: profile.data,
-      countries: countries.data,
-      provinces: provinces.data,
-    },
+    props: { winarys: response.data, profile: profile.data },
   };
 }
