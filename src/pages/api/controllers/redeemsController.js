@@ -33,8 +33,7 @@ export const updateRedeemStatus = async (req) => {
   redeemQuery += redeemUpdateFields.join(', ');
   redeemQuery += ` WHERE id = '${id}'`;
 
-  
-
+  await conn.query(redeemQuery)
   // Actualizar la tabla usuarios
   let userQuery = `UPDATE users SET `;
   let userUpdateFields = [];

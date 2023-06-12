@@ -31,7 +31,6 @@ const BellIconWithNotification = ({ notificationCount }) => (
 
 const Topbar = ({ profile }) => {
   const router = useRouter();
-
   const [selectLanguage, setSelectLanguage] = useState(false)
 
   const [isFocused, setIsFocused] = useState(false);
@@ -42,7 +41,7 @@ const Topbar = ({ profile }) => {
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
-
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showModal && !event.target.closest(".modal-content")) {
@@ -56,18 +55,6 @@ const Topbar = ({ profile }) => {
     };
 
     document.addEventListener("click", handleClickOutside);
-
-  const { t, i18n } = useTranslation();
-
-  const toggleLanguage = () => {
-    setToggle(!toggle);
-    const language = toggle ? "es" : "en";
-    i18n.changeLanguage(language);
-    setSelectLanguage(!selectLanguage)
-  };
-
-  const [toggle, setToggle] = useState(false);
-
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
@@ -75,6 +62,16 @@ const Topbar = ({ profile }) => {
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
+
+  const [toggle, setToggle] = useState(false);
+
+  const toggleLanguage = () => {
+    setToggle(!toggle);
+    const language = toggle ? "es" : "en";
+    i18n.changeLanguage(language);
+    setSelectLanguage(!selectLanguage)
+  };
+  const { t, i18n } = useTranslation();
 
   // Socket
   useEffect(() => {

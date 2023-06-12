@@ -14,10 +14,14 @@ import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
 
 const Dashboard = ({ redeemsState, profile }) => {
+
+  const {t} = useTranslation() 
+
   const filters = useSelector((state) => state.filter);
-  const {t} = useTranslation()  const showModal = useSelector((state) => state.notification.showModal);
+   const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
     dispatch(getRedeems());
+  
   }, []);
 
   const dispatch = useDispatch();

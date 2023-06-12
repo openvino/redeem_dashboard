@@ -19,12 +19,11 @@ function Detail({ redeems, profile, countries, provinces }) {
   const { register, handleSubmit, setValue } = useForm();
   const [countrieSelector, setCountrieSelector] = useState("");
   const [provinceSelector, setProvinceSelector] = useState("");
-
+  const [statusSelector, setStatusSelector] = useState("");
   const id = redeems.findIndex((r) => r.id === c_id);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setStatusSelector(redeems[id].redeem_status);
     dispatch(getRedeems());
   }, [id]);
 
@@ -38,13 +37,16 @@ function Detail({ redeems, profile, countries, provinces }) {
       setValue("province_id", redeems[id]?.province_id, { shouldDirty: false });
       setCountrieSelector(redeems[id].country_id);
       setProvinceSelector(redeems[id].province_id);
+      setStatusSelector(redeems[id].redeem_status);
 
       // Establece los valores de los demás campos deshabilitados aquí
     }
   }, [redeems]);
 
   const onSubmit = async (data) => {
-   
+
+      console.log(data)
+
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
       autoClose: false,
@@ -54,34 +56,40 @@ function Detail({ redeems, profile, countries, provinces }) {
       draggable: true,
       progress: undefined,
       theme: "dark",
-      isLoading:true
+      isLoading: true,
     });
     try {
-      
-
       const response = await clientAxios.put("/redeemRoute", {
         data,
       });
 
       toast.update(toastId, {
-        isLoading:false,
+        isLoading: false,
         type: toast.TYPE.SUCCESS,
         render: "Redeem updated",
         autoClose: 5000,
       });
     } catch (error) {
       toast.update(toastId, {
-        isLoading:false,
+        isLoading: false,
         type: toast.TYPE.ERROR,
         render: "Error ",
         autoClose: 5000,
       });
     }
-    
   };
 
-  
   const redeem = redeems[id];
+
+  useEffect(() => {
+      const setTrue = async  () => {
+            await clientAxios.post('/notificationRoute', {
+               id : redeem.id
+             })
+           dispatch(getRedeems())
+        }
+        setTrue()
+  }, [redeem])
 
   return (
     <>
@@ -109,14 +117,8 @@ function Detail({ redeems, profile, countries, provinces }) {
       overflow-x-scroll
     "
       >
-        <h1 className="text-2xl font-bold text-center mb-4">
-          {t('detalle')}
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-4">{t("detalle")}</h1>
 
-        <form
-          className="space-y-2 flex justify-center flex-col"
-          onSubmit={handleSubmit(onSubmit)}
-        >
         <form
           className="space-y-2 flex justify-center flex-col"
           onSubmit={handleSubmit(onSubmit)}
@@ -136,9 +138,8 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('monto')}:</label>
+              <label className="w-24 font-bold">{t("monto")}:</label>
               <input
-                disabled
                 disabled
                 type="text"
                 id="amount"
@@ -152,7 +153,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('nombre')}:</label>
+              <label className="w-24 font-bold">{t("nombre")}:</label>
               <input
                 type="text"
                 id="name"
@@ -205,7 +206,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('pais')}:</label>
+              <label className="w-24 font-bold">{t("pais")}:</label>
 
               <select
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
@@ -225,21 +226,18 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('provincia')}:</label>
+              <label className="w-24 font-bold">{t("provincia")}:</label>
               <select
-                name="province_id"
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 value={provinceSelector}
                 onChange={(e) => {
-                  setValue("province_id", e.target.value);
+                  console.log(e.target.value);
                   setProvinceSelector(e.target.value);
+                  setValue("province_id", e.target.value);
+
                 }}
               >
                 {provinces
-                  .filter((province) =>
-                    province.province_id.startsWith(countrieSelector + "-")
-                  )
-                  .map((province, id) => (
                   .filter((province) =>
                     province.province_id.startsWith(countrieSelector + "-")
                   )
@@ -254,7 +252,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('calle')}:</label>
+              <label className="w-24 font-bold">{t("calle")}:</label>
               <input
                 type="text"
                 id="street"
@@ -266,7 +264,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('numero')}:</label>
+              <label className="w-24 font-bold">{t("numero")}:</label>
               <input
                 type="text"
                 id="number"
@@ -280,7 +278,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('cp')}:</label>
+              <label className="w-24 font-bold">{t("cp")}:</label>
               <input
                 type="text"
                 id="zip"
@@ -306,7 +304,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t('creado')}:</label>
+              <label className="w-24 font-bold">{t("creado")}:</label>
               <input
                 disabled
                 type="text"
@@ -318,7 +316,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             </div>
             <div className="flex items-center">
               <label className="w-24 font-bold" htmlFor="status">
-              {t('estado')}
+                {t("estado")}
               </label>
               <select
                 id="status"
@@ -341,13 +339,13 @@ function Detail({ redeems, profile, countries, provinces }) {
               }}
               className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
             >
-             {t('volver')}
+              {t("volver")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
             >
-              {t('guardar')}
+              {t("guardar")}
             </button>
           </div>
         </form>
