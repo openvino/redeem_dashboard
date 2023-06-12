@@ -88,7 +88,7 @@ const Winarys = ({ winarys, profile }) => {
       <Sidebar />
       <Topbar profile={profile} />
       <div className="ml-20  min-w-fit top-4 ">
-        <Table data={data} columnas={columnas} route="/winarys" n={15} />
+        <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
       </div>
     </div>
   );

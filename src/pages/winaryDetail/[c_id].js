@@ -14,47 +14,26 @@ let winary;
 function Detail({ winarys, profile }) {
   const { t } = useTranslation();
 
+    const [id, setId] = useState('')
+    const [isAdminSelect, setIsAdminSelect] = useState('')
+
   const router = useRouter();
   let { c_id } = router.query;
-  // useEffect(() => {
-  //   if (c_id === "newWinary") winary.id = "nueva bodega";
-  // });
-  c_id = "costaflores";
+ 
   const { register, handleSubmit, setValue } = useForm();
-  // const [countrieSelector, setCountrieSelector] = useState("");
-  // const [provinceSelector, setProvinceSelector] = useState("");
-  // const [statusSelector, setStatusSelector] = useState("");
-  if (c_id === "newWinary") {
-  } else {
-    const id = winarys.findIndex((r) => r.id === c_id);
-  }
-
-  const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   // dispatch(getRedeems());
-  // }, [id]);
 
   useEffect(() => {
-    if (winarys.length > 0) {
-      setValue("id", winarys[id]?.id, { shouldDirty: false });
-      setValue("created_at", winarys[id]?.created_at, { shouldDirty: false });
-      setValue("updated_at", winarys[id]?.updated_at, { shouldDirty: false });
-      setValue("name", winarys[id]?.name, { shouldDirty: false });
-      setValue("website", winarys[id]?.website, { shouldDirty: false });
-      setValue("image", winarys[id]?.image, { shouldDirty: false });
-      setValue("primary_color", winarys[id]?.primary_color, {
-        shouldDirty: false,
-      });
-
-      setValue("isAdmin", winarys[id]?.isAdmin, { shouldDirty: false });
+    if (c_id === "newWinary") {
+    } else {
+      setId( winarys.findIndex((r) => r.id === c_id))
+      
     }
-  }, [winarys]);
+  }, [])
+
 
   const onSubmit = async (data) => {
-    console.log(data);
 
-    const toastId = toast("Updating Redeem...", {
+    const toastId = toast("Updating winary data...", {
       position: "top-right",
       autoClose: false,
       hideProgressBar: false,
@@ -65,25 +44,50 @@ function Detail({ winarys, profile }) {
       theme: "dark",
       isLoading: true,
     });
-    try {
-      const response = await clientAxios.put("/redeemRoute", {
-        data,
-      });
 
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.SUCCESS,
-        render: "Redeem updated",
-        autoClose: 5000,
-      });
-    } catch (error) {
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.ERROR,
-        render: "Error ",
-        autoClose: 5000,
-      });
+
+    if (c_id === "newWinary") {
+      try {
+        const response = await clientAxios.post("/winarysRoute", {
+          data,
+        });
+  
+        toast.update(toastId, {
+          isLoading: false,
+          type: toast.TYPE.SUCCESS,
+          render: "Redeem updated",
+          autoClose: 5000,
+        });
+      } catch (error) {
+        toast.update(toastId, {
+          isLoading: false,
+          type: toast.TYPE.ERROR,
+          render: "Error ",
+          autoClose: 5000,
+        });
+      }
+    } else {
+      try {
+        const response = await clientAxios.put("/winarysRoute", {
+          data,
+        });
+  
+        toast.update(toastId, {
+          isLoading: false,
+          type: toast.TYPE.SUCCESS,
+          render: "Redeem updated",
+          autoClose: 5000,
+        });
+      } catch (error) {
+        toast.update(toastId, {
+          isLoading: false,
+          type: toast.TYPE.ERROR,
+          render: "Error ",
+          autoClose: 5000,
+        });
+      }
     }
+   
   };
 
   if (c_id === "newWinary") {
@@ -103,20 +107,29 @@ function Detail({ winarys, profile }) {
       isAdmin: false,
     };
   } else {
-    winary = winarys[c_id];
+    winary = winarys[id];
   }
 
-  // useEffect(() => {
-  //   const setTrue = async () => {
-  //     await clientAxios.post("/notificationRoute", {
-  //       id: redeem.id,
-  //     });
-  //     dispatch(getRedeems());
-  //   };
-  //   setTrue();
-  // }, [redeem]);
-  console.log(winary);
-  return (
+   useEffect(() => {
+    if (winary) {
+      setValue("id", winarys[id]?.id, { shouldDirty: false });
+      setValue("created_at", winarys[id]?.created_at, { shouldDirty: false });
+      setValue("updated_at", winarys[id]?.updated_at, { shouldDirty: false });
+      setValue("name", winarys[id]?.name, { shouldDirty: false });
+      setValue("website", winarys[id]?.website, { shouldDirty: false });
+      setValue("image", winarys[id]?.image, { shouldDirty: false });
+      setValue("secret", winarys[id]?.secret, { shouldDirty: false });
+      setValue("public_key", winarys[id]?.public_key, { shouldDirty: false });
+      setValue("email", winarys[id]?.email, { shouldDirty: false });
+      setValue("primary_color", winarys[id]?.primary_color, {
+        shouldDirty: false,
+      });
+      setValue("isAdmin",winarys[id]?.isAdmin == true ? 'true' : 'false', { shouldDirty: false });
+      setIsAdminSelect(winarys[id]?.isAdmin == true ? 'true' : 'false')
+    }
+  }, [winary]);
+
+    return (
     <>
       <ToastContainer
         position="top-right"
@@ -167,11 +180,10 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("Nombre")}:</label>
               <input
-                disabled
                 type="text"
                 id="name"
                 name="name"
-                value={winary?.name}
+                defaultValue={winary?.name}
                 {...register("name")}
                 className="flex-1 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
               />
@@ -194,7 +206,6 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Imagen:</label>
               <input
-                disabled
                 type="text"
                 id="image"
                 name="image"
@@ -209,7 +220,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Email:</label>
               <input
-                type="text"
+                type="email"
                 id="email"
                 name="email"
                 defaultValue={winary?.email}
@@ -219,12 +230,13 @@ function Detail({ winarys, profile }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Clor Primario:</label>
+              <label className="w-24 font-bold">Color Primario:</label>
               <input
-                type="text"
+                type="color"
                 id="primary_color"
                 name="primary_color"
                 defaultValue={winary?.primary_color}
+                onChange={(e) => setValue('primary_color', e.target.value)}
                 {...register("primary_color")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -241,7 +253,7 @@ function Detail({ winarys, profile }) {
                   name="secret"
                   defaultValue={winary?.secret}
                   {...register("secret")}
-                  className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                  className="flex-1 px-2 py-1 border  border-gray-300 rounded-md"
                 />
               </div>
             </div>
@@ -264,14 +276,37 @@ function Detail({ winarys, profile }) {
               <select
                 id="isAdmin"
                 name="isAdmin"
-                defaultValue={winary?.isAdmin}
-                className=" px-2 py-1 border border-gray-300 rounded-md w-[2rem]"
+                value={isAdminSelect}
+                className=" px-2 py-1 border border-gray-300 rounded-md w-[4rem]"
                 {...register("isAdmin")}
+                onChange={(e) => {
+                  setValue('isAdmin', e.target.value)
+                  setIsAdminSelect(e.target.value)}
+                
+                    }
+                  
               >
                 <option value="true">Si</option>
                 <option value="false">No</option>
               </select>
             </div>
+          </div>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                router.back()
+              }}
+              className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
+            >
+              {t("volver")}
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
+            >
+              {t("guardar")}
+            </button>
           </div>
         </form>
       </div>
