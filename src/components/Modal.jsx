@@ -43,7 +43,7 @@ const Modal = ({ data }) => {
   else
     return (
       <div className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur flex justify-center items-center shadow-xl ">
-        <div className="fixed top-20 right-8 bg-opacity-25 md:right[10%] md:top-[8rem]">
+        <div className="fixed top-[6rem] right-8 bg-opacity-25 md:right[10%] md:top-[9rem] ">
           <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl p-2 rounded-lg">
             {data.map((e) => (
               <p

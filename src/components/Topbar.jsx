@@ -31,9 +31,9 @@ const BellIconWithNotification = ({ notificationCount }) => (
 );
 
 const Topbar = ({ profile }) => {
-  const session = useSession()
+  const session = useSession();
   const router = useRouter();
-  const [selectLanguage, setSelectLanguage] = useState(false)
+  const [selectLanguage, setSelectLanguage] = useState(false);
 
   const [isFocused, setIsFocused] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -43,7 +43,7 @@ const Topbar = ({ profile }) => {
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showModal && !event.target.closest(".modal-content")) {
@@ -71,7 +71,7 @@ const Topbar = ({ profile }) => {
     setToggle(!toggle);
     const language = toggle ? "es" : "en";
     i18n.changeLanguage(language);
-    setSelectLanguage(!selectLanguage)
+    setSelectLanguage(!selectLanguage);
   };
   const { t, i18n } = useTranslation();
 
@@ -137,15 +137,15 @@ const Topbar = ({ profile }) => {
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
-         <h1 className="text-center">{session.data?.isAdmin && 'Vista de administrador'}</h1>
+        <h1 className="text-center">
+          {session.data?.isAdmin && "Vista de administrador"}
+        </h1>
 
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
               <p className="text-2xl font-bold">0.1 ETH</p>
-              <p className="text-gray-600">
-               {t('deuda')}
-              </p>
+              <p className="text-gray-600">{t("deuda")}</p>
             </div>
             {/* <p className="bg-green-200 flex justify-center items-center rounded-lg">
             <span className="text-green-700 text-lg">+18%</span>
@@ -157,7 +157,7 @@ const Topbar = ({ profile }) => {
               <input
                 type="text"
                 className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
-                placeholder={t('buscar')}
+                placeholder={t("buscar")}
                 onFocus={() => {
                   setIsFocused(true);
                 }}
@@ -197,7 +197,6 @@ const Topbar = ({ profile }) => {
               onClick={() => setShowMenu(!showMenu)}
               className="relative shadow-xl rounded-full hover:transform hover:scale-110 transition-all duration-500"
             >
-             
               <Image
                 className="rounded-full w-full h-full "
                 src={profile.image}
@@ -214,14 +213,16 @@ const Topbar = ({ profile }) => {
                   >
                     Cerrar Sesión
                   </p>
-            <button onClick={toggleLanguage}>{t('idioma')} {selectLanguage? 'Español' : 'English'} </button>
-
+                  <button onClick={toggleLanguage}>
+                    {t("idioma")} {selectLanguage ? "Español" : "English"}{" "}
+                  </button>
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
+      {/* {console.log(allNotifications)} */}
       <Modal data={allNotifications} />
     </>
   );
