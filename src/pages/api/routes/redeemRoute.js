@@ -1,5 +1,7 @@
+
 import { getToken, jwt } from "next-auth/jwt";
 import {
+  getAllRedeems,
   getRedeems,
   updateRedeemStatus,
 } from "../controllers/redeemsController";
@@ -14,11 +16,20 @@ export default async function handler(req, res) {
 
   //GET REDEEMS
   if (req.method === "GET") {
+    const {isAdmin} = req.query
     try {
       // Verificar el token
       const token = await getToken({ req, secret });
-      const redeems = await getRedeems(token.sub);
-      return res.status(200).json(redeems);
+        
+      if(isAdmin === 'true') {
+        const redeems = await getAllRedeems()
+        return res.status(200).json(redeems);
+        
+      } else {
+        const redeems = await getRedeems(token.sub);
+        return res.status(200).json(redeems);
+
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

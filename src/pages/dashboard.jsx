@@ -12,17 +12,22 @@ import Head from "next/head.js";
 
 import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
+let flag = true
 
 const Dashboard = ({ redeemsState, profile }) => {
+  const session = useSession();
 
   const {t} = useTranslation() 
 
   const filters = useSelector((state) => state.filter);
    const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
-    dispatch(getRedeems());
+    if(session.status === 'authenticated' && flag) {
+      dispatch(getRedeems(session.data.isAdmin));
+      flag = false
+    }
   
-  }, []);
+  }, [session]);
 
   const dispatch = useDispatch();
   const chartRef = useRef(null);
@@ -242,13 +247,9 @@ const Dashboard = ({ redeemsState, profile }) => {
 
   const data = filterData(dataFormater(redeems));
 
-  const [{ data: accountData }, disconnect] = useAccount();
-
-  const session = useSession();
-  //console.log(session);
-
   return (
     <>
+    
       <Head>
         <title>OpenVino - Dashboard</title>
       </Head>
@@ -292,6 +293,7 @@ export default Dashboard;
 export async function getServerSideProps(context) {
   const session = await getSession(context);
 
+
   if (!session) {
     return {
       redirect: {
@@ -303,7 +305,11 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const { cookie } = req.headers;
 
+    
   const response = await clientAxios.get("/redeemRoute", {
+    params: {
+      isAdmin: session.isAdmin
+    },
     headers: {
       Cookie: cookie,
     },

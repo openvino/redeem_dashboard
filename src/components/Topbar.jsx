@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { FaSearch } from "react-icons/fa";
 import { useState, useRef } from "react";
 import Image from "next/image";
@@ -30,6 +31,7 @@ const BellIconWithNotification = ({ notificationCount }) => (
 );
 
 const Topbar = ({ profile }) => {
+  const session = useSession()
   const router = useRouter();
   const [selectLanguage, setSelectLanguage] = useState(false)
 
@@ -135,6 +137,8 @@ const Topbar = ({ profile }) => {
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
+         <h1 className="text-center">{session.data?.isAdmin && 'Vista de administrador'}</h1>
+
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
@@ -193,6 +197,7 @@ const Topbar = ({ profile }) => {
               onClick={() => setShowMenu(!showMenu)}
               className="relative shadow-xl rounded-full hover:transform hover:scale-110 transition-all duration-500"
             >
+             
               <Image
                 className="rounded-full w-full h-full "
                 src={profile.image}

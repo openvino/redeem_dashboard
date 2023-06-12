@@ -1,7 +1,6 @@
 import clientAxios from "@/config/clientAxios";
 import { AUTH_WINARY, GET_REDEEMS, LOGIN_METAMASK } from "../types";
 
-
  function loginApp(public_key) {
 
     
@@ -19,10 +18,13 @@ import { AUTH_WINARY, GET_REDEEMS, LOGIN_METAMASK } from "../types";
     }
 }
 
-function getRedeems() {
+function getRedeems(isAdmin) {
     return async (dispatch) => {
         try {
           const response = await clientAxios.get("/redeemRoute",{
+            params: {
+              isAdmin
+            },
             withCredentials:true
           });
           const redeems = response.data;

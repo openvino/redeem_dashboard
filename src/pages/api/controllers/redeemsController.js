@@ -45,3 +45,16 @@ export const updateRedeemStatus = async (req) => {
   const userUpdate = await conn.query(userQuery);
 
 };
+
+export const getAllRedeems = async () => {
+    let query = `SELECT redeem_infos.id, redeem_infos.created_at, redeem_infos.updated_at, redeem_infos.deleted_at, redeem_infos.customer_id, redeem_infos.year, redeem_infos.street, redeem_infos.number, redeem_infos.country_id, redeem_infos.province_id, redeem_infos.zip, redeem_infos.telegram_id, redeem_infos.amount, redeem_infos.winerie_id, redeem_infos.redeem_status, redeem_infos.watched, users.email, users.name `;
+  query += `FROM redeem_infos `;
+  query += `JOIN users ON users.public_key = redeem_infos.customer_id `;
+  const redeems = await conn.query(query);
+
+  if (redeems.rows.length > 0) {
+    return redeems.rows;
+  } else {
+    throw new Error("No redeems");
+  }
+}

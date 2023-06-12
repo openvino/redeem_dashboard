@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { utils } from "ethers";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { checkAuth } from "../controllers/authContoller";
+import { checkAuth, isAdmin } from "../controllers/authContoller";
 
 export default NextAuth({
   providers: [
@@ -38,8 +38,14 @@ export default NextAuth({
     async session({ session, token }) {
       session.address = token.sub;
       const isValid = await checkAuth(token.sub);
-
+      //preguntar si es admin
       if (isValid) {
+          const isAdminCheck = await isAdmin(token.sub)  
+          if(isAdminCheck) {
+            session.isAdmin = true
+            return session
+          }
+          session.isAdmin = false
         return session;
       } else {
         return null;

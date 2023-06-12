@@ -2,8 +2,11 @@ import { FaWineGlass, FaUser, FaWineBottle } from "react-icons/fa";
 import { RxTokens } from "react-icons/rx";
 import Link from "next/link";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import {GiCellarBarrels} from 'react-icons/gi'
 
 const Sidebar = () => {
+  const session = useSession()
   return (
     <div className="flex">
       <div className="fixed z-41 w-20 h-full p-4 bg-[#F1EDE2] border-r-[1px] flex flex-col justify-between shadow-xl ">
@@ -40,6 +43,13 @@ const Sidebar = () => {
               />
             </div>
           </Link>
+          {session.data?.isAdmin && (
+             <Link href="/">
+             <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
+              <GiCellarBarrels size={20} />
+             </div>
+           </Link>
+          )}
         </div>
       </div>
     </div>
