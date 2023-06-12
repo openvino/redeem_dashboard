@@ -14,7 +14,7 @@ import { getRedeems } from "@/redux/actions/winaryActions";
 
 const Dashboard = ({ redeemsState, profile }) => {
   const filters = useSelector((state) => state.filter);
-
+  const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
     dispatch(getRedeems());
   }, []);
@@ -257,16 +257,20 @@ const Dashboard = ({ redeemsState, profile }) => {
           <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
-              <h2 className="text-center mt-20">Estadisticas mensuales</h2>
+              <h2 className="text-center mt-20">Redeems mensuales</h2>
               <canvas ref={chartRef} />
             </div>
 
             {/* Gráfico de área polar */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mt-10 lg:mt-0 flex items-center flex-col">
-              <h2 className="text-center mt-20">Estadistica Anuales</h2>
+              <h2 className="text-center mt-20">Redeems Anuales</h2>
               <canvas
                 ref={polarChartRef}
-                className="transform scale-75 translate-y-[-45px]"
+                className={
+                  !showModal
+                    ? "transform scale-75 translate-y-[-45px]"
+                    : "hidden"
+                }
               />
             </div>
           </div>
