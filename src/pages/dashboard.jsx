@@ -1,23 +1,155 @@
 import { useSession, signOut, getSession } from "next-auth/react";
-// import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/router";
-import Sidebar from "@/components/Sidebar";
-import Topbar from "@/components/Topbar";
-import Table from "@/components/Table";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
+import Table from "../components/Table";
 import { dataFormater } from "../utils/dataFormater.js";
-import { setFilter, getFilter } from "@/redux/actions/filterActions.js";
-import clientAxios from "@/config/clientAxios";
+import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  showNotification,
-  closeNotification,
-} from "@/redux/actions/notificationActions.js";
+import Chart from "chart.js/auto";
+import Head from "next/head.js";
 
-const Dashboard = ({ redeems, profile }) => {
+import { getRedeems } from "@/redux/actions/winaryActions";
+import { useTranslation } from "react-i18next";
+let flag = true;
+
+const Dashboard = ({ redeemsState, profile }) => {
+  const session = useSession();
+
+  const { t } = useTranslation();
+
   const filters = useSelector((state) => state.filter);
-  const notifications = useSelector((state) => state.notification);
+  const showModal = useSelector((state) => state.notification.showModal);
+  useEffect(() => {
+    if (session.status === "authenticated" && flag) {
+      dispatch(getRedeems(session.data.isAdmin));
+      flag = false;
+    }
+  }, [session]);
+
   const dispatch = useDispatch();
+  const chartRef = useRef(null);
+  const polarChartRef = useRef(null);
+
+  const redeems = useSelector((state) => state.winaryAdress.redeems);
+
+  useEffect(() => {
+    const chartLabels = [];
+    const chartData = {};
+
+    // Obtener las fechas de los últimos 7 meses
+    const currentDate = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(currentDate);
+      date.setMonth(currentDate.getMonth() - i);
+      chartLabels.push(date.toLocaleString("default", { month: "long" })); // Obtener el nombre del mes
+    }
+
+    // Contar los redeems por fecha
+    chartLabels.forEach((label) => {
+      const redeemCount = redeems.filter((redeem) => {
+        const redeemDate = new Date(redeem.created_at);
+        return (
+          redeemDate.toLocaleString("default", { month: "long" }) === label &&
+          redeemDate.getFullYear() === currentDate.getFullYear()
+        );
+      }).length;
+      chartData[label] = redeemCount;
+    });
+
+    // Configurar el gráfico
+    const chartConfig = {
+      type: "bar",
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: "Redeems",
+            data: Object.values(chartData),
+            backgroundColor: "rgba(245, 39, 84, 0.8)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            stepSize: 1,
+          },
+        },
+      },
+    };
+
+    // Crear el gráfico usando Chart.js
+    const chart = new Chart(chartRef.current, chartConfig);
+
+    // Limpiar el gráfico al desmontar el componente
+    return () => {
+      chart.destroy();
+    };
+  }, [redeems]);
+
+  useEffect(() => {
+    const chartLabels = [];
+    const chartData = [];
+
+    // Obtener los últimos 7 años
+    const currentYear = new Date().getFullYear();
+    for (let i = 6; i >= 0; i--) {
+      const year = currentYear - i;
+      chartLabels.push(year.toString());
+    }
+
+    // Contar los redeems por año
+    chartLabels.forEach((label) => {
+      const redeemCount = redeems.filter((redeem) => {
+        const redeemDate = new Date(redeem.created_at);
+        return redeemDate.getFullYear().toString() === label;
+      }).length;
+      chartData.push(redeemCount);
+    });
+
+    // Configurar el gráfico
+    const polarChartConfig = {
+      type: "polarArea",
+      data: {
+        labels: chartLabels,
+        datasets: [
+          {
+            label: "Redeems",
+            data: chartData,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.8)",
+              "rgba(54, 162, 235, 0.8)",
+              "rgba(255, 206, 86, 0.8)",
+              "rgba(75, 192, 192, 0.8)",
+              "rgba(153, 102, 255, 0.8)",
+              "rgba(255, 159, 64, 0.8)",
+              "rgba(255, 99, 132, 0.8)",
+            ],
+          },
+        ],
+      },
+      options: {
+        scales: {
+          r: {
+            beginAtZero: true,
+          },
+        },
+      },
+    };
+
+    // Crear el gráfico usando Chart.js
+    const polarChart = new Chart(polarChartRef.current, polarChartConfig);
+
+    // Limpiar el gráfico al desmontar el componente
+    return () => {
+      polarChart.destroy();
+    };
+  }, [redeems]);
 
   const columnas = [
     {
@@ -33,19 +165,19 @@ const Dashboard = ({ redeems, profile }) => {
     //   field: "customer_id",
     // },
     {
-      title: "Nombre",
+      title: t("nombre"),
       field: "name",
     },
     {
-      title: "Monto",
+      title: t("monto"),
       field: "amount",
     },
     {
-      title: "País",
+      title: t("pais"),
       field: "country_id",
     },
     {
-      title: "Provincia",
+      title: t("provincia"),
       field: "province_id",
     },
 
@@ -81,19 +213,19 @@ const Dashboard = ({ redeems, profile }) => {
     //   field: "winerie_id",
     // },
     {
-      title: "Año",
+      title: t("año"),
       field: "year",
     },
     {
-      title: "CP",
+      title: t("cp"),
       field: "zip",
     },
     {
-      title: "Creado",
+      title: t("creado"),
       field: "created_at",
     },
     {
-      title: "Estado",
+      title: t("estado"),
       field: "status",
     },
   ];
@@ -112,36 +244,46 @@ const Dashboard = ({ redeems, profile }) => {
     }
   };
 
-  const data = filterData(dataFormater(redeems));
+  const data = filterData(dataFormater(redeems, []));
 
-  const router = useRouter();
-
-  const [{ data: accountData }, disconnect] = useAccount();
-
-  const session = useSession();
-  console.log(session);
-  // const handleNoti = () => {
-  //   console.log(notifications);
-  //   if (notifications.notification) {
-  //     dispatch(closeNotification());
-  //   } else {
-  //     dispatch(showNotification());
-  //   }
-  // };
   return (
-    <div className="flex flex-col ">
-      <Sidebar />
-      <Topbar  profile={profile} />
+    <>
+      <Head>
+        <title>OpenVino - Dashboard</title>
+      </Head>
+      <div className="flex ">
+        <Sidebar />
+        <Topbar profile={profile} />
 
-      <div className="ml-20  min-w-fit top-4">
-        {/* <button className="bg-green-900" onClick={handleNoti}>
-          noti
-        </button> */}
-        <div className="mx-auto p-4 flex justify-center">
+        <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
           <Table data={data} columnas={columnas} n={5} />
+          <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
+            {/* Gráfico de barras */}
+            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
+              <h2 className="text-center mt-20">
+                {t("estadisiticasMensuales")}
+              </h2>
+              <canvas ref={chartRef} />
+            </div>
+
+            {/* Gráfico de área polar */}
+            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg mt-10 lg:mt-0 flex items-center flex-col">
+              <h2 className="text-center mt-20">{t("estadisiticasAnuales")}</h2>
+              <canvas
+                ref={polarChartRef}
+                className={
+                  !showModal
+                    ? "transform scale-75 translate-y-[-45px]"
+                    : "hidden"
+                }
+              />
+            </div>
+          </div>
+          <div className="h-[200px]"></div>
         </div>
       </div>
-    </div>
+      <div className="absolute top-[20%] left-[50%] fixed"></div>
+    </>
   );
 };
 
@@ -162,6 +304,9 @@ export async function getServerSideProps(context) {
   const { cookie } = req.headers;
 
   const response = await clientAxios.get("/redeemRoute", {
+    params: {
+      isAdmin: session.isAdmin,
+    },
     headers: {
       Cookie: cookie,
     },
@@ -175,6 +320,6 @@ export async function getServerSideProps(context) {
   });
 
   return {
-    props: { redeems: response.data, profile: profile.data },
+    props: { redeemsState: response.data, profile: profile.data },
   };
 }

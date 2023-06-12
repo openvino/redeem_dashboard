@@ -1,0 +1,22 @@
+{
+    "actualizado": "updated",
+    "calle": "Street",
+    "numero": "Number",
+    "buscar": "Search",
+    "nombre": "Name",
+    "monto": "Amount",
+    "name": "Name",
+    "pais": "Country",
+    "provincia": "Province",
+    "año": "Token",
+    "cp": "Zip",
+    "creado": "Created",
+    "estado": "State",
+    "estadisiticasMensuales": "Monthly redeeem statistics",
+    "estadisiticasAnuales": "Annual redeem statistics",
+    "deuda": "Total debt of OPENVINO redeem wallet",
+    "idioma" :"Language",
+    "detalle" : "Detail of redeem",
+    "guardar" : "Save",
+    "volver" : "Back"
+    }
