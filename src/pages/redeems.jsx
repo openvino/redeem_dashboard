@@ -141,6 +141,9 @@ export async function getServerSideProps(context) {
   const { cookie } = req.headers;
 
   const response = await clientAxios.get("/redeemRoute", {
+    params: {
+      isAdmin: session.isAdmin
+    },
     headers: {
       Cookie: cookie,
     },
