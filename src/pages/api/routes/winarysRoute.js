@@ -1,9 +1,5 @@
 import { getToken, jwt } from "next-auth/jwt";
-import {
-  getAllRedeems,
-  getRedeems,
-  updateRedeemStatus,
-} from "../controllers/redeemsController";
+import { getAllWinarys } from "../controllers/winarysController";
 import tokenVerify from "../helpers/tokenVerify";
 
 export default async function handler(req, res) {
@@ -31,6 +27,7 @@ export default async function handler(req, res) {
       //     return res.status(200).json(redeems);
       //   }
     } catch (error) {
+      console.log(error);
       res.status(500).json({ message: error.message });
     }
   }

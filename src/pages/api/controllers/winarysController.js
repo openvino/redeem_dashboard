@@ -1,7 +1,7 @@
 import conn from "../config/db";
 
 export const getAllWinarys = async (token) => {
-  let query = `SELECT * from winarys `;
+  let query = `SELECT * from wineries `;
   //   query += `FROM redeem_infos `;
   //   query += `JOIN users ON users.public_key = redeem_infos.customer_id `;
   //   query += `WHERE redeem_infos.winerie_id = (SELECT id FROM wineries WHERE public_key = '${token}');`;
