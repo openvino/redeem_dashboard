@@ -137,9 +137,9 @@ const Topbar = ({ profile }) => {
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
-        <h1 className="text-center">
+        {/* <h1 className="text-center">
           {session.data?.isAdmin && "Vista de administrador"}
-        </h1>
+        </h1> */}
 
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
