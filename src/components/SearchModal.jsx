@@ -75,7 +75,7 @@ const SearchModal = ({ data, winarys }) => {
   } else {
     return (
       <div className="fixed inset-0 flex justify-center items-center z-50">
-        <div className="fixed top-[6rem] right-8 bg-opacity-90 md:right-[20%] md:top-[6rem] ">
+        <div className="fixed top-[6rem] right-8 bg-opacity-[90%] md:right-[20%] md:top-[6rem] ">
           <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl p-2 rounded-lg">
             {filteredData.map((e) => (
               <p
