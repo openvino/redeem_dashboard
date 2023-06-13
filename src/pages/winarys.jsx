@@ -84,7 +84,6 @@ const Winarys = ({ winarys, profile }) => {
   console.log(data);
   return (
     <div className="">
-      <h1>winarys</h1>
       <Sidebar />
       <Topbar profile={profile} />
       <div className="ml-20  min-w-fit top-4 ">
