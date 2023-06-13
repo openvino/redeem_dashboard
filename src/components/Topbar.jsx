@@ -219,7 +219,7 @@ const Topbar = ({ profile }) => {
           </div>
         </div>
       </div>
-      {/* {console.log(allNotifications)} */}
+
       <Modal data={allNotifications} />
       <SearchModal data={allRedeems} />
     </>

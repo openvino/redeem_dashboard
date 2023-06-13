@@ -2,19 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector, useDispatch } from "react-redux";
 import { setFilter } from "@/redux/actions/filterActions.js";
-const SearchModal = ({ data }) => {
+
+const SearchModal = ({ data, winarys }) => {
   const filters = useSelector((state) => state.filter);
-  const [show, setShow] = useState();
+  const [show, setShow] = useState(false);
+  const [path, setPath] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
+
   useEffect(() => {
-    if (router.asPath.includes("/detail")) setShow(true);
-    else setShow(false);
+    if (router.asPath.includes("/detail")) {
+      setPath("/detail");
+      setShow(true);
+    } else if (router.asPath.includes("/winaryDetail")) {
+      setPath("/winaryDetail");
+      setShow(true);
+    } else {
+      setShow(false);
+    }
+    console.log(winarys);
   }, []);
 
   const handleClick = (id) => {
     dispatch(setFilter(""));
-    router.push(`/detail/${id}`);
+    router.push(`${path}/${id}`);
   };
 
   const filterData = (data) => {
@@ -34,14 +45,25 @@ const SearchModal = ({ data }) => {
   const formatData = (data) => {
     let formattedData = data.length > 4 ? data.slice(-4) : data;
 
-    formattedData = formattedData.map((item) => ({
-      id: item.id,
-      name: item.name,
-      email: item.email,
-      country_id: item.country_id,
-      province_id: item.province_id,
-      amount: item.amount,
-    }));
+    if (path === "/detail") {
+      formattedData = formattedData.map((item) => ({
+        id: item.id,
+        name: item.name,
+        email: item.email,
+        country_id: item.country_id,
+        province_id: item.province_id,
+        amount: item.amount,
+      }));
+    } else if (path === "/winaryDetail") {
+      formattedData = formattedData.map((item) => ({
+        id: item.id,
+        name: item.name,
+        email: item.email,
+        // country_id: item.country_id,
+        // province_id: item.province_id,
+        // amount: item.amount,
+      }));
+    }
 
     return formattedData;
   };
@@ -53,7 +75,7 @@ const SearchModal = ({ data }) => {
   } else {
     return (
       <div className="fixed inset-0 flex justify-center items-center z-50">
-        <div className="fixed top-[6rem] right-8 bg-opacity-90 md:right[20%] md:top-[6rem] ">
+        <div className="fixed top-[6rem] right-8 bg-opacity-90 md:right-[20%] md:top-[6rem] ">
           <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl p-2 rounded-lg">
             {filteredData.map((e) => (
               <p
@@ -72,6 +94,41 @@ const SearchModal = ({ data }) => {
 };
 
 export default SearchModal;
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+  const { req } = context;
+  const { cookie } = req.headers;
+
+  const response = await clientAxios.get("/winarysRoute", {
+    params: {
+      isAdmin: session.isAdmin,
+    },
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
+  const profile = await clientAxios.post("/loginRoute", {
+    public_key: session.address,
+    headers: {
+      Cookie: cookie,
+    },
+  });
+
+  return {
+    props: { winarys: response.data, profile: profile.data },
+  };
+}
 
 // import React, { useEffect, useState } from "react";
 // import { useRouter } from "next/router";
