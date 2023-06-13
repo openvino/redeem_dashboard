@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
   const router = useRouter();
-  console.log(router);
+ // console.log(router);
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);

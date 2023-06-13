@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       const location = await getLocation(token.sub, country_id, province_id);
       return res.status(200).json(location);
     } catch (error) {
-      console.log("HOLA");
+     // console.log("HOLA");
       res.status(500).json({ message: error.message });
     }
   }

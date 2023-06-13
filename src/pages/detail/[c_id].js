@@ -44,7 +44,7 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
-    console.log(data);
+   // console.log(data);
 
     const toastId = toast("Updating Redeem...", {
       position: "top-right",

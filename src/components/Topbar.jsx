@@ -94,7 +94,7 @@ const Topbar = ({ profile }) => {
       if (message === "Notification updated!") {
         dispatch(getRedeems());
       } else {
-        console.log("no se hizo");
+        //console.log("no se hizo");
       }
     });
 
@@ -138,13 +138,6 @@ const Topbar = ({ profile }) => {
   return (
     <>
       <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
-<<<<<<< HEAD
-        {/* <h1 className="text-center">
-          {session.data?.isAdmin && "Vista de administrador"}
-        </h1> */}
-
-=======
->>>>>>> f32cc1102089aeb75cfa85dc37d1c60d81f02847
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">

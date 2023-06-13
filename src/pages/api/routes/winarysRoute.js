@@ -1,5 +1,5 @@
 import { getToken, jwt } from "next-auth/jwt";
-import { getAllWinarys, updateWinary } from "../controllers/winarysController";
+import { getAllWinarys, updateWinary,createWinary } from "../controllers/winarysController";
 import tokenVerify from "../helpers/tokenVerify";
 
 export default async function handler(req, res) {
@@ -50,10 +50,9 @@ if (req.method === "POST") {
   // const { redeemId, status } = req.body;
   // console.log(redeemId, status);
 
-  console.log(req.body)
-  return
+ 
   try {
-    const updateWinary = await updateWinary(req.body.data);
+    const updateWinary = await createWinary(req.body.data);
     return res.status(200).json(updateWinary);
   } catch (error) {
     console.log(error);

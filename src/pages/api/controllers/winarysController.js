@@ -1,5 +1,5 @@
 import conn from "../config/db";
-
+import { v4 as uuid } from "uuid";
 export const getAllWinarys = async (token) => {
   let query = `SELECT * from wineries `;
   //   query += `FROM redeem_infos `;
@@ -28,7 +28,7 @@ export const updateWinary = async (req) => {
     isAdmin,
   } = req;
 
-  console.log(isAdmin);
+  //console.log(isAdmin);
   // console.log(req);
 
   // Actualizar la tabla winarys
@@ -61,4 +61,17 @@ export const updateWinary = async (req) => {
   //   userQuery += ` WHERE public_key = '${customer_id}'`;
 
   //   const userUpdate = await conn.query(userQuery);
+};
+
+export const createWinary = async (req) => {
+  const id = uuid();
+
+    //console.log(id)
+//console.log(req)
+    let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin") `;
+    query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${req.public_key}', '${req.isAdmin}')`;
+    
+
+    //console.log(query)
+  const createWinary = await conn.query(query);
 };

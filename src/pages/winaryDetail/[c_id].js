@@ -47,6 +47,7 @@ function Detail({ winarys, profile }) {
 
 
     if (c_id === "newWinary") {
+      console.log(data)
       try {
         const response = await clientAxios.post("/winarysRoute", {
           data,
@@ -75,7 +76,7 @@ function Detail({ winarys, profile }) {
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
-          render: "Redeem updated",
+          render: "Winary updated",
           autoClose: 5000,
         });
       } catch (error) {
@@ -124,10 +125,14 @@ function Detail({ winarys, profile }) {
       setValue("primary_color", winarys[id]?.primary_color, {
         shouldDirty: false,
       });
-      setValue("isAdmin",winarys[id]?.isAdmin == true ? 'true' : 'false', { shouldDirty: false });
-      setIsAdminSelect(winarys[id]?.isAdmin == true ? 'true' : 'false')
+      
     }
-  }, [winary]);
+  }, []);
+
+  useEffect(() => {
+    setValue("isAdmin",winarys[id]?.isAdmin == true ? 'true' : 'false', { shouldDirty: false });
+    setIsAdminSelect(winarys[id]?.isAdmin == true ? 'true' : 'false')
+  }, [winary])
 
     return (
     <>
@@ -282,9 +287,7 @@ function Detail({ winarys, profile }) {
                 onChange={(e) => {
                   setValue('isAdmin', e.target.value)
                   setIsAdminSelect(e.target.value)}
-                
                     }
-                  
               >
                 <option value="true">Si</option>
                 <option value="false">No</option>

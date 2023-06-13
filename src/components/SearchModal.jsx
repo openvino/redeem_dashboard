@@ -20,7 +20,7 @@ const SearchModal = ({ data, winarys }) => {
     } else {
       setShow(false);
     }
-    console.log(winarys);
+   // console.log(winarys);
   }, []);
 
   const handleClick = (id) => {
