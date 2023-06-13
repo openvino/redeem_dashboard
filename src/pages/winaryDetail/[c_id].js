@@ -55,7 +55,7 @@ function Detail({ winarys, profile }) {
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
-          render: "Redeem updated",
+          render: "Winary updated",
           autoClose: 5000,
         });
       } catch (error) {

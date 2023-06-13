@@ -44,8 +44,7 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
-
-      console.log(data)
+    console.log(data);
 
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
@@ -82,14 +81,14 @@ function Detail({ redeems, profile, countries, provinces }) {
   const redeem = redeems[id];
 
   useEffect(() => {
-      const setTrue = async  () => {
-            await clientAxios.post('/notificationRoute', {
-               id : redeem.id
-             })
-           dispatch(getRedeems())
-        }
-        setTrue()
-  }, [redeem])
+    const setTrue = async () => {
+      await clientAxios.post("/notificationRoute", {
+        id: redeem.id,
+      });
+      dispatch(getRedeems());
+    };
+    setTrue();
+  }, [redeem]);
 
   return (
     <>
@@ -123,7 +122,7 @@ function Detail({ redeems, profile, countries, provinces }) {
           className="space-y-2 flex justify-center flex-col"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
+          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
               <input
@@ -234,7 +233,6 @@ function Detail({ redeems, profile, countries, provinces }) {
                   console.log(e.target.value);
                   setProvinceSelector(e.target.value);
                   setValue("province_id", e.target.value);
-
                 }}
               >
                 {provinces
@@ -372,7 +370,7 @@ export async function getServerSideProps(context) {
 
   const response = await clientAxios.get("/redeemRoute", {
     params: {
-      isAdmin: session.isAdmin
+      isAdmin: session.isAdmin,
     },
     headers: {
       Cookie: cookie,
