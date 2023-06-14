@@ -15,13 +15,15 @@ function Detail({ winarys, profile }) {
   const { t } = useTranslation();
   const session = useSession();
   const [id, setId] = useState("");
-  const [isAdminSelect, setIsAdminSelect] = useState("");
+  const [isAdminSelect, setIsAdminSelect] = useState(false);
 
   const router = useRouter();
   let { c_id } = router.query;
 
   const { register, handleSubmit, setValue } = useForm();
   const dispatch = useDispatch();
+
+ 
   useEffect(() => {
     if (c_id === "newWinary") {
     } else {
@@ -65,6 +67,7 @@ function Detail({ winarys, profile }) {
       }
     } else {
       try {
+        console.log(data)
         const response = await clientAxios.put("/winarysRoute", {
           data,
         });
@@ -86,42 +89,25 @@ function Detail({ winarys, profile }) {
     }
   };
 
-  if (c_id === "newWinary") {
-    winary = {
-      id: "",
-      created_at: "",
-      amount: "",
-      country_id: "",
-      deleted_at: "",
-      name: "",
-      email: "",
-      website: "",
-      image: "",
-      primary_color: "",
-      secret: "",
-      public_key: "",
-      isAdmin: isAdminSelect,
-    };
-  } else {
+ 
     winary = winarys[id];
-  }
 
   useEffect(() => {
     if (winary) {
-      setValue("id", winarys[id]?.id, { shouldDirty: false });
-      setValue("created_at", winarys[id]?.created_at, { shouldDirty: false });
-      setValue("updated_at", winarys[id]?.updated_at, { shouldDirty: false });
-      setValue("name", winarys[id]?.name, { shouldDirty: false });
-      setValue("website", winarys[id]?.website, { shouldDirty: false });
-      setValue("image", winarys[id]?.image, { shouldDirty: false });
-      setValue("secret", winarys[id]?.secret, { shouldDirty: false });
-      setValue("public_key", winarys[id]?.public_key, { shouldDirty: false });
-      setValue("email", winarys[id]?.email, { shouldDirty: false });
-      setValue("primary_color", winarys[id]?.primary_color, {
+      setValue("id", winary.id, { shouldDirty: false });
+      setValue("created_at", winary.created_at, { shouldDirty: false });
+      setValue("updated_at", winary.updated_at, { shouldDirty: false });
+      setValue("name", winary.name, { shouldDirty: false });
+      setValue("website", winary.website, { shouldDirty: false });
+      setValue("image", winary.image, { shouldDirty: false });
+      setValue("secret", winary.secret, { shouldDirty: false });
+      setValue("public_key", winary.public_key, { shouldDirty: false });
+      setValue("email", winary.email, { shouldDirty: false });
+      setValue("primary_color", winary.primary_color, {
         shouldDirty: false,
       });
     }
-  }, []);
+  }, [winary]);
 
   useEffect(() => {
     if (session.data?.isAdmin) dispatch(getWinarys(session.data.isAdmin));
@@ -174,6 +160,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="id"
@@ -187,6 +174,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("Nombre")}:</label>
               <input
+              required
                 type="text"
                 id="name"
                 name="name"
@@ -201,6 +189,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("Sitio web")}:</label>
               <input
+              required
                 type="text"
                 id="website"
                 name="website"
@@ -213,6 +202,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Imagen:</label>
               <input
+              required
                 type="text"
                 id="image"
                 name="image"
@@ -227,6 +217,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Email:</label>
               <input
+              required
                 type="email"
                 id="email"
                 name="email"
@@ -239,6 +230,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Color Primario:</label>
               <input
+              required
                 type="color"
                 id="primary_color"
                 name="primary_color"
@@ -268,6 +260,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Clave pública</label>
               <input
+              required
                 type="text"
                 id="public_key"
                 name="public_key"

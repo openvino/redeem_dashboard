@@ -52,6 +52,8 @@ function Detail({ redeems, profile, countries, provinces }) {
   const onSubmit = async (data) => {
     // console.log(data);
 
+     
+      
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
       autoClose: false,
@@ -132,6 +134,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="id"
@@ -145,6 +148,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("monto")}:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="amount"
@@ -160,7 +164,8 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("nombre")}:</label>
               <input
-                type="text"
+              required
+                 type="text"
                 id="name"
                 name="name"
                 defaultValue={redeem.name}
@@ -172,6 +177,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Customer_id:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="customer_id"
@@ -187,6 +193,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Email:</label>
               <input
+              required
                 type="text"
                 id="email"
                 name="email"
@@ -258,6 +265,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("calle")}:</label>
               <input
+              required
                 type="text"
                 id="street"
                 name="street"
@@ -270,6 +278,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("numero")}:</label>
               <input
+              required
                 type="text"
                 id="number"
                 name="number"
@@ -284,6 +293,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("cp")}:</label>
               <input
+              required
                 type="text"
                 id="zip"
                 name="zip"
@@ -296,12 +306,14 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Token:</label>
               <input
+              required
+              disabled
                 type="text"
                 id="year"
                 name="year"
                 defaultValue={redeem.year}
                 {...register("year")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
               />
             </div>
           </div>
@@ -310,6 +322,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("creado")}:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="created_at"
