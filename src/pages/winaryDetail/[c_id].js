@@ -124,8 +124,6 @@ function Detail({ winarys, profile }) {
   }, []);
 
   useEffect(() => {
-    console.log(session);
-    // console.log("222222222222222222222222222222222", winarys);
     if (session.data?.isAdmin) dispatch(getWinarys(session.data.isAdmin));
     setValue("isAdmin", winarys[id]?.isAdmin == true ? "true" : "false", {
       shouldDirty: false,

@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { FaSearch } from "react-icons/fa";
+import { MdLanguage } from "react-icons/md";
+import { FaLanguage } from "react-icons/fa";
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +11,7 @@ import { signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
+import Loader from "./Loader";
 import {
   closeNotification,
   showNotification,
@@ -45,7 +48,7 @@ const Topbar = ({ profile }) => {
 
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showModal && !event.target.closest(".modal-content")) {
@@ -70,10 +73,15 @@ const Topbar = ({ profile }) => {
   const [toggle, setToggle] = useState(false);
 
   const toggleLanguage = () => {
-    setToggle(!toggle);
-    const language = toggle ? "es" : "en";
-    i18n.changeLanguage(language);
-    setSelectLanguage(!selectLanguage);
+    setLoading(true);
+
+    setTimeout(() => {
+      setToggle(!toggle);
+      const language = toggle ? "es" : "en";
+      i18n.changeLanguage(language);
+      setSelectLanguage(!selectLanguage);
+      setLoading(false);
+    }, 500);
   };
   const { t, i18n } = useTranslation();
 
@@ -138,7 +146,8 @@ const Topbar = ({ profile }) => {
 
   return (
     <>
-      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2 ">
+      {loading && <Loader />}
+      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2">
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
@@ -202,8 +211,9 @@ const Topbar = ({ profile }) => {
                 height={50}
                 alt="wineryLogo"
               />
+
               {showMenu && (
-                <div className="absolute w-[112px] cursor-pointer right-[-25px] top-14 bg-white border rounded-lg shadow-lg text-center ">
+                <div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
                   {/* <p className="m-0 p-2 cursor-pointer" >Perfil</p> */}
                   <p
                     className="m-0 p-2 cursor-pointer"
@@ -211,16 +221,18 @@ const Topbar = ({ profile }) => {
                   >
                     Cerrar Sesión
                   </p>
-                  <button onClick={toggleLanguage}>
-                    {t("idioma")} {selectLanguage ? "Español" : "English"}{" "}
-                  </button>
                 </div>
               )}
             </div>
+            <button onClick={toggleLanguage}>
+              {/* {t("idioma")} */}
+              {selectLanguage ? "EN" : "ES"}
+            </button>
+
+            {/* <MdLanguage size={20} /> */}
           </div>
         </div>
       </div>
-
       <Modal data={allNotifications} />
       {router.asPath.includes("/winaryDetail") && (
         <SearchModal data={winarys} />
