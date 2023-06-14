@@ -1,6 +1,6 @@
 import { useSession, signOut, getSession } from "next-auth/react";
 import { useEffect, useState, useRef } from "react";
-import { useAccount } from "wagmi";
+
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Table from "../components/Table";
@@ -9,21 +9,44 @@ import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
 import Head from "next/head.js";
-
 import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
+import { getCountries, getProvinces } from "../redux/actions/winaryActions";
 let flag = true;
 
 const Dashboard = ({ redeemsState, profile }) => {
   const session = useSession();
-
   const { t } = useTranslation();
-
   const filters = useSelector((state) => state.filter);
+  const countries = useSelector((state) => state.winaryAdress.countries);
+  const provinces = useSelector((state) => state.winaryAdress.provinces);
+
+  const countryName = (country_id) => {
+    const country = countries.find((e) => e.country_id === country_id);
+    return country ? country.place_description : country_id;
+  };
+
+  const provinceName = (province_id) => {
+    const province = provinces.find((e) => e.province_id === province_id);
+    return province ? province.place_description : province_id;
+  };
+
+  const countryAndProvinceNames = (data) => {
+    const newData = data.map((item) => ({
+      ...item,
+      country_id: countryName(item.country_id),
+      province_id: provinceName(item.province_id),
+    }));
+
+    return newData;
+  };
+
   const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
     if (session.status === "authenticated" && flag) {
       dispatch(getRedeems(session.data.isAdmin));
+      dispatch(getCountries());
+      dispatch(getProvinces());
       flag = false;
     }
   }, [session]);
@@ -244,7 +267,7 @@ const Dashboard = ({ redeemsState, profile }) => {
     }
   };
 
-  const data = filterData(dataFormater(redeems, []));
+  const data = filterData(countryAndProvinceNames(dataFormater(redeems, [])));
 
   return (
     <>
