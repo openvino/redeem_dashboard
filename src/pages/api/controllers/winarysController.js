@@ -1,7 +1,8 @@
 import conn from "../config/db";
 import { v4 as uuid } from "uuid";
+
 export const getAllWinarys = async (token) => {
-  let query = `SELECT * from wineries `;
+  let query = `SELECT * from wineries`;
   //   query += `FROM redeem_infos `;
   //   query += `JOIN users ON users.public_key = redeem_infos.customer_id `;
   //   query += `WHERE redeem_infos.winerie_id = (SELECT id FROM wineries WHERE public_key = '${token}');`;
@@ -66,12 +67,11 @@ export const updateWinary = async (req) => {
 export const createWinary = async (req) => {
   const id = uuid();
 
-    //console.log(id)
-//console.log(req)
-    let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin") `;
-    query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${req.public_key}', '${req.isAdmin}')`;
-    
+  //console.log(id)
+  //console.log(req)
+  let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin") `;
+  query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${req.public_key}', '${req.isAdmin}')`;
 
-    //console.log(query)
+  //console.log(query)
   const createWinary = await conn.query(query);
 };

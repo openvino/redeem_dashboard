@@ -13,7 +13,7 @@ import { getRedeems } from "@/redux/actions/winaryActions";
 
 function Detail({ redeems, profile, countries, provinces }) {
   const { t } = useTranslation();
-
+  const session = useSession();
   const router = useRouter();
   const { c_id } = router.query;
   const { register, handleSubmit, setValue } = useForm({});
@@ -24,6 +24,11 @@ function Detail({ redeems, profile, countries, provinces }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // setValue("customer_id", "");
+    // setValue("amount", "");
+    // setValue("status", "");
+    // setValue("country_id", "");
+    // setValue("province_id", "");
     dispatch(getRedeems());
   }, [id]);
 
@@ -35,6 +40,7 @@ function Detail({ redeems, profile, countries, provinces }) {
       setValue("status", redeems[id]?.redeem_status, { shouldDirty: false });
       setValue("country_id", redeems[id]?.country_id, { shouldDirty: false });
       setValue("province_id", redeems[id]?.province_id, { shouldDirty: false });
+      setValue("email", redeems[id]?.email, { shouldDirty: false });
       setCountrieSelector(redeems[id].country_id);
       setProvinceSelector(redeems[id].province_id);
       setStatusSelector(redeems[id].redeem_status);
@@ -390,6 +396,7 @@ export async function getServerSideProps(context) {
       Cookie: cookie,
     },
   });
+
   const provinces = await clientAxios.get("/provinceRoute", {
     public_key: session.address,
     headers: {

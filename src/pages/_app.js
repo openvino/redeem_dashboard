@@ -14,11 +14,9 @@ export default function App({ Component, pageProps }) {
   const [loading, setLoading] = useState(false);
   // Route change event listener
   Router.events.on("routeChangeStart", (url) => {
-    console.log("Route is changing");
     setLoading(true);
   });
   Router.events.on("routeChangeComplete", (url) => {
-    console.log("Route change completed");
     setLoading(false);
   });
   return (
