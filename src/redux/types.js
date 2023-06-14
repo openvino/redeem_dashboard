@@ -1,4 +1,5 @@
 export const GET_REDEEMS = "GET_REDEEMS";
+export const GET_WINARYS = "GET_WINARYS";
 export const AUTH_WINARY = "AUTH_WINARY";
 
 export const SHOW_ALERT = "SHOW_ALERT";

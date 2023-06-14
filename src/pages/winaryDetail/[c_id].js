@@ -9,30 +9,27 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
-import { getRedeems } from "@/redux/actions/winaryActions";
+import { getRedeems, getWinarys } from "@/redux/actions/winaryActions";
 let winary;
 function Detail({ winarys, profile }) {
   const { t } = useTranslation();
-
-    const [id, setId] = useState('')
-    const [isAdminSelect, setIsAdminSelect] = useState('')
+  const session = useSession();
+  const [id, setId] = useState("");
+  const [isAdminSelect, setIsAdminSelect] = useState("");
 
   const router = useRouter();
   let { c_id } = router.query;
- 
-  const { register, handleSubmit, setValue } = useForm();
 
+  const { register, handleSubmit, setValue } = useForm();
+  const dispatch = useDispatch();
   useEffect(() => {
     if (c_id === "newWinary") {
     } else {
-      setId( winarys.findIndex((r) => r.id === c_id))
-      
+      setId(winarys.findIndex((r) => r.id === c_id));
     }
-  }, [])
-
+  }, []);
 
   const onSubmit = async (data) => {
-
     const toastId = toast("Updating winary data...", {
       position: "top-right",
       autoClose: false,
@@ -45,14 +42,13 @@ function Detail({ winarys, profile }) {
       isLoading: true,
     });
 
-
     if (c_id === "newWinary") {
-      console.log(data)
+      console.log(data);
       try {
         const response = await clientAxios.post("/winarysRoute", {
           data,
         });
-  
+
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
@@ -72,7 +68,7 @@ function Detail({ winarys, profile }) {
         const response = await clientAxios.put("/winarysRoute", {
           data,
         });
-  
+
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
@@ -88,7 +84,6 @@ function Detail({ winarys, profile }) {
         });
       }
     }
-   
   };
 
   if (c_id === "newWinary") {
@@ -111,7 +106,7 @@ function Detail({ winarys, profile }) {
     winary = winarys[id];
   }
 
-   useEffect(() => {
+  useEffect(() => {
     if (winary) {
       setValue("id", winarys[id]?.id, { shouldDirty: false });
       setValue("created_at", winarys[id]?.created_at, { shouldDirty: false });
@@ -125,16 +120,20 @@ function Detail({ winarys, profile }) {
       setValue("primary_color", winarys[id]?.primary_color, {
         shouldDirty: false,
       });
-      
     }
   }, []);
 
   useEffect(() => {
-    setValue("isAdmin",winarys[id]?.isAdmin == true ? 'true' : 'false', { shouldDirty: false });
-   
-  }, [winary])
+    console.log(session);
+    // console.log("222222222222222222222222222222222", winarys);
+    if (session.data?.isAdmin) dispatch(getWinarys(session.data.isAdmin));
+    setValue("isAdmin", winarys[id]?.isAdmin == true ? "true" : "false", {
+      shouldDirty: false,
+    });
+    setIsAdminSelect(winarys[id]?.isAdmin == true ? "true" : "false");
+  }, [winary, dispatch, session]);
 
-    return (
+  return (
     <>
       <ToastContainer
         position="top-right"
@@ -241,7 +240,7 @@ function Detail({ winarys, profile }) {
                 id="primary_color"
                 name="primary_color"
                 defaultValue={winary?.primary_color}
-                onChange={(e) => setValue('primary_color', e.target.value)}
+                onChange={(e) => setValue("primary_color", e.target.value)}
                 {...register("primary_color")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
@@ -285,9 +284,9 @@ function Detail({ winarys, profile }) {
                 className=" px-2 py-1 border border-gray-300 rounded-md w-[4rem]"
                 {...register("isAdmin")}
                 onChange={(e) => {
-                  setValue('isAdmin', e.target.value)
-                  setIsAdminSelect(e.target.value)}
-                    }
+                  setValue("isAdmin", e.target.value);
+                  setIsAdminSelect(e.target.value);
+                }}
               >
                 <option value="true">Si</option>
                 <option value="false">No</option>
@@ -298,7 +297,7 @@ function Detail({ winarys, profile }) {
             <button
               type="button"
               onClick={() => {
-                router.back()
+                router.back();
               }}
               className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
             >

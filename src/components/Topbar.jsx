@@ -35,13 +35,14 @@ const Topbar = ({ profile }) => {
   const session = useSession();
   const router = useRouter();
   const [selectLanguage, setSelectLanguage] = useState(false);
-
+  const winarys = useSelector((state) => state.winaryAdress.winarys);
   const [isFocused, setIsFocused] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const inputRef = useRef(null);
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
+
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
 
@@ -221,7 +222,10 @@ const Topbar = ({ profile }) => {
       </div>
 
       <Modal data={allNotifications} />
-      <SearchModal data={allRedeems} />
+      {router.asPath.includes("/winaryDetail") && (
+        <SearchModal data={winarys} />
+      )}
+      {router.asPath.includes("/detail") && <SearchModal data={allRedeems} />}
     </>
   );
 };

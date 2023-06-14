@@ -13,10 +13,10 @@ import { getRedeems } from "@/redux/actions/winaryActions";
 
 function Detail({ redeems, profile, countries, provinces }) {
   const { t } = useTranslation();
-
+  const session = useSession();
   const router = useRouter();
   const { c_id } = router.query;
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue } = useForm({});
   const [countrieSelector, setCountrieSelector] = useState("");
   const [provinceSelector, setProvinceSelector] = useState("");
   const [statusSelector, setStatusSelector] = useState("");
@@ -24,6 +24,11 @@ function Detail({ redeems, profile, countries, provinces }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // setValue("customer_id", "");
+    // setValue("amount", "");
+    // setValue("status", "");
+    // setValue("country_id", "");
+    // setValue("province_id", "");
     dispatch(getRedeems());
   }, [id]);
 
@@ -35,6 +40,7 @@ function Detail({ redeems, profile, countries, provinces }) {
       setValue("status", redeems[id]?.redeem_status, { shouldDirty: false });
       setValue("country_id", redeems[id]?.country_id, { shouldDirty: false });
       setValue("province_id", redeems[id]?.province_id, { shouldDirty: false });
+      setValue("email", redeems[id]?.email, { shouldDirty: false });
       setCountrieSelector(redeems[id].country_id);
       setProvinceSelector(redeems[id].province_id);
       setStatusSelector(redeems[id].redeem_status);
@@ -44,7 +50,7 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
-   // console.log(data);
+    // console.log(data);
 
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
@@ -110,7 +116,7 @@ function Detail({ redeems, profile, countries, provinces }) {
       <Sidebar />
       <div
         className="
-      z-1
+      z-1 lg:overflow-x-hidden
       mt-[8rem]
       ml-[6rem]
       overflow-x-scroll
@@ -390,6 +396,7 @@ export async function getServerSideProps(context) {
       Cookie: cookie,
     },
   });
+
   const provinces = await clientAxios.get("/provinceRoute", {
     public_key: session.address,
     headers: {
