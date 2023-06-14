@@ -100,7 +100,7 @@ function Detail({ winarys, profile }) {
       primary_color: "",
       secret: "",
       public_key: "",
-      isAdmin: setIsAdminSelect,
+      isAdmin: isAdminSelect,
     };
   } else {
     winary = winarys[id];
@@ -124,14 +124,17 @@ function Detail({ winarys, profile }) {
   }, []);
 
   useEffect(() => {
-    console.log(session);
-    // console.log("222222222222222222222222222222222", winarys);
     if (session.data?.isAdmin) dispatch(getWinarys(session.data.isAdmin));
-    setValue("isAdmin", winarys[id]?.isAdmin == true ? "true" : "false", {
-      shouldDirty: false,
-    });
-    setIsAdminSelect(winarys[id]?.isAdmin == true ? "true" : "false");
-  }, [winary, dispatch, session]);
+  }, [session]);
+
+  useEffect(() => {
+    if (c_id != "newWinary") {
+      setValue("isAdmin", winarys[id]?.isAdmin == true ? "true" : "false", {
+        shouldDirty: false,
+      });
+      setIsAdminSelect(winarys[id]?.isAdmin == true ? "true" : "false");
+    }
+  }, [winary]);
 
   return (
     <>
@@ -284,8 +287,8 @@ function Detail({ winarys, profile }) {
                 className=" px-2 py-1 border border-gray-300 rounded-md w-[4rem]"
                 {...register("isAdmin")}
                 onChange={(e) => {
-                  setValue("isAdmin", e.target.value);
                   setIsAdminSelect(e.target.value);
+                  setValue("isAdmin", e.target.value);
                 }}
               >
                 <option value="true">Si</option>
