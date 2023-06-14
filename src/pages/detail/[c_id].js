@@ -16,7 +16,7 @@ function Detail({ redeems, profile, countries, provinces }) {
 
   const router = useRouter();
   const { c_id } = router.query;
-  const { register, handleSubmit, setValue } = useForm();
+  const { register, handleSubmit, setValue } = useForm({});
   const [countrieSelector, setCountrieSelector] = useState("");
   const [provinceSelector, setProvinceSelector] = useState("");
   const [statusSelector, setStatusSelector] = useState("");
