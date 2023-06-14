@@ -105,7 +105,7 @@ function Detail({ winarys, profile }) {
       primary_color: "",
       secret: "",
       public_key: "",
-      isAdmin: false,
+      isAdmin: setIsAdminSelect,
     };
   } else {
     winary = winarys[id];
@@ -131,7 +131,7 @@ function Detail({ winarys, profile }) {
 
   useEffect(() => {
     setValue("isAdmin",winarys[id]?.isAdmin == true ? 'true' : 'false', { shouldDirty: false });
-    setIsAdminSelect(winarys[id]?.isAdmin == true ? 'true' : 'false')
+   
   }, [winary])
 
     return (
