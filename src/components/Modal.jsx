@@ -51,8 +51,17 @@ const Modal = ({ data }) => {
                 onClick={() => handleClick(e.id)}
                 key={e.id}
               >
-                {e.name} ha realizado un redeem hace{" "}
-                {getTimeDifference(e.created_at)}
+                {e.name ? (
+                  <span>
+                    {e.name} ha realizado un redeem hace{" "}
+                    {getTimeDifference(e.created_at)}
+                  </span>
+                ) : (
+                  <span>
+                    Un cliente ha realizado un redeem hace{" "}
+                    {getTimeDifference(e.created_at)}
+                  </span>
+                )}
               </p>
             ))}
           </div>
