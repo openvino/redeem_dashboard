@@ -44,7 +44,7 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
-   // console.log(data);
+    // console.log(data);
 
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
@@ -110,7 +110,7 @@ function Detail({ redeems, profile, countries, provinces }) {
       <Sidebar />
       <div
         className="
-      z-1
+      z-1 lg:overflow-x-hidden
       mt-[8rem]
       ml-[6rem]
       overflow-x-scroll
