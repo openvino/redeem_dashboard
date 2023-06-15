@@ -8,7 +8,6 @@ export async function middleware(request) {
     const jwtoken = await tokenVerify(request);
 
     if (!jwtoken) {
-      //console.log("no verificado");
       return NextResponse.redirect(new URL("/", request.url));
     }
   }

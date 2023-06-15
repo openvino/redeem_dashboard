@@ -81,7 +81,6 @@ const Winarys = ({ winarys, profile }) => {
   };
   const data = filterData(dataFormater(winarys));
   // const data = dataFormater(winarys);
-  console.log(data);
   return (
     <div className="">
       <Sidebar />

@@ -50,9 +50,6 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
-    // console.log(data);
-
-     
       
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
@@ -243,7 +240,6 @@ function Detail({ redeems, profile, countries, provinces }) {
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 value={provinceSelector}
                 onChange={(e) => {
-                  console.log(e.target.value);
                   setProvinceSelector(e.target.value);
                   setValue("province_id", e.target.value);
                 }}

@@ -32,7 +32,6 @@ const LoginButton = () => {
       if (error) {
         throw error;
       }
-      //console.log(data.account);
       signIn("credentials", { address: data?.account, callbackUrl });
     } catch (error) {
       window.alert("Metamask is not installed");

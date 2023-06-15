@@ -29,8 +29,7 @@ export const updateWinary = async (req) => {
     isAdmin,
   } = req;
 
-  //console.log(isAdmin);
-  // console.log(req);
+
 
   // Actualizar la tabla winarys
   let winaryQuery = `UPDATE wineries SET `;
@@ -67,11 +66,9 @@ export const updateWinary = async (req) => {
 export const createWinary = async (req) => {
   const id = uuid();
 
-  //console.log(id)
-  //console.log(req)
+
   let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin") `;
   query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${req.public_key}', '${req.isAdmin}')`;
 
-  //console.log(query)
   const createWinary = await conn.query(query);
 };

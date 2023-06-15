@@ -95,9 +95,7 @@ const Topbar = ({ profile }) => {
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
         dispatch(getRedeems());
-      } else {
-        //console.log("no se hizo");
-      }
+      } 
     });
 
     // Connection closed

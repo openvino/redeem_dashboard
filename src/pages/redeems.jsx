@@ -1,5 +1,5 @@
 import Table from "@/components/Table";
-import { useSession, signOut, getSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import React from "react";
 import clientAxios from "@/config/clientAxios";
 import { dataFormater } from "../utils/dataFormater.js";

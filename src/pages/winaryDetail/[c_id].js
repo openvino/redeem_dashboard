@@ -44,7 +44,6 @@ function Detail({ winarys, profile }) {
     });
 
     if (c_id === "newWinary") {
-      console.log(data);
       try {
         const response = await clientAxios.post("/winarysRoute", {
           data,
@@ -70,7 +69,6 @@ function Detail({ winarys, profile }) {
       }
     } else {
       try {
-        console.log(data);
         const response = await clientAxios.put("/winarysRoute", {
           data,
         });
