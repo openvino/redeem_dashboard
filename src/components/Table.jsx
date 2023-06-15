@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-
+import { FaSortDown, FaSortUp, FaSort } from "react-icons/fa";
 const Table = ({ data, columnas, n, route = "/detail" }) => {
   const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
@@ -173,13 +173,20 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
               {columnas.map((columna) => (
                 <th
                   key={columna.field}
-                  className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center ${
+                  className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center cursor-pointer${
                     columna.field === "acciones" ? "w-12 sm:w-16" : ""
                   }
                 `}
                   onClick={() => handleOrdenarColumna(columna.field)}
                 >
-                  {columna.title}
+                  <span>
+                    {columna.title}{" "}
+                    {/* {ascOrder ? (
+                      <FaSortUp size={10} className="ml-0 inline" />
+                    ) : (
+                      <FaSortDown size={10} className="ml-0 inline" />
+                    )} */}
+                  </span>
                 </th>
               ))}
             </tr>
@@ -197,7 +204,6 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
                         key={columna.field}
                         className="px-0 py-1 text-[1em] md:text-[0.75rem] text-gray-900 text-center"
                       >
-                      
                         <Link href={`${route}/${fila.id}`}>
                           <div className="inline-flex items-center px-0">
                             <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />
