@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { getRedeems, getWinarys } from "@/redux/actions/winaryActions";
+import Head from "next/head";
 let winary;
 function Detail({ winarys, profile }) {
   const { t } = useTranslation();
@@ -128,6 +129,9 @@ function Detail({ winarys, profile }) {
 
   return (
     <>
+    <Head>
+    <title>OpenVino - Winery Detail</title>
+  </Head>
       <ToastContainer
         position="top-right"
         autoClose={5000}

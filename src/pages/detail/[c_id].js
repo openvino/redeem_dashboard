@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { getRedeems } from "@/redux/actions/winaryActions";
-
+import Head from "next/head";
 function Detail({ redeems, profile, countries, provinces }) {
   const { t } = useTranslation();
   const session = useSession();
@@ -97,6 +97,9 @@ function Detail({ redeems, profile, countries, provinces }) {
 
   return (
     <>
+    <Head>
+    <title>OpenVino - Detail redeems</title>
+  </Head>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -221,7 +224,6 @@ function Detail({ redeems, profile, countries, provinces }) {
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 defaultValue={redeem.country_id}
                 onChange={(e) => {
-                  //console.log(e.target.value);
                   setCountrieSelector(e.target.value);
                   setValue("country_id", e.target.value);
                 }}

@@ -7,7 +7,7 @@ import Sidebar from "@/components/Sidebar.jsx";
 import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-
+import Head from "next/head.js";
 const Winarys = ({ winarys, profile }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
@@ -81,7 +81,10 @@ const Winarys = ({ winarys, profile }) => {
   };
   const data = filterData(dataFormater(winarys));
   // const data = dataFormater(winarys);
-  return (
+  return (<>
+  <Head>
+    <title>OpenVino - Winerys</title>
+  </Head>
     <div className="">
       <Sidebar />
       <Topbar profile={profile} />
@@ -89,6 +92,7 @@ const Winarys = ({ winarys, profile }) => {
         <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
       </div>
     </div>
+    </>
   );
 };
 
