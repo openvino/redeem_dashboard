@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     try {
       // Verificar el token
       const token = await getToken({ req, secret });
-        
+        console.log(isAdmin)
       if(isAdmin === 'true') {
         const redeems = await getAllRedeems()
         return res.status(200).json(redeems);

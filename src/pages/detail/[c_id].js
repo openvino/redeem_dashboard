@@ -50,6 +50,7 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
+
       
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
@@ -90,10 +91,12 @@ function Detail({ redeems, profile, countries, provinces }) {
       await clientAxios.post("/notificationRoute", {
         id: redeem.id,
       });
-      dispatch(getRedeems());
+      dispatch(getRedeems(session.data.isAdmin));
     };
-    setTrue();
-  }, [redeem]);
+    if(session.data?.isAdmin) {
+      setTrue();
+    }
+  }, [redeem,session]);
 
   return (
     <>

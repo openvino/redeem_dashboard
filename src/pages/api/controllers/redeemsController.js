@@ -15,7 +15,7 @@ export const getRedeems = async (token) => {
 
 //TODO AGREGAR CAMPO STATUS
 export const updateRedeemStatus = async (req) => {
-  const { id, amount, customer_id, status, country_id, province_id, email,name, telegram_id } = req;
+  const {street, id,number, zip,  customer_id, status, country_id, province_id, email,name, telegram_id } = req;
 
  // console.log(req);
 
@@ -23,12 +23,13 @@ export const updateRedeemStatus = async (req) => {
   let redeemQuery = `UPDATE redeem_infos SET `;
   let redeemUpdateFields = [];
 
-  if (amount) redeemUpdateFields.push(`amount = '${amount}'`);
   if (status) redeemUpdateFields.push(`redeem_status = '${status}'`);
   if (country_id) redeemUpdateFields.push(`country_id = '${country_id}'`);
   if (province_id) redeemUpdateFields.push(`province_id = '${province_id}'`);
   if (telegram_id) redeemUpdateFields.push(`telegram_id = '${telegram_id}'`);
-
+  if (street) redeemUpdateFields.push(`street = '${street}'`);
+  if (number) redeemUpdateFields.push(`number = '${number}'`);
+  if (zip) redeemUpdateFields.push(`zip = '${zip}'`);
 
   redeemQuery += redeemUpdateFields.join(', ');
   redeemQuery += ` WHERE id = '${id}'`;
@@ -51,7 +52,6 @@ export const getAllRedeems = async () => {
   query += `FROM redeem_infos `;
   query += `JOIN users ON users.public_key = redeem_infos.customer_id `;
   const redeems = await conn.query(query);
-
   if (redeems.rows.length > 0) {
     return redeems.rows;
   } else {
