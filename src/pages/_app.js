@@ -5,7 +5,7 @@ import { Provider as WagmiProvider } from "wagmi";
 import { Provider } from "react-redux";
 import store from "../redux/store";
 import { I18nextProvider } from "react-i18next";
-import i18n from "@/config/i18n";
+import i18n from "../config/i18n";
 import Router from "next/router";
 import Loader from "../components/Loader";
 import { useState } from "react";
