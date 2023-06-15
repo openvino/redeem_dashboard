@@ -1,5 +1,5 @@
 {
-    "actualizado": "updated",
+    "actualizado": "Updated",
     "calle": "Street",
     "numero": "Number",
     "buscar": "Search",
@@ -18,5 +18,12 @@
     "idioma" :"Language",
     "detalle" : "Detail of redeem",
     "guardar" : "Save",
-    "volver" : "Back"
+    "volver" : "Back",
+    "imagen" : "Image",
+    "primary_color" : "Primary color",
+    "es_admin" : "Is admin",
+    "clave" : "Public key",
+    "crear_bodega" : "Create winery",
+    "detalle_de_la_vinería" : "Winery detail"
+
     }

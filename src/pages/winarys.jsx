@@ -23,11 +23,11 @@ const Winarys = ({ winarys, profile }) => {
     },
 
     {
-      title: t("Nombre"),
+      title: t("nombre"),
       field: "name",
     },
     {
-      title: t("Website"),
+      title: t("website"),
       field: "website",
     },
     {
@@ -35,12 +35,12 @@ const Winarys = ({ winarys, profile }) => {
       field: "image",
     },
     {
-      title: t("Color Primario"),
+      title: t("primary_color"),
       field: "primary_color",
     },
 
     {
-      title: t("Actualizado"),
+      title: t("actualizado"),
       field: "updated_at",
     },
 
@@ -55,13 +55,13 @@ const Winarys = ({ winarys, profile }) => {
       field: "secret",
     },
     {
-      title: t("Clave Pública"),
+      title: t("clave"),
 
       field: "public_key",
     },
 
     {
-      title: "Es Admin",
+      title: t('es_admin'),
       field: "isAdmin",
     },
   ];
