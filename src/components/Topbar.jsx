@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { FaSearch } from "react-icons/fa";
-import { MdLanguage } from "react-icons/md";
-import { FaLanguage } from "react-icons/fa";
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,12 +50,7 @@ const Topbar = ({ profile }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showModal && !event.target.closest(".modal-content")) {
-        if (open > 0) {
-          dispatch(collapseNotificationModal());
-          setOpen(0);
-        } else {
-          setOpen(open + 1);
-        }
+        dispatch(collapseNotificationModal());
       }
     };
 
@@ -137,11 +130,15 @@ const Topbar = ({ profile }) => {
   // const showModal = useSelector((state) => state.notification.showModal);
 
   const handleModal = () => {
-    if (showModal) {
-      dispatch(collapseNotificationModal());
-    } else {
-      dispatch(showNotificationModal());
-    }
+    // setLoading(true);
+    setTimeout(() => {
+      if (showModal) {
+        dispatch(collapseNotificationModal());
+      } else {
+        dispatch(showNotificationModal());
+      }
+      // setLoading(false);
+    }, 400);
   };
 
   return (

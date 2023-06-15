@@ -4,6 +4,8 @@ import {
   GET_REDEEMS,
   LOGIN_METAMASK,
   GET_WINARYS,
+  GET_PROVINCES,
+  GET_COUNTRIES,
 } from "../types";
 
 function loginApp(public_key) {
@@ -39,7 +41,6 @@ function getRedeems(isAdmin) {
 }
 
 function getWinarys(isAdmin) {
-  console.log("GET WINARYS");
   return async (dispatch) => {
     try {
       const response = await clientAxios.get("/winarysRoute", {
@@ -48,9 +49,9 @@ function getWinarys(isAdmin) {
         },
         withCredentials: true,
       });
-      console.log(response.data);
+
       const winarys = response.data;
-      console.log("winarys                    :", winarys);
+
       dispatch({ type: GET_WINARYS, payload: winarys });
     } catch (error) {
       console.log(error);
@@ -58,4 +59,36 @@ function getWinarys(isAdmin) {
   };
 }
 
-export { loginApp, getRedeems, getWinarys };
+function getProvinces() {
+  return async (dispatch) => {
+    try {
+      const response = await clientAxios.get("/provinceRoute", {
+        withCredentials: true,
+      });
+
+      const provinces = response.data;
+
+      dispatch({ type: GET_PROVINCES, payload: provinces });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
+function getCountries() {
+  return async (dispatch) => {
+    try {
+      const response = await clientAxios.get("/countriesRoute", {
+        withCredentials: true,
+      });
+
+      const countries = response.data;
+
+      dispatch({ type: GET_COUNTRIES, payload: countries });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
+export { loginApp, getRedeems, getWinarys, getProvinces, getCountries };

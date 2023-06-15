@@ -10,7 +10,28 @@ import { useTranslation } from "react-i18next";
 const redeems = ({ redeems, profile }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
+  const countries = useSelector((state) => state.winaryAdress.countries);
+  const provinces = useSelector((state) => state.winaryAdress.provinces);
 
+  const countryName = (country_id) => {
+    const country = countries.find((e) => e.country_id === country_id);
+    return country ? country.place_description : country_id;
+  };
+
+  const provinceName = (province_id) => {
+    const province = provinces.find((e) => e.province_id === province_id);
+    return province ? province.place_description : province_id;
+  };
+
+  const countryAndProvinceNames = (data) => {
+    const newData = data.map((item) => ({
+      ...item,
+      country_id: countryName(item.country_id),
+      province_id: provinceName(item.province_id),
+    }));
+
+    return newData;
+  };
   const columnas = [
     {
       title: "",
@@ -110,7 +131,7 @@ const redeems = ({ redeems, profile }) => {
       return data;
     }
   };
-  const data = filterData(dataFormater(redeems));
+  const data = filterData(countryAndProvinceNames(dataFormater(redeems)));
 
   return (
     <div className="">
