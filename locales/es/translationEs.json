@@ -18,5 +18,11 @@
     "idioma" :"Idioma",
     "detalle" : "Detalle del redeem",
     "guardar" : "Guardar",
-    "volver" : "Volver"
+    "volver" : "Volver",
+    "imagen" : "Imagen",
+    "primary_color" : "Color primario",
+    "es_admin" : "Es admin",
+    "clave" : "Clave pública",
+    "crear_bodega" : "Crear bodega",
+    "detalle_de_la_vinería" : "Detalle de la vinería"
 }

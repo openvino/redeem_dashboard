@@ -1,5 +1,5 @@
 import Table from "@/components/Table";
-import { useSession, signOut, getSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import React from "react";
 import clientAxios from "@/config/clientAxios";
 import { dataFormater } from "../utils/dataFormater.js";
@@ -7,7 +7,11 @@ import Sidebar from "@/components/Sidebar.jsx";
 import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import Head from "next/head.js";
 const redeems = ({ redeems, profile }) => {
+
+ 
+
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
   const countries = useSelector((state) => state.winaryAdress.countries);
@@ -134,6 +138,10 @@ const redeems = ({ redeems, profile }) => {
   const data = filterData(countryAndProvinceNames(dataFormater(redeems)));
 
   return (
+    <>
+     <Head>
+    <title>OpenVino - Redeems</title>
+  </Head>
     <div className="">
       <Sidebar />
       <Topbar profile={profile} />
@@ -142,6 +150,7 @@ const redeems = ({ redeems, profile }) => {
         <Table data={data} columnas={columnas} n={15} />
       </div>
     </div>
+    </>
   );
 };
 

@@ -35,7 +35,6 @@ export default async function handler(req, res) {
   // EDIT WINARY
   if (req.method === "PUT") {
     // const { redeemId, status } = req.body;
-    // console.log(redeemId, status);
 
     try {
       const updatedWinary = await updateWinary(req.body.data);
@@ -47,8 +46,6 @@ export default async function handler(req, res) {
   }
 
 if (req.method === "POST") {
-  // const { redeemId, status } = req.body;
-  // console.log(redeemId, status);
 
  
   try {

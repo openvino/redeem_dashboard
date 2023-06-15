@@ -10,18 +10,20 @@ import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { getRedeems, getWinarys } from "@/redux/actions/winaryActions";
+import Head from "next/head";
 let winary;
 function Detail({ winarys, profile }) {
   const { t } = useTranslation();
   const session = useSession();
   const [id, setId] = useState("");
-  const [isAdminSelect, setIsAdminSelect] = useState("");
+  const [isAdminSelect, setIsAdminSelect] = useState(false);
 
   const router = useRouter();
   let { c_id } = router.query;
 
   const { register, handleSubmit, setValue } = useForm();
   const dispatch = useDispatch();
+
   useEffect(() => {
     if (c_id === "newWinary") {
     } else {
@@ -43,7 +45,6 @@ function Detail({ winarys, profile }) {
     });
 
     if (c_id === "newWinary") {
-      console.log(data);
       try {
         const response = await clientAxios.post("/winarysRoute", {
           data,
@@ -55,6 +56,10 @@ function Detail({ winarys, profile }) {
           render: "Winary updated",
           autoClose: 5000,
         });
+
+        setTimeout(() => {
+          router.back()
+      }, 3000);
       } catch (error) {
         toast.update(toastId, {
           isLoading: false,
@@ -75,6 +80,10 @@ function Detail({ winarys, profile }) {
           render: "Winary updated",
           autoClose: 5000,
         });
+
+        setTimeout(() => {
+            router.back()
+        }, 3000);
       } catch (error) {
         toast.update(toastId, {
           isLoading: false,
@@ -86,42 +95,24 @@ function Detail({ winarys, profile }) {
     }
   };
 
-  if (c_id === "newWinary") {
-    winary = {
-      id: "",
-      created_at: "",
-      amount: "",
-      country_id: "",
-      deleted_at: "",
-      name: "",
-      email: "",
-      website: "",
-      image: "",
-      primary_color: "",
-      secret: "",
-      public_key: "",
-      isAdmin: isAdminSelect,
-    };
-  } else {
-    winary = winarys[id];
-  }
+  winary = winarys[id];
 
   useEffect(() => {
     if (winary) {
-      setValue("id", winarys[id]?.id, { shouldDirty: false });
-      setValue("created_at", winarys[id]?.created_at, { shouldDirty: false });
-      setValue("updated_at", winarys[id]?.updated_at, { shouldDirty: false });
-      setValue("name", winarys[id]?.name, { shouldDirty: false });
-      setValue("website", winarys[id]?.website, { shouldDirty: false });
-      setValue("image", winarys[id]?.image, { shouldDirty: false });
-      setValue("secret", winarys[id]?.secret, { shouldDirty: false });
-      setValue("public_key", winarys[id]?.public_key, { shouldDirty: false });
-      setValue("email", winarys[id]?.email, { shouldDirty: false });
-      setValue("primary_color", winarys[id]?.primary_color, {
+      setValue("id", winary.id, { shouldDirty: false });
+      setValue("created_at", winary.created_at, { shouldDirty: false });
+      setValue("updated_at", winary.updated_at, { shouldDirty: false });
+      setValue("name", winary.name, { shouldDirty: false });
+      setValue("website", winary.website, { shouldDirty: false });
+      setValue("image", winary.image, { shouldDirty: false });
+      setValue("secret", winary.secret, { shouldDirty: false });
+      setValue("public_key", winary.public_key, { shouldDirty: false });
+      setValue("email", winary.email, { shouldDirty: false });
+      setValue("primary_color", winary.primary_color, {
         shouldDirty: false,
       });
     }
-  }, []);
+  }, [winary]);
 
   useEffect(() => {
     if (session.data?.isAdmin) dispatch(getWinarys(session.data.isAdmin));
@@ -138,6 +129,9 @@ function Detail({ winarys, profile }) {
 
   return (
     <>
+    <Head>
+    <title>OpenVino - Winery Detail</title>
+  </Head>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -163,7 +157,7 @@ function Detail({ winarys, profile }) {
     "
       >
         <h1 className="text-2xl font-bold text-center mb-4">
-          {t("Detalle de la vinería")}
+          {t("detalle_de_la_vinería")}
         </h1>
 
         <form
@@ -174,6 +168,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
               <input
+                required
                 disabled
                 type="text"
                 id="id"
@@ -185,8 +180,9 @@ function Detail({ winarys, profile }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("Nombre")}:</label>
+              <label className="w-24 font-bold">{t("nombre")}:</label>
               <input
+                required
                 type="text"
                 id="name"
                 name="name"
@@ -199,8 +195,9 @@ function Detail({ winarys, profile }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("Sitio web")}:</label>
+              <label className="w-24 font-bold">{t("Website")}:</label>
               <input
+                required
                 type="text"
                 id="website"
                 name="website"
@@ -211,8 +208,9 @@ function Detail({ winarys, profile }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Imagen:</label>
+              <label className="w-24 font-bold">{t("imagen")}:</label>
               <input
+                required
                 type="text"
                 id="image"
                 name="image"
@@ -227,6 +225,7 @@ function Detail({ winarys, profile }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Email:</label>
               <input
+                required
                 type="email"
                 id="email"
                 name="email"
@@ -237,15 +236,16 @@ function Detail({ winarys, profile }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Color Primario:</label>
+              <label className="w-32 font-bold">{t("primary_color")}:</label>
               <input
+                required
                 type="color"
                 id="primary_color"
                 name="primary_color"
                 defaultValue={winary?.primary_color}
                 onChange={(e) => setValue("primary_color", e.target.value)}
                 {...register("primary_color")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                className="w-32  px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
           </div>
@@ -266,8 +266,9 @@ function Detail({ winarys, profile }) {
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">Clave pública</label>
+              <label className="w-24 font-bold">{t("clave")}:</label>
               <input
+                required
                 type="text"
                 id="public_key"
                 name="public_key"
@@ -276,9 +277,13 @@ function Detail({ winarys, profile }) {
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
+            
+          </div>
+          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
+            
             <div className="flex items-center left-[50%]">
               <label className="w-24 font-bold" htmlFor="isAdmin">
-                {t("Es admin")}
+                {t("es_admin")}
               </label>
               <select
                 id="isAdmin"

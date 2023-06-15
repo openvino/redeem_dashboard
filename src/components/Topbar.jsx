@@ -94,10 +94,8 @@ const Topbar = ({ profile }) => {
       console.log("Received message from server:", message);
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
-        dispatch(getRedeems());
-      } else {
-        //console.log("no se hizo");
-      }
+        dispatch(getRedeems(session.data.isAdmin));
+      } 
     });
 
     // Connection closed
@@ -109,7 +107,7 @@ const Topbar = ({ profile }) => {
     return () => {
       socket.close();
     };
-  }, []);
+  }, [session]);
 
   //Notifications
   const [allNotifications, setAllnotifications] = useState([]);

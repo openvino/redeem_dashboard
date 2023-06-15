@@ -12,7 +12,6 @@ import { useRouter } from "next/router";
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
   const router = useRouter();
-  // console.log(router);
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState(null);
@@ -198,8 +197,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
                         key={columna.field}
                         className="px-0 py-1 text-[1em] md:text-[0.75rem] text-gray-900 text-center"
                       >
-                        {/* {console.log(fila.id)} */}
-                        {/* <Link href={`/detail/${index}`}> */}
+                      
                         <Link href={`${route}/${fila.id}`}>
                           <div className="inline-flex items-center px-0">
                             <FaPencilAlt className=" text-gray-400 cursor-pointer text-center hover:text-gray-700" />

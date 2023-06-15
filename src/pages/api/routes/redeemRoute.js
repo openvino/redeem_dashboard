@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     try {
       // Verificar el token
       const token = await getToken({ req, secret });
-        
+        console.log(isAdmin)
       if(isAdmin === 'true') {
         const redeems = await getAllRedeems()
         return res.status(200).json(redeems);
@@ -38,7 +38,6 @@ export default async function handler(req, res) {
   //EDIT REDEEM STATUS
   if (req.method === "PUT") {
     // const { redeemId, status } = req.body;
-    // console.log(redeemId, status);
 
        try {
        const updateRedeem = await updateRedeemStatus(req.body.data);

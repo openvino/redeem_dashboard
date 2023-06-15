@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { getRedeems } from "@/redux/actions/winaryActions";
-
+import Head from "next/head";
 function Detail({ redeems, profile, countries, provinces }) {
   const { t } = useTranslation();
   const session = useSession();
@@ -50,8 +50,8 @@ function Detail({ redeems, profile, countries, provinces }) {
   }, [redeems]);
 
   const onSubmit = async (data) => {
-    // console.log(data);
 
+      
     const toastId = toast("Updating Redeem...", {
       position: "top-right",
       autoClose: false,
@@ -91,13 +91,18 @@ function Detail({ redeems, profile, countries, provinces }) {
       await clientAxios.post("/notificationRoute", {
         id: redeem.id,
       });
-      dispatch(getRedeems());
+      dispatch(getRedeems(session.data.isAdmin));
     };
-    setTrue();
-  }, [redeem]);
+    if(session.data?.isAdmin) {
+      setTrue();
+    }
+  }, [redeem,session]);
 
   return (
     <>
+    <Head>
+    <title>OpenVino - Detail redeems</title>
+  </Head>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -132,6 +137,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Id:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="id"
@@ -145,6 +151,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("monto")}:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="amount"
@@ -160,7 +167,8 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("nombre")}:</label>
               <input
-                type="text"
+              required
+                 type="text"
                 id="name"
                 name="name"
                 defaultValue={redeem.name}
@@ -172,6 +180,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Customer_id:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="customer_id"
@@ -187,6 +196,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Email:</label>
               <input
+              required
                 type="text"
                 id="email"
                 name="email"
@@ -217,7 +227,6 @@ function Detail({ redeems, profile, countries, provinces }) {
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 defaultValue={redeem.country_id}
                 onChange={(e) => {
-                  //console.log(e.target.value);
                   setCountrieSelector(e.target.value);
                   setValue("country_id", e.target.value);
                 }}
@@ -236,7 +245,6 @@ function Detail({ redeems, profile, countries, provinces }) {
                 className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
                 value={provinceSelector}
                 onChange={(e) => {
-                  console.log(e.target.value);
                   setProvinceSelector(e.target.value);
                   setValue("province_id", e.target.value);
                 }}
@@ -258,6 +266,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("calle")}:</label>
               <input
+              required
                 type="text"
                 id="street"
                 name="street"
@@ -270,6 +279,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("numero")}:</label>
               <input
+              required
                 type="text"
                 id="number"
                 name="number"
@@ -284,6 +294,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("cp")}:</label>
               <input
+              required
                 type="text"
                 id="zip"
                 name="zip"
@@ -296,12 +307,14 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">Token:</label>
               <input
+              required
+              disabled
                 type="text"
                 id="year"
                 name="year"
                 defaultValue={redeem.year}
                 {...register("year")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
               />
             </div>
           </div>
@@ -310,6 +323,7 @@ function Detail({ redeems, profile, countries, provinces }) {
             <div className="flex items-center">
               <label className="w-24 font-bold">{t("creado")}:</label>
               <input
+              required
                 disabled
                 type="text"
                 id="created_at"
