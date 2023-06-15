@@ -58,8 +58,8 @@ function Detail({ winarys, profile }) {
         });
 
         setTimeout(() => {
-          router.back()
-      }, 3000);
+          router.back();
+        }, 3000);
       } catch (error) {
         toast.update(toastId, {
           isLoading: false,
@@ -82,7 +82,7 @@ function Detail({ winarys, profile }) {
         });
 
         setTimeout(() => {
-            router.back()
+          router.back();
         }, 3000);
       } catch (error) {
         toast.update(toastId, {
@@ -129,9 +129,9 @@ function Detail({ winarys, profile }) {
 
   return (
     <>
-    <Head>
-    <title>OpenVino - Winery Detail</title>
-  </Head>
+      <Head>
+        <title>OpenVino - Winery Detail</title>
+      </Head>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -154,6 +154,7 @@ function Detail({ winarys, profile }) {
       mt-[10rem]
       ml-[6rem]
       overflow-x-scroll
+      lg:overflow-x-hidden
     "
       >
         <h1 className="text-2xl font-bold text-center mb-4">
@@ -277,10 +278,8 @@ function Detail({ winarys, profile }) {
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
-            
           </div>
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            
             <div className="flex items-center left-[50%]">
               <label className="w-24 font-bold" htmlFor="isAdmin">
                 {t("es_admin")}
