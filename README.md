@@ -1,3 +1,51 @@
+### Requirements
+
+- Node.js and Postgresql installed on the system
+- Metamask extension
+- Backend running on openvino-api
+
+## Installing dependencies
+
+npm install --force
+
+## Running the project
+
+npm run dev
+
+## Project Configuration
+The login requires a record in the "wineries" table with the wallet value in the "public_key" field. Add your wallet to this field to log in locally.
+
+## Configuring environment variables
+
+The .env.example file contains examples of the environment variables used in the project.
+
+### Components
+Inside the "components" folder, you will find the components displayed in different views.
+- LoginButton: Renders a button and handles the login logic along with nextAuth.
+- Modal: Renders a modal to display notifications.
+- SearchModal: Renders the search modal.
+- Sidebar: Renders the sidebar.
+- Topbar: Renders the top bar.
+
+### Config
+Inside the "config" folder, there are two files:
+- clientAxios: Basic configuration for executing requests with Axios.
+- i18n: Translation configuration.
+
+### Pages
+Inside the "pages" folder, you will find the user views (routing of Next.js).
+- api: The "api" folder is the application's backend. Inside it, you will find the "auth," "controllers," "helpers," "routes," and "config" folders.
+
+- The "auth" folder contains the authentication logic.
+- The "controllers" folder contains SQL queries to the database.
+- The "helpers" folder contains a file to verify the token.
+- The "routes" folder contains the handlers for client requests.
+- The "config" folder contains the database connection.
+
+
+## Authors
+
+Pablo Levy - Juan Arguello
 
 
 # OpenVino - Dashboard
