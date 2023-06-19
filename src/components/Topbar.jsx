@@ -32,6 +32,8 @@ const BellIconWithNotification = ({ notificationCount }) => (
   </div>
 );
 
+const wsPort = process.env.NEXT_PUBLIC_WS_SERVER_URL;
+
 const Topbar = ({ profile }) => {
   const session = useSession();
   const router = useRouter();
@@ -81,8 +83,8 @@ const Topbar = ({ profile }) => {
   // Socket
   useEffect(() => {
     // Create a new WebSocket instance and specify the server URL
-    const socket = new WebSocket("ws://localhost:8080/api/sendMessage");
 
+    const socket = new WebSocket(`ws://${wsPort}:8081/api/sendMessage`);
     // Connection opened
     socket.addEventListener("open", () => {
       console.log("WebSocket connection established");
@@ -95,7 +97,7 @@ const Topbar = ({ profile }) => {
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
         dispatch(getRedeems(session.data.isAdmin));
-      } 
+      }
     });
 
     // Connection closed
