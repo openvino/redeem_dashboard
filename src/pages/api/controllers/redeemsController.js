@@ -9,15 +9,28 @@ export const getRedeems = async (token) => {
   if (redeems.rows.length > 0) {
     return redeems.rows;
   } else {
+    return [];
     throw new Error("No redeems");
   }
 };
 
 //TODO AGREGAR CAMPO STATUS
 export const updateRedeemStatus = async (req) => {
-  const {street, id,number, zip,  customer_id, status, country_id, province_id, email,name, telegram_id } = req;
+  const {
+    street,
+    id,
+    number,
+    zip,
+    customer_id,
+    status,
+    country_id,
+    province_id,
+    email,
+    name,
+    telegram_id,
+  } = req;
 
- // console.log(req);
+  // console.log(req);
 
   // Actualizar la tabla redeem_infos
   let redeemQuery = `UPDATE redeem_infos SET `;
@@ -31,24 +44,23 @@ export const updateRedeemStatus = async (req) => {
   if (number) redeemUpdateFields.push(`number = '${number}'`);
   if (zip) redeemUpdateFields.push(`zip = '${zip}'`);
 
-  redeemQuery += redeemUpdateFields.join(', ');
+  redeemQuery += redeemUpdateFields.join(", ");
   redeemQuery += ` WHERE id = '${id}'`;
 
-  await conn.query(redeemQuery)
+  await conn.query(redeemQuery);
   // Actualizar la tabla usuarios
   let userQuery = `UPDATE users SET `;
   let userUpdateFields = [];
   if (name) userUpdateFields.push(`name = '${name}'`);
   if (email) userUpdateFields.push(`email = '${email}'`);
-  userQuery += userUpdateFields.join(', ');
+  userQuery += userUpdateFields.join(", ");
   userQuery += ` WHERE public_key = '${customer_id}'`;
 
   const userUpdate = await conn.query(userQuery);
-
 };
 
 export const getAllRedeems = async () => {
-    let query = `SELECT redeem_infos.id, redeem_infos.created_at, redeem_infos.updated_at, redeem_infos.deleted_at, redeem_infos.customer_id, redeem_infos.year, redeem_infos.street, redeem_infos.number, redeem_infos.country_id, redeem_infos.province_id, redeem_infos.zip, redeem_infos.telegram_id, redeem_infos.amount, redeem_infos.winerie_id, redeem_infos.redeem_status, redeem_infos.watched, users.email, users.name `;
+  let query = `SELECT redeem_infos.id, redeem_infos.created_at, redeem_infos.updated_at, redeem_infos.deleted_at, redeem_infos.customer_id, redeem_infos.year, redeem_infos.street, redeem_infos.number, redeem_infos.country_id, redeem_infos.province_id, redeem_infos.zip, redeem_infos.telegram_id, redeem_infos.amount, redeem_infos.winerie_id, redeem_infos.redeem_status, redeem_infos.watched, users.email, users.name `;
   query += `FROM redeem_infos `;
   query += `JOIN users ON users.public_key = redeem_infos.customer_id `;
   const redeems = await conn.query(query);
@@ -57,4 +69,4 @@ export const getAllRedeems = async () => {
   } else {
     throw new Error("No redeems");
   }
-}
+};
