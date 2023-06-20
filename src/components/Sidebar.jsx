@@ -44,7 +44,7 @@ const Sidebar = () => {
             </div>
           </Link>
           {session.data?.isAdmin && (
-            <Link href="/winarys">
+            <Link href="/wineries">
               <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
                 <GiCellarBarrels size={20} />
               </div>

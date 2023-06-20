@@ -9,8 +9,10 @@ import {
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import { FaSortDown, FaSortUp, FaSort } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
+
 const Table = ({ data, columnas, n, route = "/detail" }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
@@ -179,14 +181,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
                 `}
                   onClick={() => handleOrdenarColumna(columna.field)}
                 >
-                  <span>
-                    {columna.title}{" "}
-                    {/* {ascOrder ? (
-                      <FaSortUp size={10} className="ml-0 inline" />
-                    ) : (
-                      <FaSortDown size={10} className="ml-0 inline" />
-                    )} */}
-                  </span>
+                  <span>{columna.title} </span>
                 </th>
               ))}
             </tr>
@@ -260,7 +255,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
             className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
             onClick={() => router.push("/winaryDetail/newWinary")}
           >
-            Crear Bodega
+            {t("crear_bodega")}
           </button>
         ) : null}
       </div>

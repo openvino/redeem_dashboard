@@ -24,6 +24,7 @@
     "es_admin" : "Is admin",
     "clave" : "Public key",
     "crear_bodega" : "Create winery",
-    "detalle_de_la_vinería" : "Winery detail"
+    "detalle_de_la_vinería" : "Winery detail",
+    "SI": "YES"
 
     }

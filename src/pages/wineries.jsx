@@ -39,10 +39,10 @@ const Winarys = ({ winarys, profile }) => {
       field: "primary_color",
     },
 
-    {
-      title: t("actualizado"),
-      field: "updated_at",
-    },
+    // {
+    //   title: t("actualizado"),
+    //   field: "updated_at",
+    // },
 
     {
       title: "Email",
@@ -61,7 +61,7 @@ const Winarys = ({ winarys, profile }) => {
     },
 
     {
-      title: t('es_admin'),
+      title: t("es_admin"),
       field: "isAdmin",
     },
   ];
@@ -80,18 +80,19 @@ const Winarys = ({ winarys, profile }) => {
     }
   };
   const data = filterData(dataFormater(winarys));
-  // const data = dataFormater(winarys);
-  return (<>
-  <Head>
-    <title>OpenVino - Winerys</title>
-  </Head>
-    <div className="">
-      <Sidebar />
-      <Topbar profile={profile} />
-      <div className="ml-20  min-w-fit top-4 ">
-        <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
+
+  return (
+    <>
+      <Head>
+        <title>OpenVino - Wineries</title>
+      </Head>
+      <div className="">
+        <Sidebar />
+        <Topbar profile={profile} />
+        <div className="ml-20  min-w-fit top-4 ">
+          <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
+        </div>
       </div>
-    </div>
     </>
   );
 };

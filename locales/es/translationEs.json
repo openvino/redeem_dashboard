@@ -24,5 +24,6 @@
     "es_admin" : "Es admin",
     "clave" : "Clave pública",
     "crear_bodega" : "Crear bodega",
-    "detalle_de_la_vinería" : "Detalle de la vinería"
+    "detalle_de_la_vinería" : "Detalle de la vinería",
+    "SI": "SI"
 }
