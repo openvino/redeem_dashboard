@@ -6,7 +6,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: '*', // Cambia esto al origen específico permitido
+            value: 'http://147.182.205.152', // Cambia esto al origen específico permitido
           },
            {
               key: "Access-Control-Allow-Methods",
