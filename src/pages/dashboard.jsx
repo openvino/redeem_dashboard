@@ -203,7 +203,14 @@ const Dashboard = ({ redeemsState, profile }) => {
       title: t("provincia"),
       field: "province_id",
     },
-
+    {
+      title: t("ciudad"),
+      field: "city",
+    },
+    {
+      title: t("telefono"),
+      field: "phone",
+    },
     // {
     //   title: "Actualizado",
     //   field: "updated_at",
