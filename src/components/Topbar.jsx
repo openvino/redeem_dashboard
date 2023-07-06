@@ -49,6 +49,9 @@ const Topbar = ({ profile }) => {
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
   const [loading, setLoading] = useState(false);
+  const reloadRedeems = () => {
+    dispatch(getRedeems(session.data.isAdmin));
+  };
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showModal && !event.target.closest(".modal-content")) {
@@ -61,6 +64,7 @@ const Topbar = ({ profile }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, [showModal, dispatch, open]);
+
   const handleFilter = (e) => {
     dispatch(setFilter(e.target.value));
   };
@@ -183,19 +187,20 @@ const Topbar = ({ profile }) => {
                 <FaSearch />
               </span>
             </div>
-
-            <div
-              className={
-                notification.notification
-                  ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
-                  : "hidden"
-              }
-              onClick={handleModal}
-            >
-              <BellIconWithNotification
-                notificationCount={allNotifications.length}
-              />
-            </div>
+            {allNotifications.length ? (
+              <div
+                className={
+                  notification.notification
+                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
+                    : "hidden"
+                }
+                onClick={handleModal}
+              >
+                <BellIconWithNotification
+                  notificationCount={allNotifications.length}
+                />
+              </div>
+            ) : null}
 
             <div
               onClick={() => setShowMenu(!showMenu)}
@@ -230,7 +235,7 @@ const Topbar = ({ profile }) => {
           </div>
         </div>
       </div>
-      <Modal data={allNotifications} />
+      <Modal data={allNotifications} reloadRedeems={reloadRedeems} />
       {router.asPath.includes("/winaryDetail") && (
         <SearchModal data={winarys} />
       )}

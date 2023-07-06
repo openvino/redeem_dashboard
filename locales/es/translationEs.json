@@ -25,5 +25,13 @@
     "clave" : "Clave pública",
     "crear_bodega" : "Crear bodega",
     "detalle_de_la_vinería" : "Detalle de la vinería",
-    "SI": "SI"
+    "SI": "SI",
+    "limpiar_noti": "Limpiar todas",
+    "ha_realizado_reddem": "ha realizado un redeem hace ",
+     "ago":"",
+     "días":"días",
+     "día":"día",
+     "hora":"hora",
+     "horas":"horas"
+
 }

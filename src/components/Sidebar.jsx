@@ -3,7 +3,8 @@ import { RxTokens } from "react-icons/rx";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { GiCellarBarrels } from "react-icons/gi";
+
+import { IoMdSettings } from "react-icons/io";
 
 const Sidebar = () => {
   const session = useSession();
@@ -36,7 +37,7 @@ const Sidebar = () => {
           <Link href="/">
             <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
               <Image
-                src={"/assets/mtb23.png"}
+                src={"/assets/mtb.png"}
                 width={200}
                 height={200}
                 alt="mtb23"
@@ -46,7 +47,7 @@ const Sidebar = () => {
           {session.data?.isAdmin && (
             <Link href="/wineries">
               <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
-                <GiCellarBarrels size={20} />
+                <IoMdSettings size={25} />
               </div>
             </Link>
           )}
