@@ -1,3 +1,4 @@
+                                                                                              
 const nextConfig = {
   async headers() {
     return [
@@ -6,7 +7,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
-            value: 'http://147.182.205.152', // Cambia esto al origen específico permitido
+            value: '*', // Cambia esto al origen específico permitido
           },
            {
               key: "Access-Control-Allow-Methods",
@@ -17,7 +18,7 @@ const nextConfig = {
               value:
                 "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
             },
-        
+
           {
             key: 'Access-Control-Allow-Credentials',
             value: 'true',
