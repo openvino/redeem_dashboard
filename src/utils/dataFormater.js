@@ -19,6 +19,8 @@ export const dataFormater = (redeems) => {
       year: item.year,
       zip: item.zip,
       status: item.redeem_status,
+      city: item.city,
+      phone: item.phone
     });
   });
   return data;

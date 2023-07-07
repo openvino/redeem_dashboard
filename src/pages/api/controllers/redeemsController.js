@@ -17,6 +17,8 @@ export const getRedeems = async (token) => {
 //TODO AGREGAR CAMPO STATUS
 export const updateRedeemStatus = async (req) => {
   const {
+    phone,
+    city,
     street,
     id,
     number,
@@ -36,6 +38,8 @@ export const updateRedeemStatus = async (req) => {
   let redeemQuery = `UPDATE redeem_infos SET `;
   let redeemUpdateFields = [];
 
+  if(phone) redeemUpdateFields.push(`phone = '${phone}'`)
+  if(city) redeemUpdateFields.push(`city = '${city}'`)
   if (status) redeemUpdateFields.push(`redeem_status = '${status}'`);
   if (country_id) redeemUpdateFields.push(`country_id = '${country_id}'`);
   if (province_id) redeemUpdateFields.push(`province_id = '${province_id}'`);

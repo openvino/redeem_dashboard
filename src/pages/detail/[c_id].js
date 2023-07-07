@@ -41,6 +41,9 @@ function Detail({ redeems, profile, countries, provinces }) {
       setValue("country_id", redeems[id]?.country_id, { shouldDirty: false });
       setValue("province_id", redeems[id]?.province_id, { shouldDirty: false });
       setValue("email", redeems[id]?.email, { shouldDirty: false });
+      setValue("city", redeems[id]?.city, { shouldDirty: false });
+      setValue("phone", redeems[id]?.phone, { shouldDirty: false });
+
       setCountrieSelector(redeems[id].country_id);
       setProvinceSelector(redeems[id].province_id);
       setStatusSelector(redeems[id].redeem_status);
@@ -214,6 +217,33 @@ function Detail({ redeems, profile, countries, provinces }) {
                 name="telegram_id"
                 defaultValue={redeem.telegram_id}
                 {...register("telegram_id")}
+                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+              />
+            </div>
+          </div>
+
+          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
+            <div className="flex items-center">
+              <label className="w-24 font-bold">Phone:</label>
+              <input
+              required
+                type="number"
+                id="phone"
+                name="phone"
+                defaultValue={redeem.phone}
+                {...register("phone")}
+                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+              />
+            </div>
+
+            <div className="flex items-center">
+              <label className="w-24 font-bold">Telegram:</label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                defaultValue={redeem.city}
+                {...register("city")}
                 className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
