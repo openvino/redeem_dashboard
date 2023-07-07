@@ -26,12 +26,14 @@
     "crear_bodega" : "Create winery",
     "detalle_de_la_vinería" : "Winery detail",
     "SI": "YES",
-     "limpiar_noti": "Clear all",
-     "ha_realizado_reddem":"has made a redeem ",
-     "ago":"ago",
-     "días":"days",
-     "día":"day",
-     "hora":"hour",
-     "horas":"hours"
+    "limpiar_noti": "Clear all",
+    "ha_realizado_reddem":"has made a redeem ",
+    "ago":"ago",
+    "días":"days",
+    "día":"day",
+    "hora":"hour",
+    "horas":"hours",
+    "ciudad":"City",
+    "tel":"Phone"
 
     }

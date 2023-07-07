@@ -1,5 +1,5 @@
 {
-    "actualizado":"actualizado",
+    "actualizado":"act",
     "calle" : "calle",
     "numero": "numero",
     "buscar" : "buscar",
@@ -28,10 +28,12 @@
     "SI": "SI",
     "limpiar_noti": "Limpiar todas",
     "ha_realizado_reddem": "ha realizado un redeem hace ",
-     "ago":"",
-     "días":"días",
-     "día":"día",
-     "hora":"hora",
-     "horas":"horas"
+    "ago":"",
+    "días":"días",
+    "día":"día",
+    "hora":"hora",
+    "horas":"horas",
+    "ciudad": "Ciudad:",
+    "tel":"Teléfono:"
 
 }

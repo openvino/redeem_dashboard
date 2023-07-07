@@ -9,9 +9,6 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
 const redeems = ({ redeems, profile }) => {
-
- 
-
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
   const countries = useSelector((state) => state.winaryAdress.countries);
@@ -73,10 +70,10 @@ const redeems = ({ redeems, profile }) => {
       title: t("telefono"),
       field: "phone",
     },
-    {
-      title: t("actualizado"),
-      field: "updated_at",
-    },
+    // {
+    //   title: t("actualizado"),
+    //   field: "updated_at",
+    // },
     // {
     //   title: "Borrado",
     //   field: "deleted_at",
@@ -146,17 +143,17 @@ const redeems = ({ redeems, profile }) => {
 
   return (
     <>
-     <Head>
-    <title>OpenVino - Redeems</title>
-  </Head>
-    <div className="">
-      <Sidebar />
-      <Topbar profile={profile} />
+      <Head>
+        <title>OpenVino - Redeems</title>
+      </Head>
+      <div className="">
+        <Sidebar />
+        <Topbar profile={profile} />
 
-      <div className="ml-20  min-w-fit top-4 ">
-        <Table data={data} columnas={columnas} n={15} />
+        <div className="ml-20  min-w-fit top-4 ">
+          <Table data={data} columnas={columnas} n={15} />
+        </div>
       </div>
-    </div>
     </>
   );
 };

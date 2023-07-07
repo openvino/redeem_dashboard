@@ -175,7 +175,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
               {columnas.map((columna) => (
                 <th
                   key={columna.field}
-                  className={`px-1 py-1 bg-[#840C4A]  text-[1rem] sm:text-[0.5rem] md:text-[0.75rem] text-white font-medium uppercase tracking-wider text-center cursor-pointer${
+                  className={`px-1 py-1 bg-[#840C4A]  text-[0.75rem]  text-white font-medium uppercase tracking-wider text-center cursor-pointer${
                     columna.field === "acciones" ? "w-12 sm:w-16" : ""
                   }
                 `}
