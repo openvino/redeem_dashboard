@@ -29,12 +29,12 @@ export default function Home() {
       </Head>
       <main
         style={{ backgroundImage: `url(/assets/background-login.png)` }}
-        className={`flex min-h-screen flex-col gap-10 justify-center items-center p-24 ${aBeeZee.className}`}
+        className={`flex min-h-screen flex-col gap-10 justify-center items-center p-24 ${aBeeZee.className} bg-cover`}
       >
         {alert && alert}
 
         {router.asPath.includes("error") && <p>Hubo un error</p>}
-        <div className="bg-white p-3">
+        <div className="">
           <Image
             src={"/assets/website-logo.png"}
             width={200}

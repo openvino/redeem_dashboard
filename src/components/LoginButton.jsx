@@ -56,6 +56,7 @@ const LoginButton = () => {
           disabled:text-gray-200
            disabled:border-gray-900
            disabled:hover:bg-white
+            
            `}
     >
       <Image
