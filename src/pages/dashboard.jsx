@@ -188,6 +188,10 @@ const Dashboard = ({ redeemsState, profile }) => {
     //   field: "customer_id",
     // },
     {
+      title: t("creado"),
+      field: "created_at",
+    }, 
+    {
       title: t("nombre"),
       field: "name",
     },
@@ -251,10 +255,6 @@ const Dashboard = ({ redeemsState, profile }) => {
       field: "zip",
     },
     {
-      title: t("creado"),
-      field: "created_at",
-    },
-    {
       title: t("estado"),
       field: "status",
     },
@@ -286,7 +286,7 @@ const Dashboard = ({ redeemsState, profile }) => {
         <Topbar profile={profile} />
 
         <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
-          <Table data={data} columnas={columnas} n={5} />
+          <Table data={data} columnas={columnas} n={50} /> {/**cambie n 5 x n 50 para ver mas filas */}
           <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
             <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">

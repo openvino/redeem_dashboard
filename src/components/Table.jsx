@@ -10,13 +10,15 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
+import { useEffect } from 'react';
+
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
-  const [columnOrder, setColumnOrder] = useState(null);
+  const [columnOrder, setColumnOrder] = useState('created_at');
   const [ascOrder, setAscOrder] = useState(true);
   const elementsPerPage = n;
 
@@ -59,7 +61,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
     }
   };
 
-  const orderData = () => {
+ /* const orderData = () => {
     if (columnOrder) {
       return [...data].sort((a, b) => {
         const valorA = a[columnOrder];
@@ -74,7 +76,29 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
       });
     }
     return data;
+  };*/
+
+  const orderData = () => {
+    if (columnOrder) {
+      return [...data].sort((a, b) => {
+        const valorA = a[columnOrder];
+        const valorB = b[columnOrder];
+        if (columnOrder === 'created_at') {
+          // Ordenar por created_at de forma descendente al cargar por primera vez
+          return ascOrder ? new Date(valorB) - new Date(valorA) : new Date(valorA) - new Date(valorB);
+        }
+        if (valorA < valorB) {
+          return ascOrder ? -1 : 1;
+        }
+        if (valorA > valorB) {
+          return ascOrder ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return data;
   };
+  
 
   const orderPagedData = () => {
     const orderedData = orderData();
@@ -165,6 +189,14 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 
     return buttons;
   };
+
+ /* useEffect(() => {
+    const orderedData = orderData();
+    const totalPages = Math.ceil(orderedData.length / elementsPerPage);
+    const validPage = Math.max(1, Math.min(currentPage, totalPages));
+    setCurrentPage(validPage); // Actualizar la página para que refleje la ordenación correcta
+  }, []); // El segundo argumento vacío [] asegura que este efecto se ejecute solo una vez al montar el componente
+*/
 
   return (
     <div>
