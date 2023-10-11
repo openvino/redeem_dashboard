@@ -22,7 +22,7 @@
     "imagen" : "Image",
     "primary_color" : "Primary color",
     "es_admin" : "Is admin",
-    "clave" : "Public key",
+    "clave" : "ENS or Public key",
     "crear_bodega" : "Create winery",
     "detalle_de_la_vinería" : "Winery detail",
     "SI": "YES",
