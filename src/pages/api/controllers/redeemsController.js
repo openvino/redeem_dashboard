@@ -1,9 +1,16 @@
 import conn from "../config/db";
+
 export const getRedeems = async (token) => {
+  let getUserAdmin = `SELECT * FROM admin_users WHERE id = '${token}'`;
+
+  const userAdmin = await conn.query(getUserAdmin);
+  const wineryId = userAdmin.rows[0].winery_id;
+
   let query = `SELECT redeem_infos.id,redeem_infos.city, redeem_infos.phone, redeem_infos.created_at, redeem_infos.updated_at, redeem_infos.deleted_at, redeem_infos.customer_id, redeem_infos.year, redeem_infos.street, redeem_infos.number, redeem_infos.country_id, redeem_infos.province_id, redeem_infos.zip, redeem_infos.telegram_id, redeem_infos.amount, redeem_infos.winerie_id, redeem_infos.redeem_status, redeem_infos.watched, users.email, users.name `;
   query += `FROM redeem_infos `;
   query += `JOIN users ON users.public_key = redeem_infos.customer_id `;
-  query += `WHERE redeem_infos.winerie_id = (SELECT id FROM wineries WHERE public_key = '${token}');`;
+  query += `WHERE redeem_infos.winerie_id = (SELECT id FROM wineries WHERE ID = '${wineryId}');`;
+
   const redeems = await conn.query(query);
 
   if (redeems.rows.length > 0) {
@@ -38,8 +45,8 @@ export const updateRedeemStatus = async (req) => {
   let redeemQuery = `UPDATE redeem_infos SET `;
   let redeemUpdateFields = [];
 
-  if(phone) redeemUpdateFields.push(`phone = '${phone}'`)
-  if(city) redeemUpdateFields.push(`city = '${city}'`)
+  if (phone) redeemUpdateFields.push(`phone = '${phone}'`);
+  if (city) redeemUpdateFields.push(`city = '${city}'`);
   if (status) redeemUpdateFields.push(`redeem_status = '${status}'`);
   if (country_id) redeemUpdateFields.push(`country_id = '${country_id}'`);
   if (province_id) redeemUpdateFields.push(`province_id = '${province_id}'`);

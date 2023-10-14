@@ -10,15 +10,14 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
-import { useEffect } from 'react';
-
+import { useEffect } from "react";
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
-  const [columnOrder, setColumnOrder] = useState('created_at');
+  const [columnOrder, setColumnOrder] = useState("created_at");
   const [ascOrder, setAscOrder] = useState(true);
   const elementsPerPage = n;
 
@@ -61,31 +60,16 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
     }
   };
 
- /* const orderData = () => {
-    if (columnOrder) {
-      return [...data].sort((a, b) => {
-        const valorA = a[columnOrder];
-        const valorB = b[columnOrder];
-        if (valorA < valorB) {
-          return ascOrder ? -1 : 1;
-        }
-        if (valorA > valorB) {
-          return ascOrder ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return data;
-  };*/
-
   const orderData = () => {
     if (columnOrder) {
       return [...data].sort((a, b) => {
         const valorA = a[columnOrder];
         const valorB = b[columnOrder];
-        if (columnOrder === 'created_at') {
+        if (columnOrder === "created_at") {
           // Ordenar por created_at de forma descendente al cargar por primera vez
-          return ascOrder ? new Date(valorB) - new Date(valorA) : new Date(valorA) - new Date(valorB);
+          return ascOrder
+            ? new Date(valorB) - new Date(valorA)
+            : new Date(valorA) - new Date(valorB);
         }
         if (valorA < valorB) {
           return ascOrder ? -1 : 1;
@@ -98,7 +82,6 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
     }
     return data;
   };
-  
 
   const orderPagedData = () => {
     const orderedData = orderData();
@@ -190,18 +173,10 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
     return buttons;
   };
 
- /* useEffect(() => {
-    const orderedData = orderData();
-    const totalPages = Math.ceil(orderedData.length / elementsPerPage);
-    const validPage = Math.max(1, Math.min(currentPage, totalPages));
-    setCurrentPage(validPage); // Actualizar la página para que refleje la ordenación correcta
-  }, []); // El segundo argumento vacío [] asegura que este efecto se ejecute solo una vez al montar el componente
-*/
-
   return (
     <div>
-      <div className="overflow-x-scroll ml-10 md:ml-0 w-screen md:w-full rounded-lg  mt-[10rem] md:overflow-x-hidden ">
-        <table className=" w-full  md:table-fixed divide-y divide-gray-200  border border-gray-100 overflow-x-scroll ">
+      <div className="overflow-x-scroll ml-12 md:ml-0   rounded-lg  mt-[10rem] md:overflow-x-hidden ">
+        <table className=" w-[30%] md:w-[90%] mx-auto  md:table-fixed divide-y divide-gray-200  border border-gray-100 table-auto ">
           <thead>
             <tr>
               {columnas.map((columna) => (
@@ -218,7 +193,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="text-sm">
             {orderPagedData().map((fila, index) => (
               <tr
                 key={index}
@@ -256,7 +231,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
                   return (
                     <td
                       key={columna.field}
-                      className="px-2 py-1 text-[1em] md:text-[0.75rem] text-gray-900 text-center"
+                      className="px-2 py-1 text-[1em] md:text-[0.9rem] text-gray-900 text-center"
                       style={{
                         maxWidth: "5rem",
                         overflow: "hidden",

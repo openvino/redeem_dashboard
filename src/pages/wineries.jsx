@@ -8,7 +8,7 @@ import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
-const Winarys = ({ winarys, profile }) => {
+const Winarys = ({ winarys }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
 
@@ -88,7 +88,7 @@ const Winarys = ({ winarys, profile }) => {
       </Head>
       <div className="">
         <Sidebar />
-        <Topbar profile={profile} />
+        <Topbar />
         <div className="ml-20  min-w-fit top-4 ">
           <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
         </div>
@@ -121,14 +121,8 @@ export async function getServerSideProps(context) {
       Cookie: cookie,
     },
   });
-  const profile = await clientAxios.post("/loginRoute", {
-    public_key: session.address,
-    headers: {
-      Cookie: cookie,
-    },
-  });
 
   return {
-    props: { winarys: response.data, profile: profile.data },
+    props: { winarys: response.data },
   };
 }

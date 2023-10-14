@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { getRedeems, getWinarys } from "@/redux/actions/winaryActions";
 import Head from "next/head";
 let winary;
-function Detail({ winarys, profile }) {
+function Detail({ winarys }) {
   const { t } = useTranslation();
   const session = useSession();
   const [id, setId] = useState("");
@@ -146,7 +146,7 @@ function Detail({ winarys, profile }) {
       />
       {/* Same as */}
       <ToastContainer />
-      <Topbar profile={profile} />
+      <Topbar />
       <Sidebar />
       <div
         className="
@@ -347,14 +347,8 @@ export async function getServerSideProps(context) {
       Cookie: cookie,
     },
   });
-  const profile = await clientAxios.post("/loginRoute", {
-    public_key: session.address,
-    headers: {
-      Cookie: cookie,
-    },
-  });
 
   return {
-    props: { winarys: response.data, profile: profile.data },
+    props: { winarys: response.data },
   };
 }
