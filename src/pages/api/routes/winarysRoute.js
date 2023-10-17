@@ -37,6 +37,7 @@ export default async function handler(req, res) {
     // const { redeemId, status } = req.body;
 
     try {
+      //console.log("req.body.data >>>", req.body.data );
       const updatedWinary = await updateWinary(req.body.data);
       return res.status(200).json(updatedWinary);
     } catch (error) {

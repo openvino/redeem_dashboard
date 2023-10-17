@@ -55,9 +55,14 @@ const Winarys = ({ winarys, profile }) => {
       field: "secret",
     },
     {
-      title: t("clave"),
+      title: t("key"),
 
       field: "public_key",
+    },
+    {
+      title: "ENS",
+
+      field: "ens",
     },
 
     {

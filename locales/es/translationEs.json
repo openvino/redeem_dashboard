@@ -23,6 +23,7 @@
     "primary_color" : "Color primario",
     "es_admin" : "Es admin",
     "clave" : "ENS ó Clave pública",
+    "key" : "Clave pública",
     "crear_bodega" : "Crear bodega",
     "detalle_de_la_vinería" : "Detalle de la vinería",
     "SI": "SI",

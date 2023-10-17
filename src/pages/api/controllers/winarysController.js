@@ -1,7 +1,7 @@
 import conn from "../config/db";
 import { v4 as uuid } from "uuid";
 const resolveENS = require('../../../utils/resolveENS');
-let pkOrENS; // ENS or not 
+let pkOrENS, ens; // ENS or not 
 
 export const getAllWinarys = async (token) => {
   let query = `SELECT * from wineries`;
@@ -46,7 +46,9 @@ export const updateWinary = async (req) => {
     winaryUpdateFields.push(`primary_color = '${primary_color}'`);
   if (public_key){ 
     pkOrENS = await isENS(public_key);
+    ens = (pkOrENS == public_key) ? null : public_key;
     winaryUpdateFields.push(`public_key = '${pkOrENS}'`);
+    winaryUpdateFields.push(`ens = '${ens}'`);
   };
   if (isAdmin == "true") winaryUpdateFields.push(`"isAdmin" = true`);
   else if (isAdmin === "false") {
@@ -72,11 +74,15 @@ export const createWinary = async (req) => {
   const id = uuid();
 
 
-  let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin") `;
+  let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin", ens) `;
   
   pkOrENS = await isENS(req.public_key); 
 
-  query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${pkOrENS}', '${req.isAdmin}')`;
+  ens = (pkOrENS == req.public_key) ? null : req.public_key;
+
+  //console.log('ens >>>>', ens );
+
+  query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${pkOrENS}', '${req.isAdmin}', '${ens}')`; //, ${(pkOrENS == req.public_key) ? NULL : req.public_key}
 
   const createWinary = await conn.query(query);
 };
@@ -89,8 +95,8 @@ async function isENS(input) {
       return resolvedAddress;
     } else {
       // Maneja el caso en el que no se pudo resolver el ENS
-      console.log('No se pudo resolver el ENS:', input);
-      throw new Error("No se puede resolver el ENS");
+      //console.log('No se pudo resolver el ENS:', input);
+      throw new Error("No se puede resolver el ENS " + input);
     }
   } else {
     return input;

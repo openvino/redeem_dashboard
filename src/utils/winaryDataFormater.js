@@ -18,6 +18,7 @@ export const dataFormater = (winarys) => {
       primary_color: item.primary_color,
       secret: item.secret,
       public_key: item.public_key,
+      ens: item.ens,
       isAdmin: item.isAdmin ? t("SI") : t("NO"),
     });
   });

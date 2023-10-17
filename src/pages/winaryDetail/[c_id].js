@@ -64,7 +64,7 @@ function Detail({ winarys, profile }) {
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.ERROR,
-          render: "Error ",
+          render: "Error " + error.response.data.message ,
           autoClose: 5000,
         });
       }
@@ -85,10 +85,11 @@ function Detail({ winarys, profile }) {
           router.back();
         }, 3000);
       } catch (error) {
+        console.log("error toast update >>>>>>", error);
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.ERROR,
-          render: "Error ",
+          render: "Error " + error.response.data.message ,
           autoClose: 5000,
         });
       }
@@ -298,6 +299,9 @@ function Detail({ winarys, profile }) {
                 <option value="true">Si</option>
                 <option value="false">No</option>
               </select>
+            </div>
+            <div className="flex items-center">
+              <label className="w-24 font-bold">{(winary?.ens == null) ? '' : winary?.ens }</label>
             </div>
           </div>
           <div className="flex justify-center">
