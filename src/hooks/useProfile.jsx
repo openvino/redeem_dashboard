@@ -30,6 +30,8 @@ const useProfile = () => {
 
   return {
     profile,
+    session,
+    status,
   };
 };
 

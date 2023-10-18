@@ -257,14 +257,21 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
         }
       >
         {renderbuttonsPages()}
-        {route !== "/detail" ? (
+        {route !== "/detail" && route !== "/admin" ? (
           <button
             className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
             onClick={() => router.push("/winaryDetail/newWinary")}
           >
             {t("crear_bodega")}
           </button>
-        ) : null}
+        ) : (
+          <button
+            className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
+            onClick={() => router.push("/admin/addUser")}
+          >
+            {t("add_admin")}
+          </button>
+        )}
       </div>
     </div>
   );

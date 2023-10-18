@@ -23,7 +23,7 @@ const Sidebar = () => {
               <RxTokens size={20} />
             </div>
           </Link>
-          <Link href="/">
+          <Link href="/admin">
             <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
               <FaUser size={20} />
             </div>
@@ -44,7 +44,7 @@ const Sidebar = () => {
               />
             </div>
           </Link>
-          {session.data?.isAdmin && (
+          {session.data?.is_admin && (
             <Link href="/wineries">
               <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
                 <IoMdSettings size={25} />

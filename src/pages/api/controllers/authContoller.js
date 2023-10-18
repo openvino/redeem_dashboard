@@ -2,8 +2,9 @@ import conn from "../config/db";
 
 export async function checkAuth(public_key) {
   const wineryAdmin = await conn.query(
-    `SELECT * FROM admin_users WHERE ID='${public_key}';`
+    `SELECT * FROM admin_users WHERE id='${public_key}';`
   );
+  console.log(public_key);
   if (wineryAdmin.rows.length) {
     return true;
   } else {

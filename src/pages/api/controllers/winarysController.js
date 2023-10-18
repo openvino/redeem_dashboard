@@ -1,7 +1,7 @@
 import conn from "../config/db";
 import { v4 as uuid } from "uuid";
-const resolveENS = require('../../../utils/resolveENS');
-let pkOrENS; // ENS or not 
+const resolveENS = require("../../../utils/resolveENS");
+let pkOrENS; // ENS or not
 
 export const getAllWinarys = async (token) => {
   let query = `SELECT * from wineries`;
@@ -19,19 +19,8 @@ export const getAllWinarys = async (token) => {
 
 //TODO AGREGAR CAMPO STATUS
 export const updateWinary = async (req) => {
-  const {
-    email,
-    id,
-    name,
-    website,
-    image,
-    primary_color,
-    secret,
-    public_key,
-    isAdmin,
-  } = req;
-
-
+  const { email, id, name, website, image, primary_color, secret, public_key } =
+    req;
 
   // Actualizar la tabla winarys
   let winaryQuery = `UPDATE wineries SET `;
@@ -44,13 +33,9 @@ export const updateWinary = async (req) => {
 
   if (primary_color)
     winaryUpdateFields.push(`primary_color = '${primary_color}'`);
-  if (public_key){ 
+  if (public_key) {
     pkOrENS = await isENS(public_key);
     winaryUpdateFields.push(`public_key = '${pkOrENS}'`);
-  };
-  if (isAdmin == "true") winaryUpdateFields.push(`"isAdmin" = true`);
-  else if (isAdmin === "false") {
-    winaryUpdateFields.push(`"isAdmin" = false`);
   }
 
   winaryQuery += winaryUpdateFields.join(", ");
@@ -71,25 +56,26 @@ export const updateWinary = async (req) => {
 export const createWinary = async (req) => {
   const id = uuid();
 
+  let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret) `;
 
-  let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin") `;
-  
-  pkOrENS = await isENS(req.public_key); 
+  // pkOrENS = await isENS(req.public_key);
 
-  query += `VALUES ('${id}', '${req.name}', '${req.website}', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}', '${pkOrENS}', '${req.isAdmin}')`;
+  query += `VALUES ('${req.name.toLowerCase()}', '${req.name}', '${
+    req.website
+  }', '${req.image}', '${req.email}', '${req.primary_color}', '${req.secret}')`;
 
   const createWinary = await conn.query(query);
 };
 
 async function isENS(input) {
-  if (input.endsWith('.eth')) {
+  if (input.endsWith(".eth")) {
     // La cadena parece ser un ENS
     const resolvedAddress = await resolveENS(input);
     if (resolvedAddress) {
       return resolvedAddress;
     } else {
       // Maneja el caso en el que no se pudo resolver el ENS
-      console.log('No se pudo resolver el ENS:', input);
+      console.log("No se pudo resolver el ENS:", input);
       throw new Error("No se puede resolver el ENS");
     }
   } else {

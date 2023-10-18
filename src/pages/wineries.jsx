@@ -115,7 +115,7 @@ export async function getServerSideProps(context) {
 
   const response = await clientAxios.get("/winarysRoute", {
     params: {
-      isAdmin: session.isAdmin,
+      is_admin: session.is_admin,
     },
     headers: {
       Cookie: cookie,
