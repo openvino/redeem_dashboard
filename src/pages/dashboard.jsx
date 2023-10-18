@@ -5,7 +5,6 @@ import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
 import Table from "../components/Table";
 import { dataFormater } from "../utils/dataFormater.js";
-import clientAxios from "../config/clientAxios";
 import { useDispatch, useSelector } from "react-redux";
 import Chart from "chart.js/auto";
 import Head from "next/head.js";
@@ -14,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { getCountries, getProvinces } from "../redux/actions/winaryActions";
 let flag = true;
 
-const Dashboard = ({ redeemsState, profile }) => {
+const Dashboard = () => {
   const session = useSession();
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
@@ -44,7 +43,7 @@ const Dashboard = ({ redeemsState, profile }) => {
   const showModal = useSelector((state) => state.notification.showModal);
   useEffect(() => {
     if (session.status === "authenticated" && flag) {
-      dispatch(getRedeems(session.data.isAdmin));
+      dispatch(getRedeems(session.data.is_admin));
       dispatch(getCountries());
       dispatch(getProvinces());
       flag = false;
@@ -190,7 +189,7 @@ const Dashboard = ({ redeemsState, profile }) => {
     {
       title: t("creado"),
       field: "created_at",
-    }, 
+    },
     {
       title: t("nombre"),
       field: "name",
@@ -283,13 +282,14 @@ const Dashboard = ({ redeemsState, profile }) => {
       </Head>
       <div className="flex ">
         <Sidebar />
-        <Topbar profile={profile} />
+        <Topbar />
 
         <div className=" ml-8 md:ml-16 top-4 border rounded-lg ">
-          <Table data={data} columnas={columnas} n={50} /> {/**cambie n 5 x n 50 para ver mas filas */}
+          <Table data={data} columnas={columnas} n={50} />{" "}
+          {/**cambie n 5 x n 50 para ver mas filas */}
           <div className="flex mt-20 flex-col ml-10 lg:flex-row  pr-4 ">
             {/* Gráfico de barras */}
-            <div className="w-[90vw] ml-[2rem]  lg:w-1/2 lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
+            <div className="w-[90vw] ml-[2rem]   lg:w-[40vw] shadow-xl border rounded-lg b-10 flex items-center flex-col">
               <h2 className="text-center mt-20">
                 {t("estadisiticasMensuales")}
               </h2>
@@ -330,26 +330,7 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const { req } = context;
-  const { cookie } = req.headers;
-
-  const response = await clientAxios.get("/redeemRoute", {
-    params: {
-      isAdmin: session.isAdmin,
-    },
-    headers: {
-      Cookie: cookie,
-    },
-  });
-
-  const profile = await clientAxios.post("/loginRoute", {
-    public_key: session.address,
-    headers: {
-      Cookie: cookie,
-    },
-  });
-
   return {
-    props: { redeemsState: response.data, profile: profile.data },
+    props: {},
   };
 }

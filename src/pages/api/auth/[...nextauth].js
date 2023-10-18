@@ -15,10 +15,8 @@ export default NextAuth({
         },
       },
       async authorize(credentials) {
-        if (!Boolean(utils.getAddress(credentials?.address))) {
-          return null;
-        }
-        const isValid = await checkAuth(utils.getAddress(credentials?.address));
+        console.log(credentials);
+        const isValid = await checkAuth(credentials?.address);
         if (isValid)
           return {
             id: credentials?.address,
@@ -32,23 +30,32 @@ export default NextAuth({
   },
   jwt: {
     secret: process.env.JWT_SECRET,
-    algorithm : 'HS256'
+    algorithm: "HS256",
   },
   callbacks: {
     async session({ session, token }) {
-      session.address = token.sub;
-      const isValid = await checkAuth(token.sub);
-      //preguntar si es admin
-      if (isValid) {
-          const isAdminCheck = await isAdmin(token.sub)  
-          if(isAdminCheck) {
-            session.isAdmin = true
-            return session
+      try {
+        // Aquí puedes realizar validaciones personalizadas o manejar errores
+        session.address = token.sub;
+        const isValid = await checkAuth(token.sub);
+
+        if (isValid) {
+          const isAdminCheck = await isAdmin(token.sub);
+          if (isAdminCheck) {
+            session.is_admin = true;
+          } else {
+            session.is_admin = false;
           }
-          session.isAdmin = false
+        } else {
+          // Manejo de error personalizado si la autenticación falla
+          throw new Error("Autenticación fallida");
+        }
+
         return session;
-      } else {
-        return null;
+      } catch (error) {
+        // Manejo de errores
+        console.error("Error de autenticación:", error);
+        return null; // Puedes retornar null o tomar otra acción adecuada en caso de error
       }
     },
   },

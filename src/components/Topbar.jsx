@@ -21,6 +21,7 @@ import {
   collapseNotificationModal,
 } from "@/redux/actions/notificationActions";
 import SearchModal from "./SearchModal";
+import useProfile from "@/hooks/useProfile";
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
     <FaBell className="text-2xl" />
@@ -34,7 +35,9 @@ const BellIconWithNotification = ({ notificationCount }) => (
 
 const wsPort = process.env.NEXT_PUBLIC_WS_SERVER_URL;
 
-const Topbar = ({ profile }) => {
+const Topbar = () => {
+  const { profile } = useProfile();
+
   const session = useSession();
   const router = useRouter();
   const [selectLanguage, setSelectLanguage] = useState(false);
@@ -208,7 +211,7 @@ const Topbar = ({ profile }) => {
             >
               <Image
                 className="rounded-full w-full h-full "
-                src={profile.image}
+                src={profile?.profile_img}
                 width={50}
                 height={50}
                 alt="wineryLogo"
