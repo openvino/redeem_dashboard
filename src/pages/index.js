@@ -1,27 +1,19 @@
 import { ABeeZee } from "next/font/google";
 const aBeeZee = ABeeZee({ subsets: ["latin"], weight: "400" });
-import { useDispatch, useSelector } from "react-redux";
-import LoginButton from "../components/LoginButton";
+import { useSelector } from "react-redux";
 import Image from "next/image";
 import Head from "next/head";
-
+import { ToastContainer } from "react-toastify";
 import React from "react";
-import { useSession, signOut, getSession } from "next-auth/react";
-import { useEffect } from "react";
-import { useAccount } from "wagmi";
+import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { showAlert } from "@/redux/actions/alertActions";
-
+import useLoginButton from "../components/useLoginButton";
 export default function Home() {
   const router = useRouter();
-  const dispatch = useDispatch();
-
-  const [{ data: accountData }, disconnect] = useAccount();
-
-  const session = useSession();
 
   const alert = useSelector((state) => state.alert.alert);
 
+  const { LoginButton, error } = useLoginButton();
   return (
     <>
       <Head>
@@ -32,6 +24,19 @@ export default function Home() {
         className={`flex min-h-screen flex-col gap-10 justify-center items-center p-24 ${aBeeZee.className} bg-cover`}
       >
         {alert && alert}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
 
         {router.asPath.includes("error") && <p>Hubo un error</p>}
         <div className="">

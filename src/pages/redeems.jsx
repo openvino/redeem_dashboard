@@ -8,7 +8,7 @@ import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
-const redeems = ({ redeems, profile }) => {
+const redeems = ({ redeems }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
   const countries = useSelector((state) => state.winaryAdress.countries);
@@ -38,14 +38,7 @@ const redeems = ({ redeems, profile }) => {
       title: "",
       field: "acciones",
     },
-    {
-      title: "Id",
-      field: "id",
-    },
-    {
-      title: "Cliente",
-      field: "customer_id",
-    },
+
     {
       title: t("nombre"),
       field: "name",
@@ -70,14 +63,7 @@ const redeems = ({ redeems, profile }) => {
       title: t("telefono"),
       field: "phone",
     },
-    // {
-    //   title: t("actualizado"),
-    //   field: "updated_at",
-    // },
-    // {
-    //   title: "Borrado",
-    //   field: "deleted_at",
-    // },
+
     {
       title: "Email",
       field: "email",
@@ -98,11 +84,6 @@ const redeems = ({ redeems, profile }) => {
       title: "Telegram_ID",
       field: "telegram_id",
     },
-
-    // {
-    //   title: "Vinería",
-    //   field: "winerie_id",
-    // },
 
     {
       title: t("cp"),
@@ -148,7 +129,7 @@ const redeems = ({ redeems, profile }) => {
       </Head>
       <div className="">
         <Sidebar />
-        <Topbar profile={profile} />
+        <Topbar />
 
         <div className="ml-20  min-w-fit top-4 ">
           <Table data={data} columnas={columnas} n={15} />
@@ -173,23 +154,18 @@ export async function getServerSideProps(context) {
   }
   const { req } = context;
   const { cookie } = req.headers;
+  console.log(session);
 
   const response = await clientAxios.get("/redeemRoute", {
     params: {
-      isAdmin: session.isAdmin,
+      is_admin: session.is_admin,
     },
-    headers: {
-      Cookie: cookie,
-    },
-  });
-  const profile = await clientAxios.post("/loginRoute", {
-    public_key: session.address,
     headers: {
       Cookie: cookie,
     },
   });
 
   return {
-    props: { redeems: response.data, profile: profile.data },
+    props: { redeems: response.data },
   };
 }

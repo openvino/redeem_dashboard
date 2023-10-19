@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { getRedeems } from "@/redux/actions/winaryActions";
 import Head from "next/head";
-function Detail({ redeems, profile, countries, provinces }) {
+function Detail({ redeems, countries, provinces }) {
   const { t } = useTranslation();
   const session = useSession();
   const router = useRouter();
@@ -118,7 +118,7 @@ function Detail({ redeems, profile, countries, provinces }) {
       />
       {/* Same as */}
       <ToastContainer />
-      <Topbar profile={profile} />
+      <Topbar />
       <Sidebar />
       <div
         className="
@@ -425,13 +425,6 @@ export async function getServerSideProps(context) {
     },
   });
 
-  const profile = await clientAxios.post("/loginRoute", {
-    public_key: session.address,
-    headers: {
-      Cookie: cookie,
-    },
-  });
-
   const countries = await clientAxios.get("/countriesRoute", {
     public_key: session.address,
     headers: {
@@ -449,7 +442,7 @@ export async function getServerSideProps(context) {
   return {
     props: {
       redeems: response.data,
-      profile: profile.data,
+
       countries: countries.data,
       provinces: provinces.data,
     },
