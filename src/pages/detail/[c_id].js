@@ -92,9 +92,9 @@ function Detail({ redeems, countries, provinces }) {
       await clientAxios.post("/notificationRoute", {
         id: redeem.id,
       });
-      dispatch(getRedeems(session.data.isAdmin));
+      dispatch(getRedeems(session.data.is_admin));
     };
-    if (session.data?.isAdmin) {
+    if (session.data?.is_admin) {
       setTrue();
     }
   }, [redeem, session]);
@@ -418,7 +418,7 @@ export async function getServerSideProps(context) {
 
   const response = await clientAxios.get("/redeemRoute", {
     params: {
-      isAdmin: session.isAdmin,
+      is_admin: session.is_admin,
     },
     headers: {
       Cookie: cookie,
