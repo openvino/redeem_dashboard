@@ -53,7 +53,7 @@ const Topbar = () => {
   const showModal = useSelector((state) => state.notification.showModal);
   const [loading, setLoading] = useState(false);
   const reloadRedeems = () => {
-    dispatch(getRedeems(session.data.isAdmin));
+    dispatch(getRedeems(session.data.is_admin));
   };
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -103,7 +103,7 @@ const Topbar = () => {
       console.log("Received message from server:", message);
       // Handle the incoming message from the server
       if (message === "Notification updated!") {
-        dispatch(getRedeems(session.data.isAdmin));
+        dispatch(getRedeems(session.data.is_admin));
       }
     });
 
