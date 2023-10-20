@@ -22,12 +22,12 @@ function loginApp(public_key) {
   };
 }
 
-function getRedeems(isAdmin) {
+function getRedeems(is_admin) {
   return async (dispatch) => {
     try {
       const response = await clientAxios.get("/redeemRoute", {
         params: {
-          isAdmin,
+          is_admin,
         },
         withCredentials: true,
       });
@@ -39,12 +39,12 @@ function getRedeems(isAdmin) {
   };
 }
 
-function getWinarys(isAdmin) {
+function getWinarys(is_admin) {
   return async (dispatch) => {
     try {
       const response = await clientAxios.get("/winarysRoute", {
         params: {
-          isAdmin,
+          is_admin,
         },
         withCredentials: true,
       });
