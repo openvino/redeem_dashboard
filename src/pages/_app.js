@@ -1,6 +1,6 @@
 import "../styles/globals.css";
+import "react-toastify/dist/ReactToastify.css";
 import { SessionProvider } from "next-auth/react";
-import { Provider as WagmiProvider } from "wagmi";
 //redux
 import { Provider } from "react-redux";
 import store from "../redux/store";
@@ -19,34 +19,16 @@ export default function App({ Component, pageProps }) {
   Router.events.on("routeChangeComplete", (url) => {
     setLoading(false);
   });
+
   return (
     // Application providers
     <I18nextProvider i18n={i18n}>
-      <WagmiProvider autoConnect>
-        <SessionProvider>
-          <Provider store={store}>
-            {loading && <Loader />}
-            <Component {...pageProps} />
-          </Provider>
-        </SessionProvider>
-      </WagmiProvider>
+      <SessionProvider>
+        <Provider store={store}>
+          {loading && <Loader />}
+          <Component {...pageProps} />
+        </Provider>
+      </SessionProvider>
     </I18nextProvider>
   );
 }
-
-// export default function App({ Component, pageProps }) {
-//   Router.events.on("routeChangeStart", (url) => {
-//     console.log("Route is changing");
-//   });
-//   return (
-//     <I18nextProvider i18n={i18n}>
-//       <WagmiProvider autoConnect>
-//         <SessionProvider>
-//           <Provider store={store}>
-//             <Component {...pageProps} />
-//           </Provider>
-//         </SessionProvider>
-//       </WagmiProvider>
-//     </I18nextProvider>
-//   );
-// }
