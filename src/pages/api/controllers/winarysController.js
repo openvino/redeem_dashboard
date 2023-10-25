@@ -64,7 +64,7 @@ export const createWinary = async (req) => {
 
   let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret) `;
 
-  let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin", ens) `;
+  //let query = `INSERT INTO wineries (id, name, website, image, email, primary_color, secret, public_key, "isAdmin", ens) `;
   
   pkOrENS = await isENS(req.public_key); 
 
