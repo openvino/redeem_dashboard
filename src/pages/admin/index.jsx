@@ -18,6 +18,10 @@ const Admin = () => {
       field: "id",
     },
     {
+      title: "ENS",
+      field: "ens",
+    },
+    {
       title: "nombre",
       field: "name",
     },

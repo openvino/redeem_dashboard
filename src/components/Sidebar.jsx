@@ -1,10 +1,10 @@
-import { FaWineGlass, FaUser, FaWineBottle } from "react-icons/fa";
-import { RxTokens } from "react-icons/rx";
-import Link from "next/link";
-import Image from "next/image";
-import { useSession } from "next-auth/react";
+import { FaWineGlass, FaUser, FaWineBottle } from 'react-icons/fa';
+import { RxTokens } from 'react-icons/rx';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 
-import { IoMdSettings } from "react-icons/io";
+import { IoMdSettings } from 'react-icons/io';
 
 const Sidebar = () => {
   const session = useSession();
@@ -34,10 +34,10 @@ const Sidebar = () => {
               <FaWineBottle size={20} />
             </div>
           </Link>
-          <Link href="/">
+          <Link href="/tokens">
             <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
               <Image
-                src={"/assets/mtb.png"}
+                src={'/assets/mtb.png'}
                 width={200}
                 height={200}
                 alt="mtb23"
