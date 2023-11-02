@@ -40,24 +40,24 @@ export const updateAdmin = async (req) => {
   const { id, name, last_name, email, winery_id, profile_img, is_admin } =
     req.body.data;
 
+  const { previd } = req.body;
   let adminQuery = `UPDATE admin_users SET `;
   let adminUpdateFields = [];
 
   if (id) {
-
     console.log("cambio el id: ", id);
 
-      pkOrENS = await isENS(id);
+    pkOrENS = await isENS(id);
 
-      console.log("pk or ENS: ", pkOrENS);
+    console.log("pk or ENS: ", pkOrENS);
 
-      ens = (pkOrENS == id) ? null : id;
+    ens = pkOrENS == id ? null : id;
 
-      console.log("ens: ", ens);
-      
-      adminUpdateFields.push(`ens = '${ens}'`);
-      adminUpdateFields.push(`id = '${pkOrENS}'`);
-    };
+    console.log("ens: ", ens);
+
+    adminUpdateFields.push(`ens = '${ens}'`);
+    adminUpdateFields.push(`id = '${pkOrENS.toLowerCase()}'`);
+  }
 
   if (name) adminUpdateFields.push(`name = '${name}'`);
   if (last_name) adminUpdateFields.push(`last_name = '${last_name}'`);
@@ -66,9 +66,9 @@ export const updateAdmin = async (req) => {
   if (profile_img) adminUpdateFields.push(`profile_img = '${profile_img}'`);
   if (is_admin) adminUpdateFields.push(`is_admin = '${is_admin}'`);
 
-
   adminQuery += adminUpdateFields.join(", ");
-  adminQuery += ` WHERE id = '${id}'`;
+  adminQuery += ` WHERE id = '${previd}'`;
+  console.log(id);
   await conn.query(adminQuery);
 };
 
@@ -78,9 +78,9 @@ export const createAdmin = async (req) => {
 
   let query = `INSERT INTO admin_users (id, name, last_name, email, winery_id, profile_img, is_admin, ens) `;
 
-  pkOrENS = await isENS(id); 
+  pkOrENS = await isENS(id);
 
-  ens = (pkOrENS == id) ? null : id;
+  ens = pkOrENS == id ? null : id;
 
   //console.log('ens >>>>', ens );
 

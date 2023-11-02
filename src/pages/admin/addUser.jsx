@@ -34,13 +34,13 @@ const addUser = () => {
       isLoading: true,
     });
     try {
+      const response = await clientAxios.post("/adminRoute", { data });
       toast.update(toastId, {
         isLoading: false,
         type: toast.TYPE.SUCCESS,
         render: "Admin created success",
         autoClose: 5000,
       });
-      const response = await clientAxios.post("/adminRoute", { data });
     } catch (error) {
       toast.update(toastId, {
         isLoading: false,
