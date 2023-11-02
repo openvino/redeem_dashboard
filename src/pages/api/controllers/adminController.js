@@ -1,5 +1,5 @@
-import conn from "../config/db";
-const resolveENS = require("../../../utils/resolveENS");
+import conn from '../config/db';
+const resolveENS = require('../../../utils/resolveENS');
 let pkOrENS, ens; // ENS or not
 
 export const getAllAdmins = async () => {
@@ -45,15 +45,15 @@ export const updateAdmin = async (req) => {
   let adminUpdateFields = [];
 
   if (id) {
-    console.log("cambio el id: ", id);
+    console.log('cambio el id: ', id);
 
     pkOrENS = await isENS(id);
 
-    console.log("pk or ENS: ", pkOrENS);
+    console.log('pk or ENS: ', pkOrENS);
 
     ens = pkOrENS == id ? null : id;
 
-    console.log("ens: ", ens);
+    console.log('ens: ', ens);
 
     adminUpdateFields.push(`ens = '${ens}'`);
     adminUpdateFields.push(`id = '${pkOrENS.toLowerCase()}'`);
@@ -66,7 +66,7 @@ export const updateAdmin = async (req) => {
   if (profile_img) adminUpdateFields.push(`profile_img = '${profile_img}'`);
   if (is_admin) adminUpdateFields.push(`is_admin = '${is_admin}'`);
 
-  adminQuery += adminUpdateFields.join(", ");
+  adminQuery += adminUpdateFields.join(', ');
   adminQuery += ` WHERE id = '${previd}'`;
   console.log(id);
   await conn.query(adminQuery);
@@ -90,19 +90,23 @@ export const createAdmin = async (req) => {
 
   const adminCreated = await conn.query(query);
 };
+const ensRegex =
+  /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
 
 async function isENS(input) {
-  if (input.endsWith(".eth")) {
-    // La cadena parece ser un ENS
+  if (ensRegex.test(input)) {
+    console.log('La cadena parece ser un ENS');
     const resolvedAddress = await resolveENS(input);
+
     if (resolvedAddress) {
       return resolvedAddress;
     } else {
       // Maneja el caso en el que no se pudo resolver el ENS
-      //console.log('No se pudo resolver el ENS:', input);
-      throw new Error("No se puede resolver el ENS " + input);
+      console.log('No se pudo resolver el ENS:', input);
+      throw new Error('No se puede resolver el ENS ' + input);
     }
   } else {
     return input;
   }
+  console.log('/////////////////////////////', ensRegex.test(input));
 }
