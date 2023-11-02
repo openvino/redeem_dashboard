@@ -22,6 +22,7 @@ import {
 } from '@/redux/actions/notificationActions';
 import SearchModal from './SearchModal';
 import useProfile from '@/hooks/useProfile';
+
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
     <FaBell className="text-2xl" />
@@ -55,6 +56,7 @@ const Topbar = () => {
   const reloadRedeems = () => {
     dispatch(getRedeems(session.data.isAdmin));
   };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showModal && !event.target.closest('.modal-content')) {
@@ -130,7 +132,7 @@ const Topbar = () => {
     if (unwatchedNotifications.length) {
       dispatch(showNotification());
     } else {
-      dispatch(closeNotification());
+      // dispatch(closeNotification());
     }
   }, [allRedeems]);
 

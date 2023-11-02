@@ -8,10 +8,17 @@ import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getRedeems } from '@/redux/actions/winaryActions';
 import Head from 'next/head';
+
+import {
+  closeNotification,
+  showNotification,
+} from '@/redux/actions/notificationActions';
+
 function Detail({ redeems, countries, provinces }) {
+  const allRedeems = useSelector((state) => state.winaryAdress.redeems);
   const { t } = useTranslation();
   const session = useSession();
   const router = useRouter();
@@ -22,14 +29,11 @@ function Detail({ redeems, countries, provinces }) {
   const [statusSelector, setStatusSelector] = useState('');
   const id = redeems.findIndex((r) => r.id === c_id);
   const dispatch = useDispatch();
-
+  const reloadRedeems = () => {
+    dispatch(getRedeems(session.data.is_admin));
+  };
   useEffect(() => {
-    // setValue("customer_id", "");
-    // setValue("amount", "");
-    // setValue("status", "");
-    // setValue("country_id", "");
-    // setValue("province_id", "");
-    dispatch(getRedeems());
+    reloadRedeems();
   }, [id]);
 
   useEffect(() => {
@@ -47,8 +51,6 @@ function Detail({ redeems, countries, provinces }) {
       setCountrieSelector(redeems[id].country_id);
       setProvinceSelector(redeems[id].province_id);
       setStatusSelector(redeems[id].redeem_status);
-
-      // Establece los valores de los demás campos deshabilitados aquí
     }
   }, [redeems]);
 
@@ -92,9 +94,9 @@ function Detail({ redeems, countries, provinces }) {
       await clientAxios.post('/notificationRoute', {
         id: redeem.id,
       });
-      dispatch(getRedeems(session.data.isAdmin));
+      dispatch(getRedeems(session.data.is_admin));
     };
-    if (session.data?.isAdmin) {
+    if (session.data?.is_admin) {
       setTrue();
     }
   }, [redeem, session]);
