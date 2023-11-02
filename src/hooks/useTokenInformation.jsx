@@ -1,33 +1,34 @@
-import { contratos } from "@/utils/getTokenInformation";
-import React, { useState, useEffect } from "react";
-import { MTB_ABI } from "../../contracts";
+import { contratos } from '@/utils/getTokenInformation';
+import React, { useState, useEffect } from 'react';
+import { MTB_ABI } from '../../contracts';
 import {
   getPrice,
   tokenDataInspector,
   calculateHoldersCount,
-} from "@/utils/getTokenInformation";
-import { ETH_DAI_PAIR, MTB19_ETH_PAIR } from "../../contracts";
-import { ethers } from "ethers";
+} from '@/utils/getTokenInformation';
+import { ETH_DAI_PAIR, MTB19_ETH_PAIR } from '../../contracts';
+import { ethers } from 'ethers';
+
 const useTokenInformation = (contractAddress, contractPairAddress) => {
   const contracts = contratos;
 
   const [loading, setLoading] = useState(false);
 
   const [tokenInfo, setTokenInfo] = useState({
-    name: "",
-    symbol: "",
+    name: '',
+    symbol: '',
     totalSupply: 0,
     burnedTokens: 0,
     holdersCount: -1,
     totalTransfers: -1,
-    tokenContract: "",
-    crowdsaleContract: "",
-    lpContract: "",
-    vcoStartDate: "",
-    vcoEndDate: "",
+    tokenContract: '',
+    crowdsaleContract: '',
+    lpContract: '',
+    vcoStartDate: '',
+    vcoEndDate: '',
     vcoPrice: 0,
-    vcoPriceFiat: "",
-    adminAddress: "",
+    vcoPriceFiat: '',
+    adminAddress: '',
     price: -1,
     initialLpTokenDeposit: 0,
   });
@@ -77,7 +78,7 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
 
         const fetchPricePromise = (async () => {
           const price = await getPrice(MTB19_ETH_PAIR, ETH_DAI_PAIR);
-          console.log(price, "////////////////////////");
+
           setTokenInfo((prev) => ({
             ...prev,
             price,
@@ -104,7 +105,7 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
 
         Promise.all(promises)
           .catch((error) => {
-            console.error("Error al obtener datos del token:", error);
+            console.error('Error al obtener datos del token:', error);
           })
           .finally(() => {
             setLoading(false);

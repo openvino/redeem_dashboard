@@ -7,6 +7,9 @@ export const MTB_ABI = [
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
 
+export const MTB18Address = '0x1BCfD19F541eB62c8CFeBE53fe72bf2aFc35A255';
+export const MTB18_ETH_PAIR = '0x7ECaDC96563a0E158f1a1Eec220Bb4f661640D39';
+
 export const MTB19Address = '0x87AB739464881af0011052D4Ca0B0d657e8c3B48';
 export const MTB19_ETH_PAIR = '0x9177F33f833761fB0eea7b72a5db487a7C140F5C';
 
@@ -26,3 +29,49 @@ export const MTB23AddressCrowdsale = '';
 export const MTB23_ETH_PAIR = '';
 
 export const ETH_DAI_PAIR = '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11';
+
+export const VCOPrices = [
+  {
+    name: 'MikeTangoBravo18',
+    tokenInssuance: 16.384,
+    priceEth: 0.0078,
+    dateStart: '6 - MAY - 2018',
+    dateEnd: '25 - JULY - 2018',
+  },
+  {
+    name: 'MikeTangoBravo19',
+    tokenInssuance: 17.707,
+    priceEth: 0.027778,
+    dateStart: '6 - MAY - 2019',
+    dateEnd: '25 - JULY - 2019',
+  },
+
+  {
+    name: 'MikeTangoBravo20',
+    tokenInssuance: 9.6,
+    priceEth: 0.013698630136986302,
+    dateStart: '6 - MAY - 2020',
+    dateEnd: '25 - JULY - 2020',
+  },
+  {
+    name: 'MikeTangoBravo21',
+    tokenInssuance: 12.121,
+    priceEth: 0.00081168831168831169,
+    dateStart: '6 - MAY - 2021',
+    dateEnd: '25 - JULY - 2021',
+  },
+  {
+    name: 'MikeTangoBravo22',
+    tokenInssuance: 8.192,
+    priceEth: 0.001590792453454557,
+    dateStart: '6 - MAY - 2022',
+    dateEnd: '25 - JULY - 2022',
+  },
+  {
+    name: 'MikeTangoBravo23',
+    tokenInssuance: 1.024,
+    priceEth: 0.006896551724137932,
+    dateStart: '6 - MAY - 2023',
+    dateEnd: '25 - JULY - 2023',
+  },
+];

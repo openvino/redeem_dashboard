@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
-import LoadingSpinner from "./Spinner";
-import axios from "axios";
-const TokenInfoComponent = ({ tokenInfo }) => {
+import React, { useEffect, useState } from 'react';
+import LoadingSpinner from './Spinner';
+import axios from 'axios';
+import Image from 'next/image';
+import { VCOPrices } from '../../contracts';
+const TokenInfoComponent = ({ tokenInfo, onSelectChange, contracts }) => {
   const {
     name,
     symbol,
@@ -19,27 +21,32 @@ const TokenInfoComponent = ({ tokenInfo }) => {
     initialLpTokenDeposit,
   } = tokenInfo;
 
-  const [priceFiat, setPriceFiat] = useState();
+  const [priceFiat, setPriceFiat] = useState({ ars: 0, usd: 0 });
+  const [currency, setCurrency] = useState('ars');
 
-  const getPrice = async (ethAmount) => {
+  const getPrice = async (ethAmount, currency) => {
     try {
-      const response = await axios.get(
-        "https://criptoya.com/api/bitsoalpha/eth/usd"
+      const responseUsd = await axios.get(
+        'https://criptoya.com/api/bitsoalpha/eth/usd'
+      );
+      const responseArs = await axios.get(
+        'https://criptoya.com/api/argenbtc/usdt/ars'
       );
 
-      if (response.data && response.data.ask) {
-        const ethPriceInUSD = response.data.totalAsk;
+      if (responseUsd.data && responseUsd.data.ask) {
+        const ethPriceInUSD = responseUsd.data.totalAsk;
         const priceInUSD = ethAmount * ethPriceInUSD;
-        console.log(priceInUSD);
-        setPriceFiat(priceInUSD);
+        const priceInARS = priceInUSD * responseArs.data.ask;
+        setPriceFiat({ ars: priceInARS, usd: priceInUSD });
+
         return;
       } else {
-        console.log("No se pudo obtener el precio de Ethereum en dólares");
+        console.log('No se pudo obtener el precio de Ethereum en dólares');
         return null;
       }
     } catch (error) {
       console.error(
-        "Error al obtener el precio de Ethereum en dólares:",
+        'Error al obtener el precio de Ethereum en dólares:',
         error
       );
       return null;
@@ -52,48 +59,35 @@ const TokenInfoComponent = ({ tokenInfo }) => {
     getPrice(price);
   }, [name]);
 
-  const VCOPrices = [
-    {
-      name: "MikeTangoBravo19",
-      tokenInssuance: 17.707,
-      priceEth: 0.027778,
-      dateStart: "6 - MAY - 2019 ",
-      dateEnd: "25 - JULY - 2019",
-    },
-
-    {
-      name: "MikeTangoBravo20",
-      tokenInssuance: 9.6,
-      priceEth: 0.013698630136986302,
-      dateStart: "6 - MAY - 2020 ",
-      dateEnd: "25 - JULY - 2020",
-    },
-    {
-      name: "MikeTangoBravo21",
-      tokenInssuance: 12.121,
-      priceEth: 0.00081168831168831169,
-      dateStart: "6 - MAY - 2021 ",
-      dateEnd: "25 - JULY - 2021",
-    },
-    {
-      name: "MikeTangoBravo22",
-      tokenInssuance: 8.192,
-      priceEth: 0.001590792453454557,
-      dateStart: "6 - MAY - 2022 ",
-      dateEnd: "25 - JULY - 2022",
-    },
-    {
-      name: "MikeTangoBravo23",
-      tokenInssuance: 1.024,
-      priceEth: 0.006896551724137932,
-      dateStart: "6 - MAY - 2023 ",
-      dateEnd: "25 - JULY - 2023",
-    },
-  ];
-
   return (
-    <div className="p-4 border border-[#840C4A] rounded-md  bg-[#F1EDE2]">
-      <ul className="grid grid-cols-2 text-cennter gap-4 mt-4">
+    <div className="p-4 border rounded-xl bg-[#F1EDE2] shadow-xl">
+      <div className="flex flex-row justify-between">
+        <div className="text-center flex">
+          <Image src={'/assets/mtb.svg'} width={20} height={20} alt="mtb23" />
+          <h1 className="text-md md:text-xl font-bold m-2">Token Info</h1>
+        </div>
+        <div className="flex justify-end gap-5 my-1 mr-10">
+          <select
+            name=""
+            id=""
+            onChange={onSelectChange}
+            className="text-gray-800 border rounded-lg text-md "
+            style={{ outline: 'none' }}
+          >
+            <option value="">Token</option>
+            {contracts?.map((e, index) => (
+              <option
+                key={index}
+                value={e.contractAddress}
+                name={e.contractPairAddress}
+              >
+                {e.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
         <li className="mb-2">
           Name: <span className="font-semibold">{name}</span>
         </li>
@@ -103,20 +97,10 @@ const TokenInfoComponent = ({ tokenInfo }) => {
         <li className="mb-2">
           Balance: <span className="font-semibold">{balance}</span>
         </li>
-        {price > -1 ? (
-          <li className="mb-2">
-            Price: <span className="font-semibold">{price}</span>
-          </li>
-        ) : (
-          <li className="mb-2">
-            Price:
-            <span>
-              <div className="mt-2">
-                <LoadingSpinner />
-              </div>
-            </span>
-          </li>
-        )}
+
+        <li className="mb-2">
+          Price: <span className="font-semibold">{price}</span>
+        </li>
 
         <li className="mb-2">
           Token Issuance: <span className="font-semibold">{vcoIssuance}</span>
@@ -130,21 +114,11 @@ const TokenInfoComponent = ({ tokenInfo }) => {
           <span className="font-semibold">{burnedTokens}</span>
         </li>
 
-        {holdersCount > -1 ? (
-          <li className="mb-2">
-            Holders (drinker wallets):
-            <span className="font-semibold">{holdersCount}</span>
-          </li>
-        ) : (
-          <li className="mb-2">
-            Holders (drinker wallets):
-            <span>
-              <div className="mt-2">
-                <LoadingSpinner />
-              </div>
-            </span>
-          </li>
-        )}
+        <li className="mb-2">
+          Holders (drinker wallets):
+          <span className="font-semibold">{holdersCount}</span>
+        </li>
+
         {totalTransfers > -1 ? (
           <li className="mb-2">
             Total Transfers:
@@ -154,7 +128,7 @@ const TokenInfoComponent = ({ tokenInfo }) => {
           <li className="mb-2">
             Total Transfers:
             <span>
-              <div className="mt-2">
+              <div className="mt-2 w-4 h-4">
                 <LoadingSpinner />
               </div>
             </span>
@@ -174,7 +148,7 @@ const TokenInfoComponent = ({ tokenInfo }) => {
           <span className="font-semibold">{lpContract}</span>
         </li>
         <li className="mb-2">
-          VCO Start Date:{" "}
+          VCO Start Date:{' '}
           <span className="font-semibold">
             {VCOPrices.map((element, index) => {
               if (name == element.name) return `${element.dateStart}`;
@@ -182,7 +156,7 @@ const TokenInfoComponent = ({ tokenInfo }) => {
           </span>
         </li>
         <li className="mb-2">
-          VCO End Date:{" "}
+          VCO End Date:{' '}
           <span className="font-semibold">
             {VCOPrices.map((element, index) => {
               if (name == element.name) return `${element.dateEnd}`;
@@ -198,8 +172,25 @@ const TokenInfoComponent = ({ tokenInfo }) => {
           </span>
         </li>
         <li className="mb-2">
-          VCO Price in Fiat:
-          {` $ ${priceFiat} USD`}
+          <span className="flex flex-row">
+            <div>
+              VCO Fiat Price:
+              {currency === 'ars' ? ` ${priceFiat.ars}` : ` ${priceFiat.usd}`}
+            </div>
+            <div className="">
+              <select
+                name="currencySelect"
+                id="currencySelect"
+                onChange={(e) => setCurrency(e.target.value)}
+                className=" "
+                style={{ outline: 'none' }}
+                value={currency}
+              >
+                <option value="ars">ARS</option>
+                <option value="usd">USD</option>
+              </select>
+            </div>
+          </span>
         </li>
         <li className="mb-2">
           Admin Address: <span className="font-semibold">{adminAddress}</span>
