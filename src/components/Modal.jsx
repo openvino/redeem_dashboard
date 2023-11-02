@@ -1,13 +1,13 @@
-import { collapseNotificationModal } from "@/redux/actions/notificationActions";
-import clientAxios from "@/config/clientAxios";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { useSelector, useDispatch } from "react-redux";
-import { useTranslation } from "react-i18next";
+import { collapseNotificationModal } from '@/redux/actions/notificationActions';
+import clientAxios from '@/config/clientAxios';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 const clearNotifications = async (data, reloadRedeems) => {
   const promisifiedNotifications = data.map((e) => {
-    return clientAxios.post("/notificationRoute", {
+    return clientAxios.post('/notificationRoute', {
       id: e.id,
     });
   });
@@ -20,10 +20,12 @@ const Modal = ({ data, reloadRedeems }) => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const router = useRouter();
+
   const handleClick = (id) => {
     dispatch(collapseNotificationModal());
     router.push(`/detail/${id}`);
   };
+
   function getTimeDifference(created_at) {
     const currentTime = new Date();
     const createdAt = new Date(created_at);
@@ -34,9 +36,9 @@ const Modal = ({ data, reloadRedeems }) => {
     const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
     if (hours >= 1 && hours < 24) {
-      return `${hours} ${hours === 1 ? t("hora") : t("horas")}`;
+      return `${hours} ${hours === 1 ? t('hora') : t('horas')}`;
     } else {
-      return `${days} ${days === 1 ? t("día") : t("días")}`;
+      return `${days} ${days === 1 ? t('día') : t('días')}`;
     }
   }
   const filterData = () => {
@@ -64,12 +66,12 @@ const Modal = ({ data, reloadRedeems }) => {
               >
                 {e.name ? (
                   <span>
-                    {e.name} {t("ha_realizado_reddem")}
-                    {getTimeDifference(e.created_at)} {t("ago")}
+                    {e.name} {t('ha_realizado_reddem')}
+                    {getTimeDifference(e.created_at)} {t('ago')}
                   </span>
                 ) : (
                   <span>
-                    Un cliente ha realizado un redeem hace{" "}
+                    Un cliente ha realizado un redeem hace{' '}
                     {getTimeDifference(e.created_at)}
                   </span>
                 )}
@@ -79,7 +81,7 @@ const Modal = ({ data, reloadRedeems }) => {
               className="text-xs cursor-pointer font-bold"
               onClick={() => clearNotifications(data, reloadRedeems)}
             >
-              {t("limpiar_noti")}
+              {t('limpiar_noti')}
             </p>
           </div>
         </div>
