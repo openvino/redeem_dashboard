@@ -7,6 +7,10 @@ import { MTB19Address, MTB19_ETH_PAIR } from '../../../contracts';
 import useTokenInformation from '@/hooks/useTokenInformation';
 import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/Spinner';
+import {
+  closeNotification,
+  showNotification,
+} from '@/redux/actions/notificationActions';
 
 const Tokens = () => {
   const [address, setAddress] = useState(MTB19Address);
@@ -32,7 +36,7 @@ const Tokens = () => {
       <Sidebar />
       <div className="z-1 mt-[8rem]  ml-[4.5rem] sm:ml-[6rem] w-[80%] md:w-[90%] overflow-x-hidden rounded-xl">
         {tokenInfo && !loading ? (
-          <div className="w-full flex justify-start ml-5 overflow-x-scroll">
+          <div className="w-full flex justify-start ml-5 overflow-x-hidden">
             <TokenInfoComponent
               tokenInfo={tokenInfo}
               contracts={contracts}

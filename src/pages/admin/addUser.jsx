@@ -78,14 +78,13 @@ const addUser = () => {
         <ToastContainer />
         <div className="z-1 mt-[10rem] ml-[6rem] w-full overflow-x-scrolllg: overflow-x-hidden">
           <div className="">
-            <h1 className="text-2xl font-bold text-center mb-4">
-              {t('add_admin')}
-            </h1>
-
             <form
-              className=" p-2 space-y-2 flex flex-col bg-[#f4f4f5] w-[99%] border-solid border-gray-200 border-2"
+              className=" p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] border-solid rounded-xl border-gray-200 border-2"
               onSubmit={handleSubmit(onSubmit)}
             >
+              <h1 className="text-xl font-bold text-center mb-4">
+                {t('add_admin')}
+              </h1>
               <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
                 <div className="flex items-center">
                   <label className="w-24 font-bold">{t('clave')}</label>
