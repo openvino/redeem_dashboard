@@ -55,14 +55,14 @@ export const ETH_DAI_PAIR = '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11';
 export const VCOPrices = [
   {
     name: 'MikeTangoBravo18',
-    tokenInssuance: 16.384,
+    tokenInssuance: 16384,
     priceEth: 0.0078,
     dateStart: '6 - MAY - 2018',
     dateEnd: '25 - JULY - 2018',
   },
   {
     name: 'MikeTangoBravo19',
-    tokenInssuance: 17.707,
+    tokenInssuance: 17707,
     priceEth: 0.027778,
     dateStart: '6 - MAY - 2019',
     dateEnd: '25 - JULY - 2019',
@@ -70,28 +70,28 @@ export const VCOPrices = [
 
   {
     name: 'MikeTangoBravo20',
-    tokenInssuance: 9.6,
+    tokenInssuance: 9600,
     priceEth: 0.013698630136986302,
     dateStart: '6 - MAY - 2020',
     dateEnd: '25 - JULY - 2020',
   },
   {
     name: 'MikeTangoBravo21',
-    tokenInssuance: 12.121,
+    tokenInssuance: 12121,
     priceEth: 0.00081168831168831169,
     dateStart: '6 - MAY - 2021',
     dateEnd: '25 - JULY - 2021',
   },
   {
     name: 'MikeTangoBravo22',
-    tokenInssuance: 8.192,
+    tokenInssuance: 8192,
     priceEth: 0.001590792453454557,
     dateStart: '6 - MAY - 2022',
     dateEnd: '25 - JULY - 2022',
   },
   {
     name: 'MikeTangoBravo23',
-    tokenInssuance: 1.024,
+    tokenInssuance: 1024,
     priceEth: 0.006896551724137932,
     dateStart: '6 - MAY - 2023',
     dateEnd: '25 - JULY - 2023',

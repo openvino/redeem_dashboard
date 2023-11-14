@@ -61,12 +61,15 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
   }, [name]);
 
   return (
-    <div className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center">
+    <div
+      className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center"
+      // style={{ boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}
+    >
       <div className="flex flex-row justify-between">
         <div className="text-center flex">
           <Image
             src={`/assets/${symbol}.png`}
-            width={40}
+            width={50}
             height={40}
             alt="mtb23"
           />
@@ -95,9 +98,9 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-3">
         {/* First Column */}
-        <div className="grid grid-cols-1  gap-3">
+        <div className="grid grid-cols-1  gap-2">
           <div className="mb-2">
             {t('name')}
             {':   '} <span className="font-semibold">{name}</span>
@@ -131,7 +134,7 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
         </div>
 
         {/* Second Column */}
-        <div className="grid grid-cols-1  gap-3">
+        <div className="grid grid-cols-1  gap-2">
           <div className="mb-2">
             {t('contract_address')}:{'   '}
             <span className="font-semibold">{tokenContract}</span>
@@ -200,121 +203,6 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
           </button>
         </Link>
       </div>
-
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-  
-</div> */}
-
-      {/* <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-        <li className="mb-2">
-          Name: <span className="font-semibold">{name}</span>
-        </li>
-
-        <li className="mb-2">
-          Price: <span className="font-semibold">{price}</span>
-        </li>
-
-        <li className="mb-2">
-          Symbol: <span className="font-semibold">{symbol}</span>
-        </li>
-        <li className="mb-2">
-          Token Issuance: <span className="font-semibold">{vcoIssuance}</span>
-        </li>
-        <li className="mb-2">
-          Max Total Supply (total bottles remaining):
-          <span className="font-semibold">{totalSupply}</span>
-        </li>
-        <li className="mb-2">
-          Burned tokens (redeemed! Drunk):
-          <span className="font-semibold">{burnedTokens}</span>
-        </li>
-
-        <li className="mb-2">
-          Holders (drinker wallets):
-          <span className="font-semibold">{holdersCount}</span>
-        </li>
-
-        {totalTransfers > -1 ? (
-          <li className="mb-2">
-            Total Transfers:
-            <span className="font-semibold">{totalTransfers}</span>
-          </li>
-        ) : (
-          <li className="mb-2">
-            Total Transfers:
-            <span>
-              <div className="mt-2 w-4 h-4">
-                <LoadingSpinner />
-              </div>
-            </span>
-          </li>
-        )}
-
-        <li className="mb-2">
-          Token Contract Address:
-          <span className="font-semibold">{tokenContract}</span>
-        </li>
-        <li className="mb-2">
-          Crowdsale Contract Address:
-          <span className="font-semibold">{crowdsaleContract}</span>
-        </li>
-        <li className="mb-2">
-          LP Contract Address:
-          <span className="font-semibold">{lpContract}</span>
-        </li>
-        <li className="mb-2">
-          VCO Start Date:{'   '}
-          <span className="font-semibold">
-            {VCOPrices.map((element, index) => {
-              if (name == element.name) return `${element.dateStart}`;
-            })}
-          </span>
-        </li>
-        <li className="mb-2">
-          VCO End Date:{'   '}
-          <span className="font-semibold">
-            {VCOPrices.map((element, index) => {
-              if (name == element.name) return `${element.dateEnd}`;
-            })}
-          </span>
-        </li>
-        <li className="mb-2">
-          VCO Price:
-          <span className="font-semibold">
-            {VCOPrices.map((element, index) => {
-              if (name == element.name) return `${element.priceEth} ETH`;
-            })}
-          </span>
-        </li>
-        <li className="mb-2">
-          <span className="flex flex-row">
-            <div>
-              VCO Fiat Price:
-              {currency === 'ars' ? ` ${priceFiat.ars}` : ` ${priceFiat.usd}`}
-            </div>
-            <div className="">
-              <select
-                name="currencySelect"
-                id="currencySelect"
-                onChange={(e) => setCurrency(e.target.value)}
-                className=" "
-                style={{ outline: 'none' }}
-                value={currency}
-              >
-                <option value="ars">ARS</option>
-                <option value="usd">USD</option>
-              </select>
-            </div>
-          </span>
-        </li>
-        <li className="mb-2">
-          Admin Address: <span className="font-semibold">{adminAddress}</span>
-        </li>
-        <li className="mb-2">
-          Initial LP Token Deposit:
-          <span className="font-semibold">{initialLpTokenDeposit}</span>
-        </li>
-      </ul> */}
     </div>
   );
 };

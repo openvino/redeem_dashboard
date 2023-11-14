@@ -1,4 +1,4 @@
-import { contracts } from '../../contracts';
+import { contracts, VCOPrices } from '../../contracts';
 
 import { ethers } from 'ethers';
 
@@ -65,6 +65,7 @@ export const calculateHoldersCount = async (contract) => {
 
 export const tokenDataInspector = async (contract, address) => {
   const name = await contract.name();
+
   const symbol = await contract.symbol();
 
   const totalSupplyWei = await contract.totalSupply();
@@ -75,8 +76,16 @@ export const tokenDataInspector = async (contract, address) => {
   );
   const balance = ethers.utils.formatEther(balanceWei);
 
-  const vcoIssuanceWei = await contract.cap();
-  const vcoIssuance = ethers.utils.formatEther(vcoIssuanceWei);
+  let vcoIssuanceWei;
+  let vcoIssuance;
+
+  try {
+    vcoIssuanceWei = await contract.cap();
+    vcoIssuance = ethers.utils.formatEther(vcoIssuanceWei);
+  } catch (error) {
+    vcoIssuance = 16384;
+  }
+
   const burnedTokensDrunk = vcoIssuance - totalSupply;
 
   const filteredStaticContractData = contracts.find(
@@ -99,5 +108,6 @@ export const tokenDataInspector = async (contract, address) => {
     // holdersCount,
     // transferEventsCount,
   };
+
   return tokenData;
 };
