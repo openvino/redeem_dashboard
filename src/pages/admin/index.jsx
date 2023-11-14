@@ -1,41 +1,43 @@
-import React from "react";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
-import useAdmins from "@/hooks/useAdmins";
-import Table from "@/components/Table";
-import { getSession } from "next-auth/react";
-import Head from "next/head";
+import React from 'react';
+import Topbar from '@/components/Topbar';
+import Sidebar from '@/components/Sidebar';
+import useAdmins from '@/hooks/useAdmins';
+import Table from '@/components/Table';
+import { getSession } from 'next-auth/react';
+import Head from 'next/head';
+import { useTranslation } from 'react-i18next';
 const Admin = () => {
+  const { t } = useTranslation();
   const { admins } = useAdmins();
 
   const columnas = [
     {
-      title: "",
-      field: "acciones",
+      title: '',
+      field: 'acciones',
     },
     {
-      title: "Clave publica",
-      field: "id",
+      title: t('clave'),
+      field: 'id',
     },
     {
-      title: "ENS",
-      field: "ens",
+      title: 'ENS',
+      field: 'ens',
     },
     {
-      title: "nombre",
-      field: "name",
+      title: t('nombre'),
+      field: 'name',
     },
     {
-      title: "Apellido",
-      field: "last_name",
+      title: t('apellido'),
+      field: 'last_name',
     },
     {
-      title: "Email",
-      field: "email",
+      title: 'Email',
+      field: 'email',
     },
     {
-      title: "Bodega",
-      field: "winery_id",
+      title: t('bodega'),
+      field: 'winery_id',
     },
   ];
 
@@ -62,7 +64,7 @@ export async function getServerSideProps(context) {
   if (!session) {
     return {
       redirect: {
-        destination: "/",
+        destination: '/',
         permanent: false,
       },
     };

@@ -1,5 +1,4 @@
-import { contratos } from '@/utils/getTokenInformation';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MTB_ABI } from '../../contracts';
 import {
   getPrice,
@@ -10,8 +9,6 @@ import { ETH_DAI_PAIR, MTB19_ETH_PAIR } from '../../contracts';
 import { ethers } from 'ethers';
 
 const useTokenInformation = (contractAddress, contractPairAddress) => {
-  const contracts = contratos;
-
   const [loading, setLoading] = useState(false);
 
   const [tokenInfo, setTokenInfo] = useState({
@@ -53,6 +50,9 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
             vcoIssuance,
             balance,
             burnedTokensDrunk,
+            crowdsaleAddress,
+            uniswapUri,
+            lpContractAddress,
           } = data;
 
           setTokenInfo((prev) => ({
@@ -63,9 +63,10 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
             balance,
             totalSupply,
             burnedTokens: burnedTokensDrunk,
-
             tokenContract: address,
-            // crowdsaleContract: '',
+            crowdsaleAddress,
+            uniswapUri,
+            lpContractAddress,
             // lpContract: '',
             // vcoStartDate: '',
             // vcoEndDate: '',
@@ -118,7 +119,7 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
     fetchData();
   }, [contractAddress]);
 
-  return { contracts, tokenInfo, loading };
+  return { tokenInfo, loading };
 };
 
 export default useTokenInformation;

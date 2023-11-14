@@ -1,28 +1,26 @@
-import { getToken, jwt } from "next-auth/jwt";
+import { getToken, jwt } from 'next-auth/jwt';
 import {
   getAllWinarys,
   updateWinary,
   createWinary,
-} from "../controllers/winarysController";
-import tokenVerify from "../helpers/tokenVerify";
+} from '../controllers/winarysController';
+import tokenVerify from '../helpers/tokenVerify';
 
 export default async function handler(req, res) {
   const secret = process.env.JWT_SECRET;
 
   const isValidJWT = await tokenVerify(req);
   if (!isValidJWT) {
-    return res.json("INVALID CREDENTIALS");
+    return res.json('INVALID CREDENTIALS');
   }
 
-  //GET REDEEMS
-  if (req.method === "GET") {
+  if (req.method === 'GET') {
     const { is_admin } = req.query;
 
     try {
-      // Verificar el token
       const token = await getToken({ req, secret });
 
-      if (is_admin === "true") {
+      if (is_admin === 'true') {
         const winarys = await getAllWinarys();
         return res.status(200).json(winarys);
       }
@@ -32,12 +30,8 @@ export default async function handler(req, res) {
     }
   }
 
-  // EDIT WINARY
-  if (req.method === "PUT") {
-    // const { redeemId, status } = req.body;
-
+  if (req.method === 'PUT') {
     try {
-      //console.log("req.body.data >>>", req.body.data );
       const updatedWinary = await updateWinary(req.body.data);
       return res.status(200).json(updatedWinary);
     } catch (error) {
@@ -46,7 +40,7 @@ export default async function handler(req, res) {
     }
   }
 
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     try {
       const updateWinary = await createWinary(req.body.data);
       return res.status(200).json(updateWinary);

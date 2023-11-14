@@ -53,7 +53,7 @@ function Detail({ winarys }) {
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
-          render: 'Winary updated',
+          render: 'Winery updated',
           autoClose: 5000,
         });
 
@@ -85,7 +85,6 @@ function Detail({ winarys }) {
           router.back();
         }, 3000);
       } catch (error) {
-        console.log('error toast update >>>>>>', error);
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.ERROR,

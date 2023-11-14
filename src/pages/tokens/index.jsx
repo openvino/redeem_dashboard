@@ -15,13 +15,9 @@ import {
 const Tokens = () => {
   const [address, setAddress] = useState(MTB19Address);
   const [pairAddress, setPairAddress] = useState(MTB19_ETH_PAIR);
-  const { contracts, tokenInfo, loading } = useTokenInformation(
-    address,
-    pairAddress
-  );
+  const { tokenInfo, loading } = useTokenInformation(address, pairAddress);
 
   const onSelectChange = (e) => {
-    console.log(e.target.value);
     const selectedContractAddress = e.target.value;
     const selectedContractName =
       e.target.options[e.target.selectedIndex].getAttribute('name');
@@ -39,8 +35,8 @@ const Tokens = () => {
           <div className="w-full flex justify-start ml-5 overflow-x-hidden">
             <TokenInfoComponent
               tokenInfo={tokenInfo}
-              contracts={contracts}
               onSelectChange={onSelectChange}
+              style={{ boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}
             />
           </div>
         ) : (

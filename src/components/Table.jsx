@@ -10,7 +10,6 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 
 const Table = ({ data, columnas, n, route = '/detail' }) => {
   const { t } = useTranslation();
@@ -66,7 +65,6 @@ const Table = ({ data, columnas, n, route = '/detail' }) => {
         const valorA = a[columnOrder];
         const valorB = b[columnOrder];
         if (columnOrder === 'created_at') {
-          // Ordenar por created_at de forma descendente al cargar por primera vez
           return ascOrder
             ? new Date(valorB) - new Date(valorA)
             : new Date(valorA) - new Date(valorB);
@@ -182,7 +180,7 @@ const Table = ({ data, columnas, n, route = '/detail' }) => {
               {columnas.map((columna) => (
                 <th
                   key={columna.field}
-                  className={`px-1 py-1 bg-[#840C4A]  text-[0.75rem]  text-white font-medium uppercase tracking-wider text-center cursor-pointer${
+                  className={`px-1 py-1 bg-[#840C4A]  text-[0.75rem]  text-white font-large  tracking-wider text-center cursor-pointer${
                     columna.field === 'acciones' ? 'w-12 sm:w-16' : ''
                   }
                 `}

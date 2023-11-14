@@ -1,6 +1,6 @@
-import conn from "../config/db";
-import { v4 as uuid } from "uuid";
-const resolveENS = require("../../../utils/resolveENS");
+import conn from '../config/db';
+import { v4 as uuid } from 'uuid';
+const resolveENS = require('../../../utils/resolveENS');
 let pkOrENS, ens; // ENS or not
 
 export const getAllWinarys = async (token) => {
@@ -74,9 +74,7 @@ async function isENS(input) {
     if (resolvedAddress) {
       return resolvedAddress;
     } else {
-      // Maneja el caso en el que no se pudo resolver el ENS
-      //console.log('No se pudo resolver el ENS:', input);
-      throw new Error("No se puede resolver el ENS " + input);
+      throw new Error('No se puede resolver el ENS ' + input);
       console.log('No se pudo resolver el ENS:', input);
       throw new Error('No se puede resolver el ENS');
     }

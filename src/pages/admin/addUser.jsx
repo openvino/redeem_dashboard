@@ -22,7 +22,7 @@ const addUser = () => {
   const [loading, setLoading] = useState();
 
   const onSubmit = async (data) => {
-    const toastId = toast('Updating winary data...', {
+    const toastId = toast(t('Updating winery data...'), {
       position: 'top-right',
       autoClose: false,
       hideProgressBar: false,

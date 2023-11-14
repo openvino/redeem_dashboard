@@ -1,4 +1,4 @@
-import conn from "../config/db";
+import conn from '../config/db';
 
 export const getRedeems = async (token) => {
   let getUserAdmin = `SELECT * FROM admin_users WHERE id = '${token}'`;
@@ -17,7 +17,7 @@ export const getRedeems = async (token) => {
     return redeems.rows;
   } else {
     return [];
-    throw new Error("No redeems");
+    throw new Error('No redeems');
   }
 };
 
@@ -39,9 +39,6 @@ export const updateRedeemStatus = async (req) => {
     telegram_id,
   } = req;
 
-  // console.log(req);
-
-  // Actualizar la tabla redeem_infos
   let redeemQuery = `UPDATE redeem_infos SET `;
   let redeemUpdateFields = [];
 
@@ -55,16 +52,16 @@ export const updateRedeemStatus = async (req) => {
   if (number) redeemUpdateFields.push(`number = '${number}'`);
   if (zip) redeemUpdateFields.push(`zip = '${zip}'`);
 
-  redeemQuery += redeemUpdateFields.join(", ");
+  redeemQuery += redeemUpdateFields.join(', ');
   redeemQuery += ` WHERE id = '${id}'`;
 
   await conn.query(redeemQuery);
-  // Actualizar la tabla usuarios
+
   let userQuery = `UPDATE users SET `;
   let userUpdateFields = [];
   if (name) userUpdateFields.push(`name = '${name}'`);
   if (email) userUpdateFields.push(`email = '${email}'`);
-  userQuery += userUpdateFields.join(", ");
+  userQuery += userUpdateFields.join(', ');
   userQuery += ` WHERE public_key = '${customer_id}'`;
 
   const userUpdate = await conn.query(userQuery);
@@ -78,6 +75,6 @@ export const getAllRedeems = async () => {
   if (redeems.rows.length > 0) {
     return redeems.rows;
   } else {
-    throw new Error("No redeems");
+    throw new Error('No redeems');
   }
 };

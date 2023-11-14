@@ -49,7 +49,6 @@ const Topbar = () => {
   const dispatch = useDispatch();
   const notification = useSelector((state) => state.notification);
   const allRedeems = useSelector((state) => state.winaryAdress.redeems);
-
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
   const [loading, setLoading] = useState(false);
@@ -165,7 +164,7 @@ const Topbar = () => {
           </p> */}
           </div>
 
-          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center gap-2 w-1/2 translate-x-[10%] md:translate-x-[0] sm:translate-x-[40%]  border p-4 rounded-lg items-center h-[4rem] w-[70%] md:h-[6rem] ">
+          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center gap-2 translate-x-[10%] md:translate-x-[0] sm:translate-x-[40%]  border p-4 rounded-lg items-center h-[4rem] w-[70%] md:h-[6rem] ">
             <div className="relative inline-block ">
               <input
                 type="text"
@@ -211,14 +210,15 @@ const Topbar = () => {
               onClick={() => setShowMenu(!showMenu)}
               className="relative shadow-xl rounded-full hover:transform hover:scale-110 transition-all duration-500"
             >
-              <Image
-                className="rounded-full w-full h-full "
-                src={profile?.profile_img}
-                width={50}
-                height={50}
-                alt="wineryLogo"
-              />
-
+              {profile?.profile_img && (
+                <Image
+                  className="rounded-full w-full h-full "
+                  src={profile?.profile_img}
+                  width={50}
+                  height={50}
+                  alt="wineryLogo"
+                />
+              )}
               {showMenu && (
                 <div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
                   {/* <p className="m-0 p-2 cursor-pointer" >Perfil</p> */}

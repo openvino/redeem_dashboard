@@ -1,10 +1,10 @@
-import conn from "../config/db";
+import conn from '../config/db';
 
 export async function checkAuth(public_key) {
   const wineryAdmin = await conn.query(
     `SELECT * FROM admin_users WHERE id='${public_key}';`
   );
-  console.log(public_key);
+
   if (wineryAdmin.rows.length) {
     return true;
   } else {
@@ -20,7 +20,7 @@ export async function getProfile(public_key) {
   if (wineryAdmin.rows.length) {
     return wineryAdmin.rows[0];
   } else {
-    throw new Error("Invalid credentials");
+    throw new Error('Invalid credentials');
   }
 }
 
@@ -36,6 +36,6 @@ export async function isAdmin(public_key) {
       return false;
     }
   } else {
-    throw new Error("Hubo un error");
+    throw new Error('Hubo un error');
   }
 }

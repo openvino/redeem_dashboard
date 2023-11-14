@@ -45,15 +45,9 @@ export const updateAdmin = async (req) => {
   let adminUpdateFields = [];
 
   if (id) {
-    console.log('cambio el id: ', id);
-
     pkOrENS = await isENS(id);
 
-    console.log('pk or ENS: ', pkOrENS);
-
     ens = pkOrENS == id ? null : id;
-
-    console.log('ens: ', ens);
 
     adminUpdateFields.push(`ens = '${ens}'`);
     adminUpdateFields.push(`id = '${pkOrENS.toLowerCase()}'`);
@@ -68,7 +62,7 @@ export const updateAdmin = async (req) => {
 
   adminQuery += adminUpdateFields.join(', ');
   adminQuery += ` WHERE id = '${previd}'`;
-  console.log(id);
+
   await conn.query(adminQuery);
 };
 
@@ -81,10 +75,6 @@ export const createAdmin = async (req) => {
   pkOrENS = await isENS(id);
 
   ens = pkOrENS == id ? null : id;
-
-  //console.log('ens >>>>', ens );
-
-  // pkOrENS = await isENS(req.public_key);
 
   query += `VALUES ('${pkOrENS.toLowerCase()}', '${name}', '${last_name}', '${email}', '${winery_id}', '${profile_img}', '${is_admin}', '${ens}')`;
 
@@ -101,12 +91,10 @@ async function isENS(input) {
     if (resolvedAddress) {
       return resolvedAddress;
     } else {
-      // Maneja el caso en el que no se pudo resolver el ENS
       console.log('No se pudo resolver el ENS:', input);
       throw new Error('No se puede resolver el ENS ' + input);
     }
   } else {
     return input;
   }
-  console.log('/////////////////////////////', ensRegex.test(input));
 }

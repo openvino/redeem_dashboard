@@ -1,33 +1,29 @@
-import { getToken, jwt } from "next-auth/jwt";
+import { getToken, jwt } from 'next-auth/jwt';
 import {
   getAllRedeems,
   getRedeems,
   updateRedeemStatus,
-} from "../controllers/redeemsController";
-import tokenVerify from "../helpers/tokenVerify";
+} from '../controllers/redeemsController';
+import tokenVerify from '../helpers/tokenVerify';
 export default async function handler(req, res) {
   const secret = process.env.JWT_SECRET;
 
   const isValidJWT = await tokenVerify(req);
   if (!isValidJWT) {
-    return res.json("INVALID CREDENTIALS");
+    return res.json('INVALID CREDENTIALS');
   }
 
-  //GET REDEEMS
-  if (req.method === "GET") {
+  if (req.method === 'GET') {
     const { is_admin } = req.query;
-    console.log(req.query);
+
     try {
-      // Verificar el token
       const token = await getToken({ req, secret });
 
-      //console.log(isAdmin)
-      if (is_admin === "true") {
+      if (is_admin === 'true') {
         const redeems = await getAllRedeems();
-        //console.log(redeems)
+
         return res.status(200).json(redeems);
       } else {
-        
         const redeems = await getRedeems(token.sub);
         return res.status(200).json(redeems);
       }
@@ -36,10 +32,7 @@ export default async function handler(req, res) {
     }
   }
 
-  //EDIT REDEEM STATUS
-  if (req.method === "PUT") {
-    // const { redeemId, status } = req.body;
-
+  if (req.method === 'PUT') {
     try {
       const updateRedeem = await updateRedeemStatus(req.body.data);
       return res.status(200).json(updateRedeem);

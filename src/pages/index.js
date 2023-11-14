@@ -1,13 +1,13 @@
-import { ABeeZee } from "next/font/google";
-const aBeeZee = ABeeZee({ subsets: ["latin"], weight: "400" });
-import { useSelector } from "react-redux";
-import Image from "next/image";
-import Head from "next/head";
-import { ToastContainer } from "react-toastify";
-import React from "react";
-import { getSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import useLoginButton from "../components/useLoginButton";
+import { ABeeZee } from 'next/font/google';
+import { useSelector } from 'react-redux';
+import Image from 'next/image';
+import Head from 'next/head';
+import { ToastContainer } from 'react-toastify';
+import React from 'react';
+import { getSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import useLoginButton from '../components/useLoginButton';
+const aBeeZee = ABeeZee({ subsets: ['latin'], weight: '400' });
 export default function Home() {
   const router = useRouter();
 
@@ -38,10 +38,10 @@ export default function Home() {
           theme="light"
         />
 
-        {router.asPath.includes("error") && <p>Hubo un error</p>}
+        {router.asPath.includes('error') && <p>Hubo un error</p>}
         <div className="">
           <Image
-            src={"/assets/website-logo.png"}
+            src={'/assets/website-logo.png'}
             width={200}
             height={200}
             alt="logo"
@@ -60,7 +60,7 @@ export async function getServerSideProps(context) {
   if (session) {
     return {
       redirect: {
-        destination: "/dashboard",
+        destination: '/dashboard',
         permanent: false,
       },
     };
