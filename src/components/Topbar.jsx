@@ -22,6 +22,7 @@ import {
 } from '@/redux/actions/notificationActions';
 import SearchModal from './SearchModal';
 import useProfile from '@/hooks/useProfile';
+import { getBalance } from '../../helpers';
 
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
@@ -52,9 +53,24 @@ const Topbar = () => {
   const [open, setOpen] = useState(0);
   const showModal = useSelector((state) => state.notification.showModal);
   const [loading, setLoading] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
+
   const reloadRedeems = () => {
     dispatch(getRedeems(session.data.isAdmin));
   };
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const balance = await getBalance();
+        setWalletBalance(balance);
+      } catch (error) {
+        console.error('Error fetching balance:', error);
+      }
+    };
+
+    fetchBalance();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -156,7 +172,7 @@ const Topbar = () => {
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4">
-              <p className="text-2xl font-bold">0.1 ETH</p>
+              <p className="text-2xl font-bold">{walletBalance} ETH</p>
               <p className="text-gray-600">{t('deuda')}</p>
             </div>
             {/* <p className="bg-green-200 flex justify-center items-center rounded-lg">

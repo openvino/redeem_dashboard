@@ -14,7 +14,7 @@
   "estado": "State",
   "estadisiticasMensuales": "Monthly redeeem statistics",
   "estadisiticasAnuales": "Annual redeem statistics",
-  "deuda": "Total debt of OPENVINO redeem wallet",
+  "deuda": "OPENVINO redeem wallet balance",
   "idioma": "Language",
   "detalle": "Detail of redeem",
   "guardar": "Save",
@@ -54,9 +54,9 @@
   "holders": "Holders",
   "contract_address": "Contract address",
   "crowdsale_address": "Crowdsale address",
-  "lp": "LP address",
+  "lp": "Pool address",
   "vco_start": "VCO Start Date",
   "vco_end": "VCO End Date",
   "vco_price_fiat": "VCO Price (Fiat)",
-  "vco_price": "VCO Price (ETH)"
+  "vco_price": "VCO Price"
 }

@@ -55,6 +55,7 @@ export const ETH_DAI_PAIR = '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11';
 export const VCOPrices = [
   {
     name: 'MikeTangoBravo18',
+    symbol: 'MTB18',
     tokenInssuance: 16384,
     priceEth: 0.0078,
     dateStart: '6 - MAY - 2018',
@@ -62,6 +63,7 @@ export const VCOPrices = [
   },
   {
     name: 'MikeTangoBravo19',
+    symbol: 'MTB19',
     tokenInssuance: 17707,
     priceEth: 0.027778,
     dateStart: '6 - MAY - 2019',
@@ -70,6 +72,7 @@ export const VCOPrices = [
 
   {
     name: 'MikeTangoBravo20',
+    symbol: 'MTB20',
     tokenInssuance: 9600,
     priceEth: 0.013698630136986302,
     dateStart: '6 - MAY - 2020',
@@ -77,6 +80,7 @@ export const VCOPrices = [
   },
   {
     name: 'MikeTangoBravo21',
+    symbol: 'MTB21',
     tokenInssuance: 12121,
     priceEth: 0.00081168831168831169,
     dateStart: '6 - MAY - 2021',
@@ -84,6 +88,7 @@ export const VCOPrices = [
   },
   {
     name: 'MikeTangoBravo22',
+    symbol: 'MTB22',
     tokenInssuance: 8192,
     priceEth: 0.001590792453454557,
     dateStart: '6 - MAY - 2022',
@@ -91,6 +96,7 @@ export const VCOPrices = [
   },
   {
     name: 'MikeTangoBravo23',
+    symbol: 'MTB23',
     tokenInssuance: 1024,
     priceEth: 0.006896551724137932,
     dateStart: '6 - MAY - 2023',
@@ -105,7 +111,7 @@ export const contracts = [
     contractPairAddress: MTB18_ETH_PAIR,
     uniswapUri: MTB18_UNISWAPP_URL,
     crowdsaleAddress: MTB18AddressCrowdsale,
-    lpContractAddress: MTB18LPContractAddress,
+    lpContractAddress: MTB18_ETH_PAIR,
   },
   {
     name: 'MTB19',
@@ -113,7 +119,7 @@ export const contracts = [
     contractPairAddress: MTB19_ETH_PAIR,
     uniswapUri: MTB19_UNISWAPP_URL,
     crowdsaleAddress: MTB19AddressCrowdsale,
-    lpContractAddress: MTB19LPContractAddress,
+    lpContractAddress: MTB19_ETH_PAIR,
   },
 
   {
@@ -122,7 +128,7 @@ export const contracts = [
     contractPairAddress: MTB20_ETH_PAIR,
     uniswapUri: MTB20_UNISWAPP_URL,
     crowdsaleAddress: MTB20AddressCrowdsale,
-    lpContractAddress: MTB20LPContractAddress,
+    lpContractAddress: MTB20_ETH_PAIR,
   },
   {
     name: 'MTB21',
@@ -130,7 +136,7 @@ export const contracts = [
     contractPairAddress: MTB21_ETH_PAIR,
     uniswapUri: MTB21_UNISWAPP_URL,
     crowdsaleAddress: MTB21AddressCrowdsale,
-    lpContractAddress: MTB21LPContractAddress,
+    lpContractAddress: MTB21_ETH_PAIR,
   },
   {
     name: 'MTB22',
@@ -138,7 +144,7 @@ export const contracts = [
     contractPairAddress: MTB22_ETH_PAIR,
     uniswapUri: MTB22_UNISWAPP_URL,
     crowdsaleAddress: MTB22AddressCrowdsale,
-    lpContractAddress: MTB22LPContractAddress,
+    lpContractAddress: MTB22_ETH_PAIR,
   },
   {
     name: 'MTB23',
@@ -146,6 +152,8 @@ export const contracts = [
     contractPairAddress: MTB23_ETH_PAIR,
     uniswapUri: MTB23_UNISWAPP_URL,
     crowdsaleAddress: MTB23AddressCrowdsale,
-    lpContractAddress: MTB23LPContractAddress,
+    lpContractAddress: MTB23_ETH_PAIR,
   },
 ];
+
+// redeem.costaflores.openvino.eth 0xe613FAF5fA44f019E3A3AF5927bAA6B13643BA53

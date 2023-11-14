@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 
 export async function getPairPrice(pairAddress) {
   const provider = new ethers.providers.JsonRpcProvider(
-    'https://eth-mainnet.g.alchemy.com/v2/Mhhe8YLO8wfrZet4bwKyh0VOepmZDi35'
+    process.env.NEXT_PUBLIC_ETHEREUM_PROVIDER_URL
   );
 
   const pairContract = new ethers.Contract(
@@ -71,11 +71,6 @@ export const tokenDataInspector = async (contract, address) => {
   const totalSupplyWei = await contract.totalSupply();
   const totalSupply = ethers.utils.formatEther(totalSupplyWei);
 
-  const balanceWei = await contract.balanceOf(
-    '0x34bC045416c8D2Ae1cFDD8789eF8C10E2A079Ca8'
-  );
-  const balance = ethers.utils.formatEther(balanceWei);
-
   let vcoIssuanceWei;
   let vcoIssuance;
 
@@ -83,7 +78,8 @@ export const tokenDataInspector = async (contract, address) => {
     vcoIssuanceWei = await contract.cap();
     vcoIssuance = ethers.utils.formatEther(vcoIssuanceWei);
   } catch (error) {
-    vcoIssuance = 16384;
+    const filtered = VCOPrices.filter((e) => e.symbol === symbol);
+    vcoIssuance = filtered[0].tokenInssuance;
   }
 
   const burnedTokensDrunk = vcoIssuance - totalSupply;
@@ -94,19 +90,17 @@ export const tokenDataInspector = async (contract, address) => {
 
   const { crowdsaleAddress, uniswapUri, lpContractAddress } =
     filteredStaticContractData;
+
   const tokenData = {
     address,
     name,
     symbol,
-    totalSupply,
-    vcoIssuance,
-    balance,
-    burnedTokensDrunk,
+    totalSupply: Math.trunc(totalSupply),
+    vcoIssuance: Math.trunc(vcoIssuance),
+    burnedTokensDrunk: Math.trunc(burnedTokensDrunk),
     crowdsaleAddress,
     uniswapUri,
     lpContractAddress,
-    // holdersCount,
-    // transferEventsCount,
   };
 
   return tokenData;

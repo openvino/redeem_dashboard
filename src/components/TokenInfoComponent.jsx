@@ -164,7 +164,7 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
             </span>
           </div>
           <div>
-            {t('vco_price_eth')}:{'   '}
+            {t('vco_price')}:{'   '}
             <span className="font-semibold">
               {VCOPrices.map((element, index) => {
                 if (name == element.name) return `${element.priceEth} ETH`;
