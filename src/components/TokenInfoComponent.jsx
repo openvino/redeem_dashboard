@@ -61,11 +61,9 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
   }, [name]);
 
   return (
-    <div
-      className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center"
-      // style={{ boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}
-    >
-      <div className="flex flex-row justify-between">
+    <div className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center">
+      <div className="flex flex-col md:flex-row justify-start md:justify-between ">
+        {/* Imagen y texto */}
         <div className="text-center flex">
           <Image
             src={`/assets/${symbol}.png`}
@@ -77,12 +75,14 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
             {t('token_info')}
           </h1>
         </div>
-        <div className="flex justify-end gap-5 my-1 mr-10">
+
+        {/* Select */}
+        <div className="flex my-1 mr-10">
           <select
             name=""
             id=""
             onChange={onSelectChange}
-            className="text-gray-800 border rounded-lg text-md "
+            className="text-gray-800 border rounded-lg text-md"
             style={{ outline: 'none' }}
           >
             <option value="">{t('select_token')}</option>
@@ -98,9 +98,10 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
           </select>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-3">
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 mt-3 min-w-[500px] overflow-x-auto md:overflow-hidden">
         {/* First Column */}
-        <div className="grid grid-cols-1  gap-2">
+        <div className="grid grid-cols-1  gap-2 text-sm lg:text-lg">
           <div className="mb-2">
             {t('name')}
             {':   '} <span className="font-semibold">{name}</span>
@@ -134,10 +135,10 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
         </div>
 
         {/* Second Column */}
-        <div className="grid grid-cols-1  gap-2">
+        <div className="grid grid-cols-1 gap-2 text-xs lg:text-lg w-[600px]">
           <div className="mb-2">
             {t('contract_address')}:{'   '}
-            <span className="font-semibold">{tokenContract}</span>
+            <span className="font-semibold ">{tokenContract}</span>
           </div>
           <div className="mb-2">
             {t('crowdsale_address')}:{'   '}
@@ -195,7 +196,7 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
           </div>
         </div>
       </div>
-      <div className="flex justify-end mt-4 mr-8">
+      <div className="flex justify-start md:justify-end mt-4 mr-8">
         <Link href={uniswapUri || ''} target="blank">
           <button className="px-2 py-1 rounded bg-[#840C4A] text-white  w-30">
             {/* {t('add_admin')} */}

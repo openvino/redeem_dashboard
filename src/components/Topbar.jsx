@@ -168,19 +168,16 @@ const Topbar = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="fixed w-full md:w-[94%]  z-50 left-[5rem] mt-2">
+      <div className="fixed w-full md:w-[94%]  z-50 left-[6rem] sm:left-[5rem] mt-2">
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
-            <div className="flex flex-col w-full  pb-4">
-              <p className="text-2xl font-bold">{walletBalance} ETH</p>
-              <p className="text-gray-600">{t('deuda')}</p>
+            <div className="flex flex-col w-full  pb-4 text-lg">
+              <p className=" font-bold">{walletBalance} ETH</p>
+              <p className="text-gray-600  text-[16px]">{t('deuda')}</p>
             </div>
-            {/* <p className="bg-green-200 flex justify-center items-center rounded-lg">
-            <span className="text-green-700 text-lg">+18%</span>
-          </p> */}
           </div>
 
-          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center gap-2 translate-x-[10%] md:translate-x-[0] sm:translate-x-[40%]  border p-4 rounded-lg items-center h-[4rem] w-[70%] md:h-[6rem] ">
+          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center ml-2 sm:ml-20 md:ml-0 gap-2   border p-4 rounded-lg items-center h-[4rem] w-[70%]   md:h-[6rem] ">
             <div className="relative inline-block ">
               <input
                 type="text"
@@ -237,7 +234,6 @@ const Topbar = () => {
               )}
               {showMenu && (
                 <div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
-                  {/* <p className="m-0 p-2 cursor-pointer" >Perfil</p> */}
                   <p
                     className="m-0 p-2 cursor-pointer"
                     onClick={async () => await signOut({ redirect: '/' })}
@@ -248,11 +244,8 @@ const Topbar = () => {
               )}
             </div>
             <button onClick={toggleLanguage}>
-              {/* {t("idioma")} */}
               {selectLanguage ? 'EN' : 'ES'}
             </button>
-
-            {/* <MdLanguage size={20} /> */}
           </div>
         </div>
       </div>
