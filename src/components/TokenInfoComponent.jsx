@@ -59,7 +59,7 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
 
     getPrice(price);
   }, [name]);
-
+  console.log('/////////////////////////////////////', VCOPrices);
   return (
     <div className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center">
       <div className="flex flex-col md:flex-row justify-start md:justify-between ">
@@ -175,11 +175,26 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
           <div>
             <span className="flex flex-row">
               <div>
-                {t('vco_price_fiat')}:{'   '}
-                {currency === 'ars' ? ` ${priceFiat.ars}` : ` ${priceFiat.usd}`}
+                <div>
+                  {t('vco_price_fiat')}:{' '}
+                  {VCOPrices.map((element, index) => {
+                    console.log('Element:', element);
+                    console.log('Name:', name);
+
+                    if (name === element.name) {
+                      return (
+                        <span className="font-semibold" key={index}>
+                          {`${element.priceArs} ARS`}
+                        </span>
+                      );
+                    }
+
+                    return null;
+                  })}
+                </div>
               </div>
 
-              <div className="">
+              {/* <div className="">
                 <select
                   name="currencySelect"
                   id="currencySelect"
@@ -191,7 +206,7 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
                   <option value="ars">ARS</option>
                   <option value="usd">USD</option>
                 </select>
-              </div>
+              </div> */}
             </span>
           </div>
         </div>
