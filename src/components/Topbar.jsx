@@ -201,7 +201,7 @@ const Topbar = () => {
                   inputRef.current.focus();
                 }}
               >
-                <FaSearch />
+                <FaSearch className="hidden md:block" />
               </span>
             </div>
             {allNotifications.length ? (
@@ -225,7 +225,7 @@ const Topbar = () => {
             >
               {profile?.profile_img && (
                 <Image
-                  className="rounded-full w-full h-full "
+                  className="rounded-full w-full h-full min-w-[3rem]"
                   src={profile?.profile_img}
                   width={50}
                   height={50}

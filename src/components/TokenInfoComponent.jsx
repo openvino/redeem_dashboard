@@ -59,31 +59,32 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
 
     getPrice(price);
   }, [name]);
-  console.log('/////////////////////////////////////', VCOPrices);
+
   return (
-    <div className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center">
-      <div className="flex flex-col md:flex-row justify-start md:justify-between ">
+    <div className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center min-w-full min-h-full">
+      <div className="flex flex-row justify-between ">
         {/* Imagen y texto */}
         <div className="text-center flex">
           <Image
             src={`/assets/${symbol}.png`}
-            width={50}
-            height={40}
+            width={100}
+            height={80}
+            className="w-[8rem] sm:w-[8rem] h-auto"
             alt="mtb23"
           />
-          <h1 className="text-md md:text-xl font-bold m-2">
+          {/* <h1 className="text-md md:text-xl font-bold m-2">
             {t('token_info')}
-          </h1>
+          </h1> */}
         </div>
 
         {/* Select */}
-        <div className="flex my-1 mr-10">
+        <div className="flex my-1 mr-10 items-center sm:w-[16rem] w-full justify-end">
           <select
             name=""
             id=""
             onChange={onSelectChange}
-            className="text-gray-800 border rounded-lg text-md"
-            style={{ outline: 'none' }}
+            className="text-gray-800 border rounded-lg text-md "
+            style={{ outline: 'none', height: '2.5rem', width: '7rem' }}
           >
             <option value="">{t('select_token')}</option>
             {contracts?.map((e, index) => (
