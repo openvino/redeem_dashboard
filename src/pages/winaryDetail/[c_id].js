@@ -1,21 +1,21 @@
-import { useSession, signOut, getSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import clientAxios from "@/config/clientAxios";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
-import { useForm } from "react-hook-form";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
-import { getRedeems, getWinarys } from "@/redux/actions/winaryActions";
-import Head from "next/head";
+import { useSession, signOut, getSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import clientAxios from '@/config/clientAxios';
+import Topbar from '@/components/Topbar';
+import Sidebar from '@/components/Sidebar';
+import { useForm } from 'react-hook-form';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { getRedeems, getWinarys } from '@/redux/actions/winaryActions';
+import Head from 'next/head';
 let winary;
 function Detail({ winarys }) {
   const { t } = useTranslation();
   const session = useSession();
-  const [id, setId] = useState("");
+  const [id, setId] = useState('');
   const [isAdminSelect, setIsAdminSelect] = useState(false);
 
   const router = useRouter();
@@ -25,35 +25,35 @@ function Detail({ winarys }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (c_id === "newWinary") {
+    if (c_id === 'newWinary') {
     } else {
       setId(winarys.findIndex((r) => r.id === c_id));
     }
   }, []);
 
   const onSubmit = async (data) => {
-    const toastId = toast("Updating winary data...", {
-      position: "top-right",
+    const toastId = toast('Updating winary data...', {
+      position: 'top-right',
       autoClose: false,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      theme: "dark",
+      theme: 'dark',
       isLoading: true,
     });
 
-    if (c_id === "newWinary") {
+    if (c_id === 'newWinary') {
       try {
-        const response = await clientAxios.post("/winarysRoute", {
+        const response = await clientAxios.post('/winarysRoute', {
           data,
         });
 
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
-          render: "Winary updated",
+          render: 'Winery updated',
           autoClose: 5000,
         });
 
@@ -64,20 +64,20 @@ function Detail({ winarys }) {
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.ERROR,
-          render: "Error ",
+          render: 'Error ' + error.response.data.message,
           autoClose: 5000,
         });
       }
     } else {
       try {
-        const response = await clientAxios.put("/winarysRoute", {
+        const response = await clientAxios.put('/winarysRoute', {
           data,
         });
 
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.SUCCESS,
-          render: "Winary updated",
+          render: 'Winary updated',
           autoClose: 5000,
         });
 
@@ -88,7 +88,7 @@ function Detail({ winarys }) {
         toast.update(toastId, {
           isLoading: false,
           type: toast.TYPE.ERROR,
-          render: "Error ",
+          render: 'Error ' + error.response.data.message,
           autoClose: 5000,
         });
       }
@@ -99,16 +99,16 @@ function Detail({ winarys }) {
 
   useEffect(() => {
     if (winary) {
-      setValue("id", winary.id, { shouldDirty: false });
-      setValue("created_at", winary.created_at, { shouldDirty: false });
-      setValue("updated_at", winary.updated_at, { shouldDirty: false });
-      setValue("name", winary.name, { shouldDirty: false });
-      setValue("website", winary.website, { shouldDirty: false });
-      setValue("image", winary.image, { shouldDirty: false });
-      setValue("secret", winary.secret, { shouldDirty: false });
-      setValue("public_key", winary.public_key, { shouldDirty: false });
-      setValue("email", winary.email, { shouldDirty: false });
-      setValue("primary_color", winary.primary_color, {
+      setValue('id', winary.id, { shouldDirty: false });
+      setValue('created_at', winary.created_at, { shouldDirty: false });
+      setValue('updated_at', winary.updated_at, { shouldDirty: false });
+      setValue('name', winary.name, { shouldDirty: false });
+      setValue('website', winary.website, { shouldDirty: false });
+      setValue('image', winary.image, { shouldDirty: false });
+      setValue('secret', winary.secret, { shouldDirty: false });
+      setValue('public_key', winary.public_key, { shouldDirty: false });
+      setValue('email', winary.email, { shouldDirty: false });
+      setValue('primary_color', winary.primary_color, {
         shouldDirty: false,
       });
     }
@@ -150,7 +150,7 @@ function Detail({ winarys }) {
     "
       >
         <h1 className="text-2xl font-bold text-center mb-4">
-          {t("detalle_de_la_vinería")}
+          {t('detalle_de_la_vinería')}
         </h1>
 
         <form
@@ -167,20 +167,20 @@ function Detail({ winarys }) {
                 id="id"
                 name="id"
                 value={winary?.id}
-                {...register("id")}
+                {...register('id')}
                 className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("nombre")}:</label>
+              <label className="w-24 font-bold">{t('nombre')}:</label>
               <input
                 required
                 type="text"
                 id="name"
                 name="name"
                 defaultValue={winary?.name}
-                {...register("name")}
+                {...register('name')}
                 className="w-64 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
               />
             </div>
@@ -188,27 +188,27 @@ function Detail({ winarys }) {
 
           <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("Website")}:</label>
+              <label className="w-24 font-bold">{t('Website')}:</label>
               <input
                 required
                 type="text"
                 id="website"
                 name="website"
                 defaultValue={winary?.website}
-                {...register("website")}
+                {...register('website')}
                 className="w-64 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("imagen")}:</label>
+              <label className="w-24 font-bold">{t('imagen')}:</label>
               <input
                 required
                 type="text"
                 id="image"
                 name="image"
                 defaultValue={winary?.image}
-                {...register("image")}
+                {...register('image')}
                 className="w-64 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
               />
             </div>
@@ -223,21 +223,21 @@ function Detail({ winarys }) {
                 id="email"
                 name="email"
                 defaultValue={winary?.email}
-                {...register("email")}
+                {...register('email')}
                 className="w-64 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
 
             <div className="flex items-center">
-              <label className="w-24 font-bold">{t("primary_color")}:</label>
+              <label className="w-24 font-bold">{t('primary_color')}:</label>
               <input
                 required
                 type="color"
                 id="primary_color"
                 name="primary_color"
                 defaultValue={winary?.primary_color}
-                onChange={(e) => setValue("primary_color", e.target.value)}
-                {...register("primary_color")}
+                onChange={(e) => setValue('primary_color', e.target.value)}
+                {...register('primary_color')}
                 className="w-64  px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
@@ -251,13 +251,12 @@ function Detail({ winarys }) {
                 id="secret"
                 name="secret"
                 defaultValue={winary?.secret}
-                {...register("secret")}
+                {...register('secret')}
                 className="w-64 px-2 py-1 border border-gray-300 rounded-md"
               />
             </div>
             <div className="flex justify-center w-[22rem] "></div>
           </div>
-
           <div className="flex justify-center">
             <button
               type="button"
@@ -266,13 +265,13 @@ function Detail({ winarys }) {
               }}
               className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
             >
-              {t("volver")}
+              {t('volver')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
             >
-              {t("guardar")}
+              {t('guardar')}
             </button>
           </div>
         </form>
@@ -289,7 +288,7 @@ export async function getServerSideProps(context) {
   if (!session) {
     return {
       redirect: {
-        destination: "/",
+        destination: '/',
         permanent: false,
       },
     };
@@ -297,7 +296,7 @@ export async function getServerSideProps(context) {
   const { req } = context;
   const { cookie } = req.headers;
 
-  const response = await clientAxios.get("/winarysRoute", {
+  const response = await clientAxios.get('/winarysRoute', {
     params: {
       is_admin: session.is_admin,
     },

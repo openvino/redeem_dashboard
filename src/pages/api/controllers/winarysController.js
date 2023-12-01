@@ -1,7 +1,7 @@
-import conn from "../config/db";
-import { v4 as uuid } from "uuid";
-const resolveENS = require("../../../utils/resolveENS");
-let pkOrENS; // ENS or not
+import conn from '../config/db';
+import { v4 as uuid } from 'uuid';
+const resolveENS = require('../../../utils/resolveENS');
+let pkOrENS, ens; // ENS or not
 
 export const getAllWinarys = async (token) => {
   let query = `SELECT * from wineries`;
@@ -13,7 +13,7 @@ export const getAllWinarys = async (token) => {
   if (winarys.rows.length > 0) {
     return winarys.rows;
   } else {
-    throw new Error("No winarys");
+    throw new Error('No winarys');
   }
 };
 
@@ -38,7 +38,7 @@ export const updateWinary = async (req) => {
     winaryUpdateFields.push(`public_key = '${pkOrENS}'`);
   }
 
-  winaryQuery += winaryUpdateFields.join(", ");
+  winaryQuery += winaryUpdateFields.join(', ');
   winaryQuery += ` WHERE id = '${id}'`;
 
   const response = await conn.query(winaryQuery);
@@ -68,15 +68,15 @@ export const createWinary = async (req) => {
 };
 
 async function isENS(input) {
-  if (input.endsWith(".eth")) {
+  if (input.endsWith('.eth')) {
     // La cadena parece ser un ENS
     const resolvedAddress = await resolveENS(input);
     if (resolvedAddress) {
       return resolvedAddress;
     } else {
-      // Maneja el caso en el que no se pudo resolver el ENS
-      console.log("No se pudo resolver el ENS:", input);
-      throw new Error("No se puede resolver el ENS");
+      throw new Error('No se puede resolver el ENS ' + input);
+      console.log('No se pudo resolver el ENS:', input);
+      throw new Error('No se puede resolver el ENS');
     }
   } else {
     return input;

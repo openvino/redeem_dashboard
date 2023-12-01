@@ -58,7 +58,10 @@ const AdminUser = () => {
 
     try {
       setLoading(true);
-      const response = await clientAxios.put("/adminRoute", { data });
+      const response = await clientAxios.put("/adminRoute", {
+        data,
+        previd: admins.id,
+      });
 
       toast.update(toastId, {
         isLoading: false,
