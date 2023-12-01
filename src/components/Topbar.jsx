@@ -56,7 +56,7 @@ const Topbar = () => {
   const [walletBalance, setWalletBalance] = useState(0);
 
   const reloadRedeems = () => {
-    dispatch(getRedeems(session.data.isAdmin));
+    dispatch(getRedeems(session.data.is_admin));
   };
 
   useEffect(() => {
@@ -119,6 +119,7 @@ const Topbar = () => {
       const message = event.data;
       console.log('Received message from server:', message);
       // Handle the incoming message from the server
+
       if (message === 'Notification updated!') {
         dispatch(getRedeems(session.data.isAdmin));
       }

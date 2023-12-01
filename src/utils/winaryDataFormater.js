@@ -20,6 +20,7 @@ export const dataFormater = (winarys) => {
       public_key: item.public_key,
       ens: item.ens,
       isAdmin: item.isAdmin ? t("SI") : t("NO"),
+
     });
   });
   return data;

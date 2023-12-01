@@ -185,9 +185,11 @@ const addUser = () => {
                       id="is_admin"
                       {...register('is_admin')}
                     >
+
                       <option>{t('select')}</option>
                       <option value="true">{t('SI')}</option>
                       <option value="false">No</option>
+
                     </select>
                   </div>
 
