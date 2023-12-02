@@ -9,7 +9,7 @@ import i18n from '../config/i18n';
 import Router from 'next/router';
 import Loader from '../components/Loader';
 import { useState } from 'react';
-import { Montserrat } from '@next/font/google';
+import { Montserrat } from "next/font/google";
 const roboto = Montserrat({
   subsets: ['latin'],
 

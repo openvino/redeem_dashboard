@@ -58,5 +58,6 @@
   "vco_start": "VCO Start Date",
   "vco_end": "VCO End Date",
   "vco_price_fiat": "VCO Price (Fiat)",
-  "vco_price": "VCO Price"
+  "vco_price": "VCO Price",
+  "action" : "Actions"
 }
