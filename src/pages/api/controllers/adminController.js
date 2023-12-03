@@ -1,5 +1,5 @@
-import conn from '../config/db';
-const resolveENS = require('../../../utils/resolveENS');
+import conn from "../config/db";
+const resolveENS = require("../../../utils/resolveENS");
 let pkOrENS, ens; // ENS or not
 
 export const getAllAdmins = async () => {
@@ -60,7 +60,7 @@ export const updateAdmin = async (req) => {
   if (profile_img) adminUpdateFields.push(`profile_img = '${profile_img}'`);
   if (is_admin) adminUpdateFields.push(`is_admin = '${is_admin}'`);
 
-  adminQuery += adminUpdateFields.join(', ');
+  adminQuery += adminUpdateFields.join(", ");
   adminQuery += ` WHERE id = '${previd}'`;
 
   await conn.query(adminQuery);
@@ -85,16 +85,28 @@ const ensRegex =
 
 async function isENS(input) {
   if (ensRegex.test(input)) {
-    console.log('La cadena parece ser un ENS');
+    console.log("La cadena parece ser un ENS");
     const resolvedAddress = await resolveENS(input);
 
     if (resolvedAddress) {
       return resolvedAddress;
     } else {
-      console.log('No se pudo resolver el ENS:', input);
-      throw new Error('No se puede resolver el ENS ' + input);
+      console.log("No se pudo resolver el ENS:", input);
+      throw new Error("No se puede resolver el ENS " + input);
     }
   } else {
     return input;
   }
 }
+
+export const deleteAdmin = async (req) => {
+  const { id } = req.query;
+
+  console.log(id);
+
+  const deleteQery = `DELETE FROM admin_users WHERE id = '${id}' `;
+
+  const deletedAdmin = await conn.query(deleteQery);
+
+  console.log(deleteAdmin);
+};

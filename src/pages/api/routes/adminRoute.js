@@ -1,17 +1,18 @@
 import {
   createAdmin,
+  deleteAdmin,
   getAdmin,
   getAdminsForWinery,
   getAllAdmins,
   updateAdmin,
-} from '../controllers/adminController';
-import tokenVerify from '../helpers/tokenVerify';
+} from "../controllers/adminController";
+import tokenVerify from "../helpers/tokenVerify";
 export default async function handler(req, res) {
   const isValidJWT = await tokenVerify(req);
   if (!isValidJWT) {
-    return res.json('INVALID CREDENTIALS');
+    return res.json("INVALID CREDENTIALS");
   }
-  if (req.method === 'GET') {
+  if (req.method === "GET") {
     if (Object.keys(req.query).length > 0 && req.query.id) {
       const { id } = req.query;
       try {
@@ -24,7 +25,7 @@ export default async function handler(req, res) {
       }
     } else if (
       Object.keys(req.query).length > 0 &&
-      req.query.is_admin === 'true'
+      req.query.is_admin === "true"
     ) {
       try {
         const admins = await getAllAdmins();
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
       }
     } else if (
       Object.keys(req.query).length > 0 &&
-      req.query.is_admin === 'false'
+      req.query.is_admin === "false"
     ) {
       try {
         const admins = await getAdminsForWinery(req.query.winery_id);
@@ -47,23 +48,34 @@ export default async function handler(req, res) {
     }
   }
 
-  if (req.method === 'PUT') {
+  if (req.method === "PUT") {
     try {
       await updateAdmin(req);
-      return res.status(200).json('Success');
+      return res.status(200).json("Success");
     } catch (error) {
       console.log(error);
       return res.status(500).json(error.message);
     }
   }
 
-  if (req.method === 'POST') {
+  if (req.method === "POST") {
     try {
       const response = await createAdmin(req);
-      return res.status(200).json('Success');
+      return res.status(200).json("Success");
     } catch (error) {
       console.log(error);
       return res.status(500).json(error.message);
+    }
+  }
+
+  if (req.method === "DELETE") {
+    try {
+      console.log(req.body);
+      const response = await deleteAdmin(req);
+
+      return res.status(200).json("Admin deleted successfully");
+    } catch (error) {
+      return res.status(400).json(error.message);
     }
   }
 }

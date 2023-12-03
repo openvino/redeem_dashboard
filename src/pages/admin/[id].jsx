@@ -81,6 +81,39 @@ const AdminUser = () => {
     }
   };
 
+  const handleDeleteAdmin = async () => {
+    const toastId = toast("Deleting admin...", {
+      position: "top-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      isLoading: true,
+    });
+
+    try {
+      setLoading(true);
+      const response = await clientAxios.delete("/adminRoute", {
+        params: {
+          id,
+        },
+      });
+      toast.update(toastId, {
+        isLoading: false,
+        type: toast.TYPE.SUCCESS,
+        render: "Admin deleted successfully",
+        autoClose: 5000,
+      });
+
+      router.back();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -97,7 +130,7 @@ const AdminUser = () => {
           </h1>
 
           <form
-            className=" p-2 space-y-2 flex flex-col bg-[#f4f4f5] w-[99%] border-solid border-gray-200 border-2"
+            className=" p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] border-solid rounded-xl border-gray-200 border-2"
             onSubmit={handleSubmit(onSubmit)}
           >
             <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
@@ -231,6 +264,14 @@ const AdminUser = () => {
                 className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
               >
                 {t("guardar")}
+              </button>
+
+              <button
+                type="button"
+                className="px-4 py-2 ml-4 bg-red-600 text-white rounded-md"
+                onClick={handleDeleteAdmin}
+              >
+                Eliminar
               </button>
             </div>
           </form>
