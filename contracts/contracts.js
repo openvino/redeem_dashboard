@@ -13,7 +13,8 @@ export const MTB18_UNISWAPP_URL =
   'https://v2.info.uniswap.org/pair/0x7ecadc96563a0e158f1a1eec220bb4f661640d39';
 export const MTB18AddressCrowdsale =
   '0xd237f244a7eb67fe2057f119878c1a8918786a74';
-export const MTB18LPContractAddress = '//todo';
+export const MTB18LPContractAddress =
+  '0x7ECaDC96563a0E158f1a1Eec220Bb4f661640D39';
 
 export const MTB19Address = '0x87AB739464881af0011052D4Ca0B0d657e8c3B48';
 export const MTB19_ETH_PAIR = '0x9177F33f833761fB0eea7b72a5db487a7C140F5C';
