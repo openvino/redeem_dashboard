@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import TokenInfoComponent from '@/components/TokenInfoComponent';
 import Topbar from '@/components/Topbar';
 import Sidebar from '@/components/Sidebar';
-import { MTB19Address, MTB19_ETH_PAIR } from '../../../contracts';
+import { MTB18Address, MTB18_ETH_PAIR } from '../../../contracts';
 import useTokenInformation from '@/hooks/useTokenInformation';
 import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/Spinner';
@@ -13,8 +13,8 @@ import {
 } from '@/redux/actions/notificationActions';
 
 const Tokens = () => {
-  const [address, setAddress] = useState(MTB19Address);
-  const [pairAddress, setPairAddress] = useState(MTB19_ETH_PAIR);
+  const [address, setAddress] = useState(MTB18Address);
+  const [pairAddress, setPairAddress] = useState(MTB18_ETH_PAIR);
   const { tokenInfo, loading } = useTokenInformation(address, pairAddress);
 
   const onSelectChange = (e) => {
