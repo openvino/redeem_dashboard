@@ -31,11 +31,9 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
   });
 
   useEffect(() => {
-    const INFURA_ID = process.env.NEXT_PUBLIC_INFURA_ID;
+    const providerUri = process.env.NEXT_PUBLIC_ETHEREUM_PROVIDER_URL;
 
-    const provider = new ethers.providers.JsonRpcProvider(
-      `https://mainnet.infura.io/v3/${INFURA_ID}`
-    );
+    const provider = new ethers.providers.JsonRpcProvider(providerUri);
     const contract = new ethers.Contract(contractAddress, MTB_ABI, provider);
     const fetchData = async () => {
       try {
