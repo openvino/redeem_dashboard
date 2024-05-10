@@ -18,9 +18,12 @@ const Dashboard = () => {
   const filters = useSelector((state) => state.filter);
   const countries = useSelector((state) => state.winaryAdress.countries);
   const provinces = useSelector((state) => state.winaryAdress.provinces);
-
+  console.log(countries);
+  console.log(provinces);
   const countryName = (country_id) => {
     const country = countries.find((e) => e.country_id === country_id);
+    console.log(country);
+
     return country ? country.place_description : country_id;
   };
 
@@ -35,7 +38,7 @@ const Dashboard = () => {
       country_id: countryName(item.country_id),
       province_id: provinceName(item.province_id),
     }));
-
+    console.log(newData);
     return newData;
   };
 
@@ -264,6 +267,7 @@ const Dashboard = () => {
   };
 
   const data = filterData(countryAndProvinceNames(dataFormater(redeems, [])));
+  console.log(data);
 
   return (
     <>

@@ -8,7 +8,7 @@ export async function getCountries() {
     }
 }
 
-export async function getProvices() {
+export async function getProvinces() {
     const provinces = await conn.query("SELECT province_id, place_description FROM shipping_costs_clone WHERE country_id = '' AND province_id <> ''; ")
 
     if(provinces.rows.length) {

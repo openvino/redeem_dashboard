@@ -1,7 +1,6 @@
 import '../styles/globals.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { SessionProvider } from 'next-auth/react';
-//redux
 import { Provider } from 'react-redux';
 import store from '../redux/store';
 import { I18nextProvider } from 'react-i18next';
