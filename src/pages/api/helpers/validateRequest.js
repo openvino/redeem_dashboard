@@ -4,19 +4,17 @@ export default async function validateRequest(req) {
 
  const apiSecret = process.env.API_SECRET
  const authHeader = req.headers.authorization
+
  if (!authHeader || !authHeader.startsWith('Bearer ')) {
   return false; 
 }
-const token = authHeader.split(' ')[1];
- console.log(token);
-    
-    
 
-    if (!token) {
-     
-      return false
+const token = authHeader?.split(' ')[1];
+
+    if (token && token === apiSecret) {
+      return true
     } else {
-        return true
+      return false
     }
 
 }
