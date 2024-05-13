@@ -170,7 +170,7 @@ const Table = ({ data, columnas, n, route = '/detail' }) => {
 
     return buttons;
   };
-
+  console.log('//*/*/*/*/*/*/*/*/*/*/*/*/*/*/*//* :    ', data);
   return (
     <div>
       <div className="overflow-x-scroll ml-12 md:ml-0   rounded-lg  mt-[10rem] md:overflow-x-hidden ">

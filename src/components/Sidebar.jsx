@@ -1,5 +1,7 @@
-import { FaWineGlass, FaUser, FaWineBottle } from 'react-icons/fa';
+import { FaWineGlass, FaUser, FaWineBottle,FaShippingFast} from 'react-icons/fa';
+
 import { RxTokens } from 'react-icons/rx';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
@@ -32,6 +34,11 @@ const Sidebar = () => {
           <Link href="/redeems">
             <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
               <FaWineBottle size={20} />
+            </div>
+          </Link>
+          <Link href="/shipping">
+            <div className="bg-white hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block text-[#840C4A]">
+              <FaShippingFast size={20} />
             </div>
           </Link>
           <Link href="/tokens">

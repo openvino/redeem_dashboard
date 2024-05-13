@@ -108,7 +108,7 @@ const Topbar = () => {
   useEffect(() => {
     // Create a new WebSocket instance and specify the server URL
 
-    const socket = new WebSocket(`${wsPort}:8081/api/sendMessage`);
+    const socket = new WebSocket(`${wsPort}/api/sendMessage`);
     // Connection opened
     socket.addEventListener('open', () => {
       console.log('WebSocket connection established');
