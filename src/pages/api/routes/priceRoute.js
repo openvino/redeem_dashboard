@@ -3,9 +3,9 @@ import axios from "axios"
 import validateRequest from '../helpers/validateRequest';
 
 const cmktUrl = process.env.NEXT_PUBLIC_CRYPTOMKT_URL;
-
+const url = process.env.NEXT_PUBLIC_EXCHANGE_URL;
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3002");
+  res.setHeader("Access-Control-Allow-Origin", url);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
 
