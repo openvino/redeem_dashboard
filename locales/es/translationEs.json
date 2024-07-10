@@ -9,7 +9,7 @@
   "pais": "País",
   "provincia": "Provincia",
   "año": "Token",
-  "cp": "Zip",
+  "cp": "Código Postal",
   "creado": "Creado",
   "estado": "Estado",
   "estadisiticasMensuales": "Redeems mensuales",
@@ -58,5 +58,7 @@
   "vco_end": "Fecha de finalización VCO",
   "vco_price_fiat": "Precio VCO (FIAT)",
   "vco_price": "Precio VCO",
-  "action": "Acciones"
+  "action": "Acciones",
+  "shipping_paid_status": "Envío pagado",
+  "pickup": "Retiro en bodega"
 }

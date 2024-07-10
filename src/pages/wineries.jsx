@@ -1,6 +1,6 @@
 import Table from "@/components/Table";
 import { useSession, signOut, getSession } from "next-auth/react";
-import React from "react";
+import React, { useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
 import { dataFormater } from "../utils/winaryDataFormater.js";
 import Sidebar from "@/components/Sidebar.jsx";
@@ -8,6 +8,7 @@ import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
+import { scrollStyle } from "@/styles/table.js";
 const Winarys = ({ winarys }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
@@ -85,7 +86,15 @@ const Winarys = ({ winarys }) => {
     }
   };
   const data = filterData(dataFormater(winarys));
+  useEffect(() => {
+    const styleElement = document.createElement("style");
+    styleElement.innerHTML = scrollStyle;
+    document.head.appendChild(styleElement);
 
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
   return (
     <>
       <Head>
@@ -94,7 +103,7 @@ const Winarys = ({ winarys }) => {
       <div className="">
         <Sidebar />
         <Topbar />
-        <div className="ml-20  min-w-fit top-4 ">
+        <div className="ml-20  top-4 overflow-x-scroll custom-scroll ">
           <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
         </div>
       </div>

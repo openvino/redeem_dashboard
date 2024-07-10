@@ -2,14 +2,15 @@ import Table from "@/components/Table";
 import { getSession } from "next-auth/react";
 import React, { useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
-import { dataFormater } from "../utils/dataFormater.js";
+import { dataFormater, logDataFormater } from "../utils/dataFormater.js";
 import Sidebar from "@/components/Sidebar.jsx";
 import Topbar from "@/components/Topbar.jsx";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
 import { scrollStyle } from "@/styles/table.js";
-const redeems = ({ redeems }) => {
+const redeemLogs = ({ logs }) => {
+  console.log(logs);
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
   const countries = useSelector((state) => state.winaryAdress.countries);
@@ -34,20 +35,38 @@ const redeems = ({ redeems }) => {
 
     return newData;
   };
+
   const columnas = [
     {
-      title: "",
-      field: "acciones",
+      title: t("creado"),
+      field: "created_at",
+    },
+    {
+      title: "id",
+      field: "id",
+    },
+    {
+      title: "customer_id",
+      field: "customer_id",
+    },
+    {
+      title: t("año"),
+      field: "year",
     },
 
     {
-      title: t("nombre"),
-      field: "name",
+      title: t("numero"),
+      field: "number",
     },
     {
       title: t("monto"),
       field: "amount",
     },
+    {
+      title: "error_message",
+      field: "error_message",
+    },
+
     {
       title: t("pais"),
       field: "country_id",
@@ -61,6 +80,14 @@ const redeems = ({ redeems }) => {
       field: "city",
     },
     {
+      title: t("cp"),
+      field: "zip",
+    },
+    {
+      title: "Telegram_ID",
+      field: "telegram_id",
+    },
+    {
       title: t("telefono"),
       field: "phone",
     },
@@ -72,39 +99,35 @@ const redeems = ({ redeems }) => {
 
     {
       title: t("calle"),
-
       field: "street",
     },
     {
       title: t("numero"),
-
       field: "number",
     },
-
     {
-      title: "Telegram_ID",
-      field: "telegram_id",
-    },
-
-    {
-      title: t("cp"),
-
-      field: "zip",
+      title: t("winerie_id"),
+      field: "winerie_id",
     },
     {
-      title: t("año"),
-
-      field: "year",
+      title: t("signature"),
+      field: "signature",
     },
     {
-      title: t("creado"),
-
-      field: "created_at",
+      title: t("burn_tx_hash"),
+      field: "burn_tx_hash",
     },
     {
-      title: t("estado"),
-
-      field: "status",
+      title: t("shipping_tx_hash"),
+      field: "shipping_tx_hash",
+    },
+    {
+      title: t("shipping_paid_status"),
+      field: "shipping_paid_status",
+    },
+    {
+      title: t("pickup"),
+      field: "pickup",
     },
   ];
 
@@ -121,7 +144,8 @@ const redeems = ({ redeems }) => {
       return data;
     }
   };
-  const data = filterData(countryAndProvinceNames(dataFormater(redeems)));
+  const data = filterData(countryAndProvinceNames(logDataFormater(logs)));
+  console.log(data);
   useEffect(() => {
     const styleElement = document.createElement("style");
     styleElement.innerHTML = scrollStyle;
@@ -148,7 +172,7 @@ const redeems = ({ redeems }) => {
   );
 };
 
-export default redeems;
+export default redeemLogs;
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
@@ -165,7 +189,7 @@ export async function getServerSideProps(context) {
   const { cookie } = req.headers;
   console.log(session);
 
-  const response = await clientAxios.get("/redeemRoute", {
+  const response = await clientAxios.get("/logsRoute", {
     params: {
       is_admin: session.is_admin,
     },
@@ -173,8 +197,8 @@ export async function getServerSideProps(context) {
       Cookie: cookie,
     },
   });
-
+  console.log(response.data);
   return {
-    props: { redeems: response.data },
+    props: { logs: response.data },
   };
 }

@@ -32,6 +32,7 @@ function getRedeems(is_admin) {
         withCredentials: true,
       });
       const redeems = response.data;
+
       dispatch({ type: GET_REDEEMS, payload: redeems });
     } catch (error) {
       console.log(error);
@@ -90,4 +91,28 @@ function getCountries() {
   };
 }
 
-export { loginApp, getRedeems, getWinarys, getProvinces, getCountries };
+function getLogs(is_admin) {
+  return async (dispatch) => {
+    try {
+      const response = await clientAxios.get("/redeemRoute", {
+        params: {
+          is_admin,
+        },
+        withCredentials: true,
+      });
+      const redeems = response.data;
+
+      dispatch({ type: GET_REDEEMS, payload: redeems });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+export {
+  loginApp,
+  getRedeems,
+  getWinarys,
+  getProvinces,
+  getCountries,
+  getLogs,
+};

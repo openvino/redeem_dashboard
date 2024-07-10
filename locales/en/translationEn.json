@@ -59,5 +59,7 @@
   "vco_end": "VCO End Date",
   "vco_price_fiat": "VCO Price (Fiat)",
   "vco_price": "VCO Price",
-  "action" : "Actions"
+  "action": "Actions",
+  "shipping_paid_status": "Shipping paid",
+  "pickup": "Winery pickup"
 }

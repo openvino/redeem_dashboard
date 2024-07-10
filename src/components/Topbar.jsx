@@ -1,28 +1,28 @@
-import React, { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { FaSearch } from 'react-icons/fa';
-import { useState, useRef } from 'react';
-import Image from 'next/image';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFilter } from '@/redux/actions/filterActions.js';
-import { signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import { getRedeems } from '@/redux/actions/winaryActions';
-import { useTranslation } from 'react-i18next';
-import Loader from './Loader';
+import React, { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { FaSearch } from "react-icons/fa";
+import { useState, useRef } from "react";
+import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { setFilter } from "@/redux/actions/filterActions.js";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
+import { getRedeems } from "@/redux/actions/winaryActions";
+import { useTranslation } from "react-i18next";
+import Loader from "./Loader";
 import {
   closeNotification,
   showNotification,
-} from '@/redux/actions/notificationActions';
-import { FaBell } from 'react-icons/fa';
-import Modal from './Modal';
+} from "@/redux/actions/notificationActions";
+import { FaBell } from "react-icons/fa";
+import Modal from "./Modal";
 import {
   showNotificationModal,
   collapseNotificationModal,
-} from '@/redux/actions/notificationActions';
-import SearchModal from './SearchModal';
-import useProfile from '@/hooks/useProfile';
-import { getBalance } from '../../helpers';
+} from "@/redux/actions/notificationActions";
+import SearchModal from "./SearchModal";
+import useProfile from "@/hooks/useProfile";
+import { getBalance } from "../../helpers";
 
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
@@ -65,7 +65,7 @@ const Topbar = () => {
         const balance = await getBalance();
         setWalletBalance(balance);
       } catch (error) {
-        console.error('Error fetching balance:', error);
+        console.error("Error fetching balance:", error);
       }
     };
 
@@ -74,14 +74,14 @@ const Topbar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showModal && !event.target.closest('.modal-content')) {
+      if (showModal && !event.target.closest(".modal-content")) {
         dispatch(collapseNotificationModal());
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [showModal, dispatch, open]);
 
@@ -96,7 +96,7 @@ const Topbar = () => {
 
     setTimeout(() => {
       setToggle(!toggle);
-      const language = toggle ? 'es' : 'en';
+      const language = toggle ? "es" : "en";
       i18n.changeLanguage(language);
       setSelectLanguage(!selectLanguage);
       setLoading(false);
@@ -110,24 +110,24 @@ const Topbar = () => {
 
     const socket = new WebSocket(`${wsPort}/api/sendMessage`);
     // Connection opened
-    socket.addEventListener('open', () => {
-      console.log('WebSocket connection established');
+    socket.addEventListener("open", () => {
+      console.log("WebSocket connection established");
     });
 
     // Listen for messages from the server
-    socket.addEventListener('message', async (event) => {
+    socket.addEventListener("message", async (event) => {
       const message = event.data;
-      console.log('Received message from server:', message);
+      console.log("Received message from server:", message);
       // Handle the incoming message from the server
 
-      if (message === 'Notification updated!') {
+      if (message === "Notification updated!") {
         dispatch(getRedeems(session.data.isAdmin));
       }
     });
 
     // Connection closed
-    socket.addEventListener('close', () => {
-      console.log('WebSocket connection closed');
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed");
     });
 
     // Clean up the WebSocket connection when the component unmounts
@@ -169,12 +169,12 @@ const Topbar = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="fixed w-full md:w-[94%]  z-50 left-[6rem] sm:left-[5rem] mt-2">
+      <div className="fixed w-full md:w-[94%]  z-50 left-[6rem] sm:left-[6rem] mt-2">
         <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
           <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
             <div className="flex flex-col w-full  pb-4 text-lg">
               <p className=" font-bold">{walletBalance} ETH</p>
-              <p className="text-gray-600  text-[16px]">{t('deuda')}</p>
+              <p className="text-gray-600  text-[16px]">{t("deuda")}</p>
             </div>
           </div>
 
@@ -183,7 +183,7 @@ const Topbar = () => {
               <input
                 type="text"
                 className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
-                placeholder={t('buscar')}
+                placeholder={t("buscar")}
                 onFocus={() => {
                   setIsFocused(true);
                 }}
@@ -196,7 +196,7 @@ const Topbar = () => {
               <span
                 id="search-icon"
                 className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer ${
-                  isFocused ? 'opacity-0' : 'opacity-100'
+                  isFocused ? "opacity-0" : "opacity-100"
                 }`}
                 onClick={() => {
                   inputRef.current.focus();
@@ -209,8 +209,8 @@ const Topbar = () => {
               <div
                 className={
                   notification.notification
-                    ? ' cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500'
-                    : 'hidden'
+                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
+                    : "hidden"
                 }
                 onClick={handleModal}
               >
@@ -237,7 +237,7 @@ const Topbar = () => {
                 <div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
                   <p
                     className="m-0 p-2 cursor-pointer"
-                    onClick={async () => await signOut({ redirect: '/' })}
+                    onClick={async () => await signOut({ redirect: "/" })}
                   >
                     Cerrar Sesión
                   </p>
@@ -245,16 +245,16 @@ const Topbar = () => {
               )}
             </div>
             <button onClick={toggleLanguage}>
-              {selectLanguage ? 'EN' : 'ES'}
+              {selectLanguage ? "EN" : "ES"}
             </button>
           </div>
         </div>
       </div>
       <Modal data={allNotifications} reloadRedeems={reloadRedeems} />
-      {router.asPath.includes('/winaryDetail') && (
+      {router.asPath.includes("/winaryDetail") && (
         <SearchModal data={winarys} />
       )}
-      {router.asPath.includes('/detail') && <SearchModal data={allRedeems} />}
+      {router.asPath.includes("/detail") && <SearchModal data={allRedeems} />}
     </>
   );
 };
