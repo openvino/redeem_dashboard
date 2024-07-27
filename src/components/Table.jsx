@@ -26,6 +26,9 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
     x: 0,
     y: 0,
   });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [scrollStartX, setScrollStartX] = useState(0);
   const elementsPerPage = n;
 
   const handlePrevPage = () => {
@@ -185,9 +188,31 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
     toast.success(`Contenido copiado: ${content}`);
   };
 
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setDragStartX(e.clientX);
+    setScrollStartX(e.currentTarget.scrollLeft);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStartX;
+    e.currentTarget.scrollLeft = scrollStartX - dx;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   return (
     <>
-      <div>
+      <div
+        className="overflow-hidden cursor-grab"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
         <table className="w-[2048px] ml-[2rem] mt-[8rem] divide-y divide-gray-200 border border-gray-100">
           <thead>
             <tr>
