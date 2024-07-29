@@ -180,7 +180,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
   };
 
   const handleMouseLeave = () => {
-    setTooltip({ ...tooltip, visible: false });
+    !isDragging && setTooltip({ ...tooltip, visible: false });
   };
 
   const handleClickTooltip = (content) => {
