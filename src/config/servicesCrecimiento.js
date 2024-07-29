@@ -2,7 +2,7 @@ const { default: axios } = require("axios");
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const websocket = process.env.NEXT_PUBLIC_CRECIMIENTO_WEBSOCKET;
-const webhookUrl = process.env.NEXT_PUBLIC_CRECIMIENTO_WEBHOOK;
+const webhookURL = process.env.NEXT_PUBLIC_CRECIMIENTO_WEBHOOK;
 const didMethod = "did:quarkid";
 
 console.log(baseUrl);
@@ -28,7 +28,7 @@ async function interpretWACIFlow(params) {
 async function createDID() {
   const result = await axios.put(`${baseUrl}/dids/quarkid`, {
     websocket,
-    webhookUrl,
+    webhookURL,
     didMethod,
   });
 
