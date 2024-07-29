@@ -48,6 +48,7 @@ export default async function handler(req, res) {
 }
 
 const openDoor = async () => {
+  console.log("Abriendo puerta...");
   try {
     const res = await axios.post(
       "http://concepcion.treetech.com.ar:1080/control",
