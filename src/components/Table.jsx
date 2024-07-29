@@ -215,6 +215,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        style={{ userSelect: "none" }}
       >
         <table className="w-[2048px] ml-[2rem] mt-[8rem] divide-y divide-gray-200 border border-gray-100">
           <thead>
