@@ -32,25 +32,30 @@ export default async function handler(req, res) {
       eventType,
       JSON.stringify(eventData)
     );
-    openDoor(eventData);
 
-    res.status(200).json("Flujo completado");
+    if (!eventData.verified) {
+      console.log("Not Verified :(");
+      return;
+    } else {
+      openDoor(eventData);
+
+      res.status(200).json("Flujo completado");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error });
   }
 }
 
-const openDoor = async (eventData) => {
-  if (!eventData.verified) {
-    console.log("Not Verified :(");
-    return;
-  } else {
-    const doorResponse = await axios.post(
+const openDoor = async () => {
+  try {
+    const res = await axios.post(
       "http://concepcion.treetech.com.ar:1080/control",
       { status: "Open" }
     );
     console.log("Puerta abierta!");
     console.log("Door Response: ", doorResponse);
+  } catch (error) {
+    console.log(error);
   }
 };
