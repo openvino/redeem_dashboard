@@ -3,6 +3,7 @@ import axios from "axios";
 
 const cmktUrl = process.env.NEXT_PUBLIC_CRYPTOMKT_URL;
 const url = process.env.NEXT_PUBLIC_EXCHANGE_URL;
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -31,10 +32,25 @@ export default async function handler(req, res) {
       eventType,
       JSON.stringify(eventData)
     );
-    console.log("RESPUESTA DE LA API: ", response);
-    res.status(200);
+    openDoor(eventData);
+
+    res.status(200).json("Flujo completado");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error });
   }
 }
+
+const openDoor = async (eventData) => {
+  if (!eventData.verified) {
+    console.log("Not Verified :(");
+    return;
+  } else {
+    const doorResponse = await axios.post(
+      "http://concepcion.treetech.com.ar:1080/control",
+      { status: "Open" }
+    );
+    console.log("Puerta abierta!");
+    console.log("Door Response: ", doorResponse);
+  }
+};
