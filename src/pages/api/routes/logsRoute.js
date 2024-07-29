@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
       if (is_admin === "true") {
         const logs = await getAllLogs();
-        console.log(logs);
+
         return res.status(200).json(logs);
       } else {
         const logs = await getAllLogs(token.sub);
