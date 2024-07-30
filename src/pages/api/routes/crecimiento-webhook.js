@@ -68,9 +68,9 @@ const openDoor = async (eventData) => {
   );
   console.log("Abriendo puerta...", endpoint);
   try {
-    const doorResponse = await axios.post(endpoint, { status: "Open" });
+    const doorResponse = await axios.post(endpoint, { state: "open" });
     console.log("Puerta abierta!");
-    console.log("Door Response: ", doorResponse.verifiableCredentials);
+    console.log("Door Response: ", doorResponse.data);
   } catch (error) {
     console.log("Error al abrir la puerta ");
   }
