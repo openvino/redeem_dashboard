@@ -47,13 +47,19 @@ export default async function handler(req, res) {
   }
 }
 
-const openDoor = async () => {
+const openDoor = async (eventData) => {
+  let endpoint;
+
+  if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1) {
+    endpoint = process.env.NEXT_PUBLIC_ENDPOINT1;
+  }
+  if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2) {
+    endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
+  }
+
   console.log("Abriendo puerta...");
   try {
-    const res = await axios.post(
-      "http://concepcion.treetech.com.ar:1080/control",
-      { status: "Open" }
-    );
+    const doorResponse = await axios.post(endpoint, { status: "Open" });
     console.log("Puerta abierta!");
     console.log("Door Response: ", doorResponse);
   } catch (error) {
