@@ -6,6 +6,8 @@ const webhookURL = process.env.NEXT_PUBLIC_CRECIMIENTO_WEBHOOK;
 const didMethod = "did:quarkid";
 
 console.log(baseUrl);
+console.log(websocket);
+console.log(webhookURL);
 
 async function getIssuanceQR(params) {
   const result = await axios.put(`${baseUrl}/credentialsbbs/wacioob`, params);

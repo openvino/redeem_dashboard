@@ -1,12 +1,8 @@
-import { createDID, webhook } from "@/config/servicesCrecimiento";
 import axios from "axios";
-
-const cmktUrl = process.env.NEXT_PUBLIC_CRYPTOMKT_URL;
-const url = process.env.NEXT_PUBLIC_EXCHANGE_URL;
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -48,16 +44,21 @@ export default async function handler(req, res) {
 }
 
 const openDoor = async (eventData) => {
+  console.log("verifierDID=", eventData.verifierDID);
+  // console.log("Verifier1", process.env.NEXT_PUBLIC_VERIFIER1);
+  // console.log("Verifier2", process.env.NEXT_PUBLIC_VERIFIER2);
   let endpoint;
 
   if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT1;
-  }
-  if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2) {
+  } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
+  } else {
+    console.log("Verifier not found");
+    return;
   }
 
-  console.log("Abriendo puerta...");
+  console.log("Abriendo puerta...", endpoint);
   try {
     const doorResponse = await axios.post(endpoint, { status: "Open" });
     console.log("Puerta abierta!");

@@ -1,7 +1,5 @@
 import { createDID } from "@/config/servicesCrecimiento";
 
-const cmktUrl = process.env.NEXT_PUBLIC_CRYPTOMKT_URL;
-const url = process.env.NEXT_PUBLIC_EXCHANGE_URL;
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
