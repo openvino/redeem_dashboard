@@ -50,9 +50,7 @@ const openDoor = async (eventData) => {
   console.log("verifierDID=", eventData.verifierDID);
   console.log("Verifier1", process.env.NEXT_PUBLIC_VERIFIER1);
   console.log("Verifier2", process.env.NEXT_PUBLIC_VERIFIER2);
-  console.log(
-    "****************************************************************"
-  );
+
   let endpoint;
 
   if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1) {
@@ -64,12 +62,16 @@ const openDoor = async (eventData) => {
     return;
   }
 
+  console.log("Endpoint: ", endpoint);
+  console.log(
+    "****************************************************************"
+  );
   console.log("Abriendo puerta...", endpoint);
   try {
     const doorResponse = await axios.post(endpoint, { status: "Open" });
     console.log("Puerta abierta!");
     console.log("Door Response: ", doorResponse.verifiableCredentials);
   } catch (error) {
-    console.log(error);
+    console.log("Error al abrir la puerta ");
   }
 };
