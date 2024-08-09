@@ -57,10 +57,6 @@ const openDoor = async (eventData) => {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT1;
   } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
-  } else if (
-    eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_DISCORD_BOT
-  ) {
-    endpoint = process.env.NEXT_PUBLIC_ENDPOINT3;
   } else {
     console.log("Verifier not found");
     return;
