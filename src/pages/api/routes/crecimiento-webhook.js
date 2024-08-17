@@ -77,10 +77,10 @@ const openDoor = async (eventData) => {
     eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2_PRODUCTION
   ) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
-    console.log("Verifier2 (1P)", process.env.NEXT_PUBLIC_VERIFIER2);
+    console.log("Verifier2 (1P)", eventData.verifierDID);
   } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_ZAPP) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT_ZAPP;
-    console.log("ZAPP", process.env.NEXT_PUBLIC_VERIFIER_ZAPP);
+    console.log("ZAPP", eventData.verifierDID);
   } else {
     console.log("Verifier not found");
     return;
