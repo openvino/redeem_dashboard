@@ -95,10 +95,16 @@ const openDoor = async (eventData) => {
     if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_ZAPP) {
       console.log("zapp");
 
-      const response = await axios.post(endpoint, {
-        state: "open",
+      console.log("BODY", {
         invitationId: eventData.invitationId,
         verified: eventData.verified,
+        rawData: eventData,
+      });
+
+      const response = await axios.post(endpoint, {
+        invitationId: eventData.invitationId,
+        verified: eventData.verified,
+        rawData: eventData,
       });
       console.log(response.data);
       return;
