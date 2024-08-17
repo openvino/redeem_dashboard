@@ -1,5 +1,6 @@
 import axios from "axios";
-
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const apiKey = process.env.NEXT_PUBLIC_EXT_API_KEY;
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
 
     if (eventType === "presentation-request") {
       response = await axios.put(
-        `https://sandbox-ssi.extrimian.com/v1/credentialsbbs/waci/oob/presentation-proceed`,
+        `${baseUrl}/credentialsbbs/waci/oob/presentation-proceed?apiKey=${apiKey}`,
         {
           invitationId: eventData.invitationId,
           verifiableCredentials: [eventData.credentialsToPresent[0].data],
@@ -48,15 +49,23 @@ const openDoor = async (eventData) => {
     "****************************************************************"
   );
   console.log("verifierDID=", eventData.verifierDID);
-  console.log("Verifier1", process.env.NEXT_PUBLIC_VERIFIER1);
-  console.log("Verifier2", process.env.NEXT_PUBLIC_VERIFIER2);
+  // console.log("Verifier1 (PB)", process.env.NEXT_PUBLIC_VERIFIER1);
+  // console.log("Verifier2 (1er Piso)", process.env.NEXT_PUBLIC_VERIFIER2);
+  // console.log("VerifierZapp", process.env.NEXT_PUBLIC_VERIFIER_ZAPP);
+  console.log("VERIFIED: ", eventData.verified);
+  console.log("invitationId: ", eventData.invitationId);
 
   let endpoint;
 
   if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1) {
+    console.log("Verifier1 (PB)", process.env.NEXT_PUBLIC_VERIFIER1);
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT1;
   } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
+    console.log("Verifier2 (1P)", process.env.NEXT_PUBLIC_VERIFIER2);
+  } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_ZAPP) {
+    endpoint = process.env.NEXT_PUBLIC_ENDPOINT_ZAPP;
+    console.log("ZAPP", process.env.NEXT_PUBLIC_VERIFIER_ZAPP);
   } else {
     console.log("Verifier not found");
     return;
@@ -66,8 +75,21 @@ const openDoor = async (eventData) => {
   console.log(
     "****************************************************************"
   );
-  console.log("Abriendo puerta...", endpoint);
+
   try {
+    if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_ZAPP) {
+      console.log("zapp");
+
+      const response = await axios.post(endpoint, {
+        state: "open",
+        invitationId: eventData.invitationId,
+        verified: eventData.verified,
+      });
+      console.log(response.data);
+      return;
+    }
+
+    console.log("Abriendo puerta...", endpoint);
     const doorResponse = await axios.post(endpoint, { state: "open" });
     console.log("Puerta abierta!");
     console.log("Door Response: ", doorResponse.data);
