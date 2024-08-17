@@ -49,18 +49,33 @@ const openDoor = async (eventData) => {
     "****************************************************************"
   );
   console.log("verifierDID=", eventData.verifierDID);
-  // console.log("Verifier1 (PB)", process.env.NEXT_PUBLIC_VERIFIER1);
-  // console.log("Verifier2 (1er Piso)", process.env.NEXT_PUBLIC_VERIFIER2);
-  // console.log("VerifierZapp", process.env.NEXT_PUBLIC_VERIFIER_ZAPP);
+  console.log("Verifier1 (PB)", process.env.NEXT_PUBLIC_VERIFIER1);
+  console.log("Verifier2 (1er Piso)", process.env.NEXT_PUBLIC_VERIFIER2);
+  console.log(
+    "Verifier1 (PB) PRODUCTION",
+    process.env.NEXT_PUBLIC_VERIFIER1_PRODUCTION
+  );
+  console.log(
+    "Verifier2 (1er Piso) PRODUCTION",
+    process.env.NEXT_PUBLIC_VERIFIER2_PRODUCTION
+  );
+  console.log("VerifierZapp", process.env.NEXT_PUBLIC_VERIFIER_ZAPP);
+
   console.log("VERIFIED: ", eventData.verified);
   console.log("invitationId: ", eventData.invitationId);
 
   let endpoint;
 
-  if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1) {
-    console.log("Verifier1 (PB)", process.env.NEXT_PUBLIC_VERIFIER1);
+  if (
+    eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1 ||
+    eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER1_PRODUCTION
+  ) {
+    console.log("Verifier1 (PB)", eventData.verifierDID);
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT1;
-  } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2) {
+  } else if (
+    eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2 ||
+    eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER2_PRODUCTION
+  ) {
     endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
     console.log("Verifier2 (1P)", process.env.NEXT_PUBLIC_VERIFIER2);
   } else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_ZAPP) {
