@@ -1,5 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
 import { getUsers } from "../controllers/userController";
 import tokenVerify from "../helpers/tokenVerify";
 export default async function handler(req, res) {
@@ -7,9 +5,11 @@ export default async function handler(req, res) {
   if (!isValidJWT) {
     return res.json("INVALID CREDENTIALS");
   }
-  //TODO PROTEGER RUTAS
+
   try {
     const users = await getUsers();
+    console.log(users);
+
     res.status(200).json(users);
   } catch (error) {
     res.status(404).json(error.message);
