@@ -10,7 +10,7 @@ export default async function handler(req, res) {
         'Access-Control-Allow-Headers',
         'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
     );
-    
+
     // Manejar solicitud OPTIONS (preflight)
     if (req.method === 'OPTIONS') {
         res.status(200).end();
@@ -24,9 +24,9 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    if (secret_key !== process.env.NEXT_PUBLIC_SECRET_KEY) {
-        return res.status(401).json({ message: 'Invalid secret key' });
-    }
+    // if (secret_key !== process.env.NEXT_PUBLIC_SECRET_KEY) {
+    //     return res.status(401).json({ message: 'Invalid secret key' });
+    // }
 
     const sendEmailMessage = async (email, subject, message) => {
         try {
@@ -58,9 +58,43 @@ export default async function handler(req, res) {
         }
     };
 
+
+    const sendEmailMessageAdmin = async (email) => {
+        try {
+            let transporter = nodemailer.createTransport({
+                host: "127.0.0.1",
+                port: 1025,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: process.env.NEXT_PUBLIC_EMAIL_USER, // generated ethereal user
+                    pass: process.env.NEXT_PUBLIC_EMAIL_PASS, // generated ethereal password
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
+
+            let info = await transporter.sendMail({
+                from: '"Openvino" <redeem@openvino.org>',
+                to: "Mica@costaflores.com",
+                subject: '',
+                text: "Openvino",
+                html: `<div>
+                    <h3>El usuario ${email} ha realizado un nuevo redeem</h3>
+                </div>`
+            });
+
+            console.log("Mensaje enviado: %s", info.messageId);
+        } catch (error) {
+            console.log(error);
+            throw new Error('Error sending email');
+        }
+    };
+
     if (req.method === "POST") {
         try {
             await sendEmailMessage(email, subject, message);
+            await sendEmailMessageAdmin(email);
             return res.status(200).json("Success");
         } catch (error) {
             console.log(error);

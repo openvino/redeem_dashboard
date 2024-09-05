@@ -1,12 +1,18 @@
+import { format } from "date-fns";
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return format(date, "PP");
+};
+
 export const dataFormater = (redeems) => {
   const data = [];
   redeems.map((item, index) => {
     data.push({
       amount: item.amount,
       country_id: item.country_id,
-      created_at: item.created_at,
+      created_at: formatDate(item.created_at),
       customer_id: item.customer_id,
-      deleted_at: item.deleted_at,
+      deleted_at: formatDate(item.deleted_at),
       email: item.email,
       id: item.id,
       name: item.name,
@@ -45,7 +51,7 @@ export const logDataFormater = (logs) => {
         zip: item.zip,
         telegram_id: item.telegram_id,
         amount: item.amount,
-        created_at: item.created_at,
+        created_at: formatDate(item.created_at),
         winerie_id: item.winerie_id,
         city: item.city,
         phone: item.phone,

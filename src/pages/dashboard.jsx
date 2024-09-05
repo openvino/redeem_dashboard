@@ -53,117 +53,10 @@ const Dashboard = () => {
   }, [session]);
 
   const dispatch = useDispatch();
-  // const chartRef = useRef(null);
-  // const polarChartRef = useRef(null);
+
 
   const redeems = useSelector((state) => state.winaryAdress.redeems);
-
-  // useEffect(() => {
-  //   const chartLabels = [];
-  //   const chartData = {};
-
-  //   const currentDate = new Date();
-  //   for (let i = 6; i >= 0; i--) {
-  //     const date = new Date(currentDate);
-  //     date.setMonth(currentDate.getMonth() - i);
-  //     chartLabels.push(date.toLocaleString("default", { month: "long" }));
-  //   }
-
-  //   chartLabels.forEach((label) => {
-  //     const redeemCount = redeems.filter((redeem) => {
-  //       const redeemDate = new Date(redeem.created_at);
-  //       return (
-  //         redeemDate.toLocaleString("default", { month: "long" }) === label &&
-  //         redeemDate.getFullYear() === currentDate.getFullYear()
-  //       );
-  //     }).length;
-  //     chartData[label] = redeemCount;
-  //   });
-
-  //   const chartConfig = {
-  //     type: "bar",
-  //     data: {
-  //       labels: chartLabels,
-  //       datasets: [
-  //         {
-  //           label: "Redeems",
-  //           data: Object.values(chartData),
-  //           backgroundColor: "rgba(245, 39, 84, 0.8)",
-  //           borderColor: "rgba(75, 192, 192, 1)",
-  //           borderWidth: 1,
-  //         },
-  //       ],
-  //     },
-  //     options: {
-  //       scales: {
-  //         y: {
-  //           beginAtZero: true,
-  //           stepSize: 1,
-  //         },
-  //       },
-  //     },
-  //   };
-
-  //   const chart = new Chart(chartRef.current, chartConfig);
-
-  //   return () => {
-  //     chart.destroy();
-  //   };
-  // }, [redeems]);
-
-  // useEffect(() => {
-  //   const chartLabels = [];
-  //   const chartData = [];
-
-  //   const currentYear = new Date().getFullYear();
-  //   for (let i = 6; i >= 0; i--) {
-  //     const year = currentYear - i;
-  //     chartLabels.push(year.toString());
-  //   }
-
-  //   chartLabels.forEach((label) => {
-  //     const redeemCount = redeems.filter((redeem) => {
-  //       const redeemDate = new Date(redeem.created_at);
-  //       return redeemDate.getFullYear().toString() === label;
-  //     }).length;
-  //     chartData.push(redeemCount);
-  //   });
-
-  //   const polarChartConfig = {
-  //     type: "polarArea",
-  //     data: {
-  //       labels: chartLabels,
-  //       datasets: [
-  //         {
-  //           label: "Redeems",
-  //           data: chartData,
-  //           backgroundColor: [
-  //             "rgba(255, 99, 132, 0.8)",
-  //             "rgba(54, 162, 235, 0.8)",
-  //             "rgba(255, 206, 86, 0.8)",
-  //             "rgba(75, 192, 192, 0.8)",
-  //             "rgba(153, 102, 255, 0.8)",
-  //             "rgba(255, 159, 64, 0.8)",
-  //             "rgba(255, 99, 132, 0.8)",
-  //           ],
-  //         },
-  //       ],
-  //     },
-  //     options: {
-  //       scales: {
-  //         r: {
-  //           beginAtZero: true,
-  //         },
-  //       },
-  //     },
-  //   };
-
-  //   const polarChart = new Chart(polarChartRef.current, polarChartConfig);
-
-  //   return () => {
-  //     polarChart.destroy();
-  //   };
-  // }, [redeems]);
+  
 
   const columnas = [
     {
@@ -218,10 +111,10 @@ const Dashboard = () => {
       title: t("ciudad"),
       field: "city",
     },
-    {
-      title: t("telefono"),
-      field: "phone",
-    },
+    // {
+    //   title: t("telefono"),
+    //   field: "phone",
+    // },
     // {
     //   title: "Actualizado",
     //   field: "updated_at",
@@ -274,7 +167,6 @@ const Dashboard = () => {
     }
   };
 
-  console.log(redeems);
   const data = filterData(countryAndProvinceNames(dataFormater(redeems, [])));
   console.log(data);
   useEffect(() => {
