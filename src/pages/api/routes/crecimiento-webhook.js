@@ -36,7 +36,6 @@ export default async function handler(req, res) {
 			return;
 		} else {
 			openDoor(eventData);
-			saveToAirtable(eventData);
 
 			res.status(200).json("Flujo completado");
 		}
@@ -80,6 +79,7 @@ const openDoor = async (eventData) => {
 	) {
 		endpoint = process.env.NEXT_PUBLIC_ENDPOINT2;
 		console.log("Verifier2 (1P)", eventData.verifierDID);
+		saveToAirtable(eventData);
 	} else if (eventData.verifierDID === process.env.NEXT_PUBLIC_VERIFIER_ZAPP) {
 		endpoint = process.env.NEXT_PUBLIC_ENDPOINT_ZAPP;
 		console.log("ZAPP", eventData.verifierDID);
@@ -131,8 +131,8 @@ const saveToAirtable = async (eventData) => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					did: responseJson.verifiableCredentials[0].credentialSubject.id,
-					email: responseJson.verifiableCredentials[0].credentialSubject.email,
+					did: eventData.verifiableCredentials[0].credentialSubject.id,
+					email: eventData.verifiableCredentials[0].credentialSubject.email,
 				}),
 			}
 		);
