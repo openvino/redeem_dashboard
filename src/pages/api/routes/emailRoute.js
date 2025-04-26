@@ -17,16 +17,13 @@ export default async function handler(req, res) {
         return;
     }
 
-    const { email, subject, message, secret_key } = req.body;
+    const { email, subject, message, } = req.body;
 
     // Verificación de parámetros
     if (!email || !subject || !message) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
-
-    if (secret_key !== process.env.NEXT_PUBLIC_SECRET_KEY) {
-        return res.status(401).json({ message: 'Invalid secret key' });
-    }
+  
 
     const sendEmailMessage = async (email, subject, message) => {
         try {
