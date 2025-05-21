@@ -6,6 +6,7 @@ import {
   GET_WINARYS,
   GET_PROVINCES,
   GET_COUNTRIES,
+  GET_ORDERS,
 } from "../types";
 
 function loginApp(public_key) {
@@ -108,6 +109,26 @@ function getLogs(is_admin) {
     }
   };
 }
+
+function getOrders(is_admin) {
+  return async (dispatch) => {
+    try {
+      const response = await clientAxios.get("/ordersRoute", {
+        params: {
+          is_admin,
+        },
+        withCredentials: true,
+      });
+      const orders = response.data;
+
+      dispatch({ type: GET_ORDERS, payload: orders });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+}
+
+
 export {
   loginApp,
   getRedeems,
@@ -115,4 +136,5 @@ export {
   getProvinces,
   getCountries,
   getLogs,
+  getOrders
 };

@@ -85,7 +85,6 @@ const ensRegex =
 
 async function isENS(input) {
   if (ensRegex.test(input)) {
-    console.log("La cadena parece ser un ENS");
     const resolvedAddress = await resolveENS(input);
 
     if (resolvedAddress) {
@@ -102,11 +101,9 @@ async function isENS(input) {
 export const deleteAdmin = async (req) => {
   const { id } = req.query;
 
-  console.log(id);
 
   const deleteQery = `DELETE FROM admin_users WHERE id = '${id}' `;
 
   const deletedAdmin = await conn.query(deleteQery);
 
-  console.log(deleteAdmin);
 };

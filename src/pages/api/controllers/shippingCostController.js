@@ -5,7 +5,6 @@ export const getShippingCost = async (body) => {
     let query = `SELECT * FROM ${token.toLowerCase()}_shipping_cost WHERE province_id = '${province_id}'`;
     const { rows } = await conn.query(query);
 
-    console.log(query);
     if (rows.length > 0) {
         const amountParsed = parseInt(amount, 10);
         const amountValidated = Math.max(amountParsed, 6);

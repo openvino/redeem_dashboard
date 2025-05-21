@@ -17,7 +17,6 @@ export const getYditoiUsers = async (address) => {
 };
 
 export const createYdiyoiUser = async (address) => {
-  address && console.log("createYdiyoiUser", address);
 
   try {
     const query = `

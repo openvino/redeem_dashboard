@@ -42,7 +42,6 @@ export default async function handler(req, res) {
 				privates,
 			});
 
-			console.log(wineData);
 
 			// res.status(200).json(users);
 			// const response = {
@@ -61,17 +60,11 @@ export default async function handler(req, res) {
 			const { wine } = req.query;
 
 			if (wine) {
-				console.log(wine);
-
 				const wineData = await getWineBiodigitalData({ wine });
-
 				res.status(200).json(wineData);
-				console.log(wineData);
 			}
 
 			const winesData = await getWinesBiodigitalData();
-			console.log(winesData);
-
 			res.status(200).json(winesData);
 		} catch (error) {
 			console.error("Error", error);

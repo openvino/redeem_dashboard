@@ -23,6 +23,8 @@ import {
 import SearchModal from "./SearchModal";
 import useProfile from "@/hooks/useProfile";
 import { getBalance } from "../../helpers";
+import FormField from "./FormField";
+import SidebarMobile from "./SidebarMobile";
 
 const BellIconWithNotification = ({ notificationCount }) => (
   <div className="relative">
@@ -169,84 +171,92 @@ const Topbar = () => {
   return (
     <>
       {loading && <Loader />}
-      <div className="fixed w-full md:w-[94%]  z-50 left-[6rem] sm:left-[6rem] mt-2">
-        <div className="  flex-col md:flex-row   gap-2 md:p-3  md:flex   ">
-          <div className=" bg-[#F1EDE2] bg-opacity-70 w-1/2 shadow-xl border p-4 hidden md:block md:rounded-lg h-[6rem]">
+      <div className="bg-[#F1EDE2] md:bg-transparent md:px-4 md:py-3">
+        <div className="flex flex-col md:flex-row gap-3 ">
+          <div className="hidden md:flex bg-[#F1EDE2] bg-opacity-70 shadow-xl border p-4 md:rounded-lg flex-1 ">
             <div className="flex flex-col w-full  pb-4 text-lg">
               <p className=" font-bold">{walletBalance} ETH</p>
               <p className="text-gray-600  text-[16px]">{t("deuda")}</p>
             </div>
           </div>
 
-          <div className="bg-[#F1EDE2] bg-opacity-70 shadow-xl flex justify-center ml-2 sm:ml-20 md:ml-0 gap-2   border p-4 rounded-lg items-center h-[4rem] w-[70%]   md:h-[6rem] ">
-            <div className="relative inline-block ">
-              <input
-                type="text"
-                className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
-                placeholder={t("buscar")}
-                onFocus={() => {
-                  setIsFocused(true);
-                }}
-                onBlur={() => {
-                  setIsFocused(false);
-                }}
-                ref={inputRef}
-                onChange={handleFilter}
-              />
-              <span
-                id="search-icon"
-                className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer ${
-                  isFocused ? "opacity-0" : "opacity-100"
-                }`}
-                onClick={() => {
-                  inputRef.current.focus();
-                }}
-              >
-                <FaSearch className="hidden md:block" />
-              </span>
-            </div>
-            {allNotifications.length ? (
-              <div
-                className={
-                  notification.notification
-                    ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
-                    : "hidden"
-                }
-                onClick={handleModal}
-              >
-                <BellIconWithNotification
-                  notificationCount={allNotifications.length}
-                />
+          <div className="w-calc-full-6rem md:w-full bg-[#F1EDE2]    bg-opacity-70 md:shadow-xl flex flex-col md:flex-row justify-evenly gap-2 border p-4 rounded-lg items-center flex-1">
+            <div className="flex justify-evenly items-center w-full gap-3 px-2">
+              <div>
+                <SidebarMobile />
               </div>
-            ) : null}
-
-            <div
-              onClick={() => setShowMenu(!showMenu)}
-              className="relative shadow-xl rounded-full hover:transform hover:scale-110 transition-all duration-500"
-            >
-              {profile?.profile_img && (
-                <Image
-                  className="rounded-full w-full h-full min-w-[3rem]"
-                  src={profile?.profile_img}
-                  width={50}
-                  height={50}
-                  alt="wineryLogo"
+              <div className="  relative inline-block ">
+                <FormField
+                  type="text"
+                  className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
+                  placeholder={t("buscar")}
+                  onFocus={() => {
+                    setIsFocused(true);
+                  }}
+                  onBlur={() => {
+                    setIsFocused(false);
+                  }}
+                  ref={inputRef}
+                  onChange={handleFilter}
                 />
-              )}
-              {showMenu && (
-                <div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
-                  <p
-                    className="m-0 p-2 cursor-pointer"
-                    onClick={async () => await signOut({ redirect: "/" })}
-                  >
-                    Cerrar Sesión
-                  </p>
+                <span
+                  id="search-icon"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer ${
+                    isFocused ? "opacity-0" : "opacity-100"
+                  }`}
+                  onClick={() => {
+                    inputRef.current.focus();
+                  }}
+                >
+                  <FaSearch className="hidden md:block" />
+                </span>
+              </div>
+              {allNotifications.length ? (
+                <div
+                  className={
+                    notification.notification
+                      ? " cursor-pointer my-4 p-3 rounded-full inline-block text-[#840C4A] pr-4 hover:transform hover:scale-105 transition-all duration-500"
+                      : "hidden"
+                  }
+                  onClick={handleModal}
+                >
+                  <BellIconWithNotification
+                    notificationCount={allNotifications.length}
+                  />
                 </div>
-              )}
+              ) : null}
+
+              <div
+                onClick={() => setShowMenu(!showMenu)}
+                className="relative shadow-xl  rounded-full hover:transform hover:scale-110 transition-all duration-500"
+              >
+                {profile?.profile_img && (
+                  <Image
+                    className="rounded-full w-full h-full min-w-[3rem]"
+                    src={profile?.profile_img}
+                    width={30}
+                    height={30}
+                    alt="wineryLogo"
+                  />
+                )}
+                {showMenu && (
+                  <div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
+                    <p
+                      className="m-0 p-2 cursor-pointer"
+                      onClick={async () => await signOut({ redirect: "/" })}
+                    >
+                      Cerrar Sesión
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <button onClick={toggleLanguage}>
+                {selectLanguage ? "EN" : "ES"}
+              </button>
             </div>
-            <button onClick={toggleLanguage}>
-              {selectLanguage ? "EN" : "ES"}
-            </button>
+
+           
           </div>
         </div>
       </div>

@@ -8,7 +8,6 @@ export default async function handler(req, res) {
 
   try {
     const users = await getUsers();
-    console.log(users);
 
     res.status(200).json(users);
   } catch (error) {

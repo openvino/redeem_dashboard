@@ -11,6 +11,7 @@ import useWineries from "@/hooks/useWineries";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import clientAxios from "@/config/clientAxios";
+import HomeLayout from "@/components/HomeLayout";
 
 const AdminUser = () => {
   const router = useRouter();
@@ -115,13 +116,11 @@ const AdminUser = () => {
   };
 
   return (
-    <>
-      <Head>
+   <HomeLayout>
+    <Head>
         <title>Openvino - Admin info</title>
       </Head>
-      <Topbar />
-
-      <Sidebar />
+ 
       <ToastContainer />
       <div className="z-1 mt-[10rem] ml-[6rem] w-full overflow-x-scrolllg: overflow-x-hidden">
         <div className="">
@@ -277,7 +276,7 @@ const AdminUser = () => {
           </form>
         </div>
       </div>
-    </>
+   </HomeLayout>
   );
 };
 

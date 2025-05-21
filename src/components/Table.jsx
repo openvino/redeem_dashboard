@@ -14,12 +14,14 @@ import { getStatusColor } from "@/utils/tableUtils";
 import { toast } from "react-toastify";
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
+  console.log(data);
+  
   const { t } = useTranslation();
   const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
   const [currentPage, setCurrentPage] = useState(1);
   const [columnOrder, setColumnOrder] = useState("created_at");
-  const [ascOrder, setAscOrder] = useState(true);
+  const [ascOrder, setAscOrder] = useState(false);
   const [tooltip, setTooltip] = useState({
     visible: false,
     content: "",
@@ -58,25 +60,58 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
   };
 
   const orderData = () => {
-    if (columnOrder) {
-      return [...data].sort((a, b) => {
-        const valorA = a[columnOrder];
-        const valorB = b[columnOrder];
-        if (columnOrder === "created_at") {
-          return ascOrder
-            ? new Date(valorB) - new Date(valorA)
-            : new Date(valorA) - new Date(valorB);
-        }
-        if (valorA < valorB) {
-          return ascOrder ? -1 : 1;
-        }
-        if (valorA > valorB) {
-          return ascOrder ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return data;
+    if (!columnOrder) return data;
+
+    const ordered = [...data].sort((a, b) => {
+      const valA = a[columnOrder];
+      const valB = b[columnOrder];
+
+      if (valA == null && valB != null) return ascOrder ? -1 : 1;
+      if (valA != null && valB == null) return ascOrder ? 1 : -1;
+      if (valA == null && valB == null) return 0;
+
+      // Si es fecha
+      if (
+        columnOrder.toLowerCase().includes("date") ||
+        columnOrder === "created_at"
+      ) {
+        const normalizeDate = (val) =>
+          new Date(
+            String(val).replace(" ", "T").replace(/\+00$/, "+00:00")
+          ).getTime();
+
+        const dateA = normalizeDate(valA);
+        const dateB = normalizeDate(valB);
+        return ascOrder ? dateA - dateB : dateB - dateA;
+      }
+
+      // Si es número
+      if (typeof valA === "number" && typeof valB === "number") {
+        return ascOrder ? valA - valB : valB - valA;
+      }
+
+      // Si es booleano
+      if (typeof valA === "boolean" && typeof valB === "boolean") {
+        return ascOrder
+          ? valA === valB
+            ? 0
+            : valA
+            ? 1
+            : -1
+          : valA === valB
+          ? 0
+          : valA
+          ? -1
+          : 1;
+      }
+
+      // Si es string u otro tipo
+      return ascOrder
+        ? String(valA).localeCompare(String(valB))
+        : String(valB).localeCompare(String(valA));
+    });
+
+    return ordered;
   };
 
   const orderPagedData = () => {
@@ -217,22 +252,33 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
         onMouseLeave={handleMouseUp}
         style={{ userSelect: "none" }}
       >
-        <table className="w-[2048px] ml-[2rem] mt-[8rem] divide-y divide-gray-200 border border-gray-100">
+        <table className="w-full divide-y divide-gray-200 border border-gray-100">
           <thead>
             <tr>
               {columnas.map((columna) => (
                 <th
                   key={columna.field}
-                  className={`px-1 py-1 bg-[#840C4A] text-[0.75rem] text-white font-large tracking-wider text-center cursor-pointer${
+                  onClick={() => handleOrdenarColumna(columna.field)}
+                  className={`px-2 py-2 bg-[#840C4A] text-[0.75rem] text-white font-medium tracking-wider text-center cursor-pointer ${
                     columna.field === "acciones" ? "w-12 sm:w-16" : ""
                   }`}
-                  onClick={() => handleOrdenarColumna(columna.field)}
+                  style={{
+                    maxWidth: "5rem",
+                  }}
                 >
-                  <span>{columna.title} </span>
+                  <div
+                    className={`
+            whitespace-nowrap overflow-hidden text-ellipsis 
+            sm:whitespace-normal sm:break-words
+          `}
+                  >
+                    {columna.title}
+                  </div>
                 </th>
               ))}
             </tr>
           </thead>
+
           <tbody className="text-sm">
             {orderPagedData().map((fila, index) => (
               <tr
@@ -255,19 +301,6 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
                     );
                   }
 
-                  if (columna.field === "status") {
-                    return (
-                      <td
-                        key={columna.field}
-                        className={`px-2 py-1 text-center text-[0.75rem] font-medium ${getStatusColor(
-                          fila[columna.field]
-                        )}`}
-                      >
-                        {fila[columna.field]}
-                      </td>
-                    );
-                  }
-
                   return (
                     <td
                       key={columna.field}
@@ -283,7 +316,13 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
                       }
                       onMouseLeave={handleMouseLeave}
                     >
-                      <div>{fila[columna.field]}</div>
+                      <div>
+                        {columna.field === "created_at"
+                          ? new Date(fila[columna.field]).toLocaleDateString(
+                              "es-AR"
+                            )
+                          : fila[columna.field]}
+                      </div>
                     </td>
                   );
                 })}

@@ -1,5 +1,6 @@
 import {
   GET_COUNTRIES,
+  GET_ORDERS,
   GET_PROVINCES,
   GET_REDEEMS,
   GET_WINARYS,
@@ -10,6 +11,7 @@ const initialState = {
   winarys: [],
   provinces: [],
   countries: [],
+  orders: [],
 };
 
 export default function winaryReducer(state = initialState, action) {
@@ -35,6 +37,12 @@ export default function winaryReducer(state = initialState, action) {
       return {
         ...state,
         countries: action.payload,
+      };
+
+    case GET_ORDERS:
+      return {
+        ...state,
+        orders: action.payload,
       };
 
     default:

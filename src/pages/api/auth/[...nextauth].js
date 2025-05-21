@@ -15,7 +15,6 @@ export default NextAuth({
         },
       },
       async authorize(credentials) {
-        console.log(credentials);
         const isValid = await checkAuth(credentials?.address);
         if (isValid)
           return {

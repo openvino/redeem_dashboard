@@ -1,3 +1,7 @@
+
+import { FaCheck } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
+
 export const dataFormater = (redeems) => {
   const data = [];
   redeems.map((item, index) => {
@@ -18,20 +22,18 @@ export const dataFormater = (redeems) => {
       winerie_id: item.winerie_id,
       year: item.year,
       zip: item.zip,
-      status: item.status,
+      status: item.status ,
       city: item.city,
       phone: item.phone,
-      shipping_paid_status: item.shipping_paid_status,
-      pickup: item.pickup,
+      shipping_paid_status: item.shipping_paid_status === 'true' ? <FaCheck  color="green" className="text-center w-full" /> : <IoMdClose color="red" className="text-center w-full" /> ,
+      pickup: item.pickup  === 'true' ? <FaCheck  color="green" className="text-center w-full" /> : <IoMdClose color="red" className="text-center w-full" />,
     });
   });
   return data;
 };
 
 export const logDataFormater = (logs) => {
-  console.log(logs);
   const data = [];
-
   logs &&
     logs.map((item, index) => {
       data.push({
@@ -57,6 +59,5 @@ export const logDataFormater = (logs) => {
         error_message: item.error_message,
       });
     });
-  console.log(data);
   return data;
 };

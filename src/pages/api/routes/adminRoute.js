@@ -70,7 +70,6 @@ export default async function handler(req, res) {
 
   if (req.method === "DELETE") {
     try {
-      console.log(req.body);
       const response = await deleteAdmin(req);
 
       return res.status(200).json("Admin deleted successfully");

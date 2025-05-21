@@ -10,9 +10,7 @@ export default async function handler(req, res) {
       return;
     }
     
-    
     const isValidApiRequest = await validateRequest(req);
-    
     
     if (!isValidApiRequest) {
         return res.status(401).json("INVALID CREDENTIALS");
@@ -20,9 +18,7 @@ export default async function handler(req, res) {
     
     try {
         const {from, to} = req.query;
-        console.log(from, to);
         const url = `${cmktUrl}?from=${from}&to=${to}`
-        console.log(url);
         res.status(200).json(url);
     } catch (error) {
         console.error("Error in testRoute:", error);

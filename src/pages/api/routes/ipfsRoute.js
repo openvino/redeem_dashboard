@@ -40,12 +40,10 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const { cid } = req.query;
-      console.log(`Attempting to fetch CID: ${cid}`);
 
       const response = await axios.get(`https://ipfs.io/ipfs/${cid}`, {
         timeout: 10000,
       });
-      console.log(response.data);
 
       const data = response.data;
       res.status(200).json(data);

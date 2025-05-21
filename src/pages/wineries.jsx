@@ -9,67 +9,21 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
 import { scrollStyle } from "@/styles/table.js";
+import HomeLayout from "@/components/HomeLayout.jsx";
 const Winarys = ({ winarys }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
 
   const columnas = [
-    {
-      title: "",
-      field: "acciones",
-    },
-    {
-      title: "Id",
-      field: "id",
-    },
-
-    {
-      title: t("nombre"),
-      field: "name",
-    },
-    {
-      title: t("website"),
-      field: "website",
-    },
-    {
-      title: t("Imagen"),
-      field: "image",
-    },
-    {
-      title: t("primary_color"),
-      field: "primary_color",
-    },
-
-    // {
-    //   title: t("actualizado"),
-    //   field: "updated_at",
-    // },
-
-    {
-      title: "Email",
-      field: "email",
-    },
-
-    {
-      title: t("Secret"),
-
-      field: "secret",
-    },
-    {
-      title: t("key"),
-
-      field: "public_key",
-    },
-    {
-      title: "ENS",
-
-      field: "ens",
-    },
-
-    {
-      title: t("es_admin"),
-      field: "isAdmin",
-    },
+    { title: "", field: "acciones" },
+    { title: "Id", field: "id" },
+    { title: t("nombre"), field: "name" },
+    { title: t("website"), field: "website" },
+    { title: t("Imagen"), field: "image" },
+    { title: "Email", field: "email" },
+    { title: t("key"), field: "public_key" },
+    { title: "ENS", field: "ens" },
+    { title: t("es_admin"), field: "isAdmin" },
   ];
 
   const filterData = (data) => {
@@ -96,18 +50,16 @@ const Winarys = ({ winarys }) => {
     };
   }, []);
   return (
-    <>
+    <HomeLayout>
       <Head>
         <title>OpenVino - Wineries</title>
       </Head>
       <div className="">
-        <Sidebar />
-        <Topbar />
-        <div className="ml-20  top-4 overflow-x-scroll custom-scroll ">
+        <div className=" top-4 overflow-x-scroll custom-scroll ">
           <Table data={data} columnas={columnas} route="/winaryDetail" n={15} />
         </div>
       </div>
-    </>
+    </HomeLayout>
   );
 };
 

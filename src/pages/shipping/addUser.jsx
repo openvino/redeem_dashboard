@@ -53,13 +53,11 @@ const addUser = () => {
       setLoading(false);
     }
 
-    console.log(data);
   };
 
   useEffect(() => {
     if (status !== 'loading') {
       if (!session.is_admin && profile) {
-        console.log(profile);
         setValue('winery_id', profile.winery_id, { shouldDirty: false });
         setValue('is_admin', false, { shouldDirty: false });
       }

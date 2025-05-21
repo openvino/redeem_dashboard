@@ -179,9 +179,6 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
                 <div>
                   {t('vco_price_fiat')}:{' '}
                   {VCOPrices.map((element, index) => {
-                    console.log('Element:', element);
-                    console.log('Name:', name);
-
                     if (name === element.name) {
                       return (
                         <span className="font-semibold" key={index}>

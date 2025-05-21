@@ -27,14 +27,11 @@ export default async function handler(req, res) {
   // }
 
   if (req.method === "POST") {
-    console.log("holaaaaaa post");
 
     try {
       const { address } = req.body;
-      console.log(address);
 
       const user = await createYdiyoiUser(address);
-      console.log(user);
 
       // res.status(200).json(users);
       // const response = {
@@ -53,10 +50,8 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const { address } = req.query;
-      console.log(address);
 
       const user = await getYditoiUsers(address);
-      console.log(user);
 
       const response = {
         exists: !!user,
