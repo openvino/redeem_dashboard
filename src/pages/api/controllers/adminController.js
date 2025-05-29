@@ -40,6 +40,8 @@ export const updateAdmin = async (req) => {
   const { id, name, last_name, email, winery_id, profile_img, is_admin } =
     req.body.data;
 
+  console.log(req.body.data);
+
   const { previd } = req.body;
   let adminQuery = `UPDATE admin_users SET `;
   let adminUpdateFields = [];
@@ -101,9 +103,7 @@ async function isENS(input) {
 export const deleteAdmin = async (req) => {
   const { id } = req.query;
 
-
   const deleteQery = `DELETE FROM admin_users WHERE id = '${id}' `;
 
   const deletedAdmin = await conn.query(deleteQery);
-
 };

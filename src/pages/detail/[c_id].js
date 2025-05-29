@@ -1,14 +1,12 @@
-import { useSession, signOut, getSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getRedeems } from "@/redux/actions/winaryActions";
 import Head from "next/head";
 import HomeLayout from "@/components/HomeLayout";
@@ -63,7 +61,7 @@ function Detail({ redeems, countries, provinces }) {
       isLoading: true,
     });
     try {
-      const response = await clientAxios.put("/redeemRoute", {
+      await clientAxios.put("/redeemRoute", {
         data,
       });
 

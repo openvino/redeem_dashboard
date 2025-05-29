@@ -15,8 +15,13 @@ export const getAllOrders = async () => {
 };
 
 export const getOrders = async (wineryId) => {
-  let getOrdersQuery = `SELECT * FROM sales WHERE winery_id = '${wineryId}'`;
-    getOrdersQuery += ` JOIN users ON users.public_key = sales.customer_id `;
+  let getOrdersQuery = `
+    SELECT * 
+    FROM sales 
+    JOIN users ON users.public_key = sales.customer_id 
+    WHERE winerie_id = '${wineryId}';
+  `;
+  
   const orders = await conn.query(getOrdersQuery);
 
   if (orders.rows.length > 0) {
@@ -25,5 +30,6 @@ export const getOrders = async (wineryId) => {
     return [];
   }
 };
+
 
 //TODO AGREGAR CAMPO STATUS

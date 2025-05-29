@@ -11,7 +11,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "GET") {
-    const { is_admin } = req.query;
+    const { is_admin, winery_id } = req.query;
 
     try {
       const token = await getToken({ req, secret });
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         const orders = await getAllOrders();
         return res.status(200).json(orders);
       } else {
-        const orders = await getOrders(token.sub);
+        const orders = await getOrders(winery_id);
         return res.status(200).json(orders);
       }
     } catch (error) {

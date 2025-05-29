@@ -10,12 +10,9 @@ import {
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
-import { getStatusColor } from "@/utils/tableUtils";
 import { toast } from "react-toastify";
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
-  console.log(data);
-  
   const { t } = useTranslation();
   const router = useRouter();
   const showModal = useSelector((state) => state.notification.showModal);
@@ -279,56 +276,66 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
             </tr>
           </thead>
 
-          <tbody className="text-sm">
-            {orderPagedData().map((fila, index) => (
-              <tr
-                key={index}
-                className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
-              >
-                {columnas.map((columna) => {
-                  if (columna.field === "acciones") {
+          {data.length > 0 ? (
+            <tbody className="text-sm">
+              {orderPagedData().map((fila, index) => (
+                <tr
+                  key={index}
+                  className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+                >
+                  {columnas.map((columna) => {
+                    if (columna.field === "acciones") {
+                      return (
+                        <td
+                          key={columna.field}
+                          className="px-0 py-1 text-[0.75rem] text-gray-900 text-center"
+                        >
+                          <Link href={`${route}/${fila.id}`}>
+                            <div className="inline-flex items-center px-0">
+                              <FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+                            </div>
+                          </Link>
+                        </td>
+                      );
+                    }
+
                     return (
                       <td
                         key={columna.field}
-                        className="px-0 py-1 text-[0.75rem] text-gray-900 text-center"
+                        className="px-2 py-1 text-[0.9rem] text-gray-900 text-center"
+                        style={{
+                          maxWidth: "5rem",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                        onMouseEnter={(e) =>
+                          handleMouseEnter(fila[columna.field], e)
+                        }
+                        onMouseLeave={handleMouseLeave}
                       >
-                        <Link href={`${route}/${fila.id}`}>
-                          <div className="inline-flex items-center px-0">
-                            <FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
-                          </div>
-                        </Link>
+                        <div>
+                          {columna.field === "created_at"
+                            ? new Date(fila[columna.field]).toLocaleDateString(
+                                "es-AR"
+                              )
+                            : fila[columna.field]}
+                        </div>
                       </td>
                     );
-                  }
-
-                  return (
-                    <td
-                      key={columna.field}
-                      className="px-2 py-1 text-[0.9rem] text-gray-900 text-center"
-                      style={{
-                        maxWidth: "5rem",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                      onMouseEnter={(e) =>
-                        handleMouseEnter(fila[columna.field], e)
-                      }
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <div>
-                        {columna.field === "created_at"
-                          ? new Date(fila[columna.field]).toLocaleDateString(
-                              "es-AR"
-                            )
-                          : fila[columna.field]}
-                      </div>
-                    </td>
-                  );
-                })}
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          ) : (
+            <tbody>
+              <tr>
+                <td colSpan={columnas.length} className="text-center">
+                  {t("no_data")}
+                </td>
               </tr>
-            ))}
-          </tbody>
+            </tbody>
+          )}
         </table>
       </div>
 

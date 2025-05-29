@@ -14,30 +14,31 @@ const index = () => {
   const session = useSession();
 
   const dispatch = useDispatch();
+  const orders = useSelector((state) => state.winaryAdress.orders);
 
   useEffect(() => {
     if (session.status === "authenticated" && flag) {
-      dispatch(getOrders(session.data.is_admin));
-      flag = false;
-    }
+      dispatch(getOrders(session.data.is_admin, session.data.winery_id));
 
-    console.log(orders);
+      flag = false; 
+    }
   }, [session]);
 
-  const orders = useSelector((state) => state.winaryAdress.orders);
+
+  console.log(session.data)
 
   const columnas = [
     // { title: "", field: "acciones" },
     { title: t("creado"), field: "created_at" },
     { title: t("token"), field: "token" },
+    { title: "Email", field: "email" },
     { title: t("nombre"), field: "name" },
     { title: t("monto"), field: "amount" },
-    { title: "Email", field: "email" },
   ];
 
   return (
     <HomeLayout>
-      { <Table data={orders} columnas={columnas} n={50} />}
+      {<Table data={orders} columnas={columnas} n={50} />}
     </HomeLayout>
   );
 };

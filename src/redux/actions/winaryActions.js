@@ -110,11 +110,12 @@ function getLogs(is_admin) {
   };
 }
 
-function getOrders(is_admin) {
+function getOrders(is_admin, winery_id) {
   return async (dispatch) => {
     try {
       const response = await clientAxios.get("/ordersRoute", {
         params: {
+          winery_id,
           is_admin,
         },
         withCredentials: true,

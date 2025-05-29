@@ -1,4 +1,4 @@
-import { FaWineGlass, FaUser, FaWineBottle } from "react-icons/fa";
+import { FaWineGlass, FaUser, FaWineBottle, FaShippingFast } from "react-icons/fa";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { IoMdSettings } from "react-icons/io";
 
@@ -21,11 +21,11 @@ const Sidebar = () => {
       icon: <RiMoneyDollarCircleLine size={20} />,
       title: "Orders",
     },
-    // {
-    //   href: "/shipping",
-    //   icon: <FaShippingFast size={20} />,
-    //   title: "Shipping",
-    // },
+    {
+      href: "/shipping",
+      icon: <FaShippingFast size={20} />,
+      title: "Shipping",
+    },
     {
       href: "/tokens",
       icon: (
@@ -59,7 +59,7 @@ const Sidebar = () => {
               title={item.title}
               className={`h-12 w-12 flex justify-center items-center cursor-pointer rounded-lg
                             ${
-                              router.pathname === item?.href
+                              router.pathname.includes(item.href)
                                 ? "bg-[#840C4A] text-white"
                                 : "bg-white hover:bg-gray-200 text-[#840C4A]  "
                             }
