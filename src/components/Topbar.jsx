@@ -267,7 +267,7 @@ const Topbar = () => {
 									/>
 								)}
 
-								{showMenu && (
+								{/* {showMenu && (
 									<div className="absolute w-[112px] cursor-pointer right-[-25px] top-15 bg-[#F1EDE2] border rounded-lg shadow-lg text-center text-sm ">
 										<p
 											className="m-0 p-2 cursor-pointer"
@@ -276,7 +276,7 @@ const Topbar = () => {
 											Cerrar Sesión
 										</p>
 									</div>
-								)}
+								)} */}
 							</div>
 
 							<button onClick={toggleLanguage}>
@@ -287,7 +287,7 @@ const Topbar = () => {
 				</div>
 			</div>
 			<Modal data={allNotifications} reloadRedeems={reloadRedeems} />
-			{router.asPath.includes("/winaryDetail") && (
+			{router.asPath.includes("/wineryDetail") && (
 				<SearchModal data={winarys} />
 			)}
 			{router.asPath.includes("/detail") && <SearchModal data={allRedeems} />}

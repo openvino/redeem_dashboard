@@ -15,7 +15,6 @@ const SessionSync = () => {
 		const tryLogin = async () => {
 			const currentAddress = account?.address?.toLowerCase();
 
-			// Si no hay cuenta o ya falló para esta wallet
 			if (!currentAddress || currentAddress === loginFailedFor) return;
 
 			loginAttemptedRef.current = true;
@@ -27,9 +26,9 @@ const SessionSync = () => {
 
 			if (!res?.ok) {
 				toast.error("Wallet no autorizada");
-				setLoginFailedFor(currentAddress); // evita repetir intentos fallidos
+				setLoginFailedFor(currentAddress);
 			} else {
-				router.replace("/dashboard"); // navegación limpia sin hard refresh
+				router.replace("/dashboard");
 			}
 		};
 
@@ -42,7 +41,7 @@ const SessionSync = () => {
 		if (!account && session) {
 			signOut({ redirect: "/" });
 			loginAttemptedRef.current = false;
-			setLoginFailedFor(null); // permite reintentar con una wallet correcta
+			setLoginFailedFor(null);
 		}
 	}, [account, session]);
 
