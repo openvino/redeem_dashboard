@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { createProposal, getAllProposals } from "../controllers/daoControllers";
 
 export default async function handler(req, res) {
