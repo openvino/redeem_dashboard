@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useAdmins from "@/hooks/useAdmins";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
-import Head from "next/head";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import useProfile from "@/hooks/useProfile";
@@ -12,272 +9,175 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import clientAxios from "@/config/clientAxios";
 import HomeLayout from "@/components/HomeLayout";
+import { useActiveAccount } from "thirdweb/react";
+import rawMTB from "../../../contracts/artifacts/MTB.json";
+import { ethers } from "ethers";
 
-const AdminUser = () => {
-  const router = useRouter();
+const Launch = () => {
+	const router = useRouter();
+	const account = useActiveAccount();
+	const { id } = router.query;
 
-  const { id } = router.query;
+	const { admins } = useAdmins(id);
+	const { wineries } = useWineries();
+	const { profile } = useProfile();
+	const { register, handleSubmit, setValue, getValues } = useForm();
+	const { t } = useTranslation();
+	const [loading, setLoading] = useState(false);
 
-  const { admins } = useAdmins(id);
+	// ABI del constructor
+	const constructorFragment = {
+		type: "constructor",
+		stateMutability: "nonpayable",
+		inputs: [
+			{ internalType: "string", name: "name", type: "string" },
+			{ internalType: "string", name: "symbol", type: "string" },
+			{ internalType: "uint256", name: "cap", type: "uint256" },
+			{ internalType: "uint256", name: "initialMintAmount", type: "uint256" },
+		],
+	};
+	const abi = [constructorFragment, ...rawMTB.abi];
+	const bytecode = rawMTB.data.bytecode.object;
 
-  const { wineries } = useWineries();
+	useEffect(() => {
+		if (admins) {
+			setValue("id", admins.id);
+			setValue("name", admins.name);
+			setValue("last_name", admins.last_name);
+			setValue("winery_id", admins.winery_id);
+			setValue("email", admins.email);
+			setValue("profile_img", admins.profile_img);
+			setValue("is_admin", admins.is_admin ? "true" : "false");
+		}
+	}, [admins]);
 
-  const { profile } = useProfile();
+	const handleDeployToken = async () => {
+		const toastId = toast("Deploying token...", {
+			position: "top-right",
+			autoClose: false,
+			isLoading: true,
+			theme: "dark",
+		});
 
-  const { register, handleSubmit, setValue } = useForm();
+		try {
+			if (!account) throw new Error("No wallet detected");
 
-  const { t } = useTranslation();
+			const { name: _n, symbol: _s, cap: _c } = getValues();
+			const name = _n?.trim(),
+				symbol = _s?.trim(),
+				capInput = String(_c ?? "").trim();
 
-  const [loading, setLoading] = useState();
+			if (!name || !symbol || !capInput || isNaN(Number(capInput))) {
+				throw new Error("Missing or invalid fields");
+			}
 
-  useEffect(() => {
-    if (admins) {
-      setValue("id", admins.id, { shouldDirty: false });
-      setValue("name", admins.name, { shouldDirty: false });
-      setValue("last_name", admins.last_name, { shouldDirty: false });
-      setValue("winery_id", admins.winery_id, { shouldDirty: false });
-      setValue("email", admins.email, { shouldDirty: false });
+			const cap = ethers.utils.parseEther(capInput);
 
-      setValue("profile_img", admins.profile_img, { shouldDirty: false });
-      setValue("is_admin", admins.is_admin == true ? "true" : "false", {
-        shouldDirty: false,
-      });
-    }
-  }, [admins]);
-  const onSubmit = async (data) => {
-    const toastId = toast("Updating winary data...", {
-      position: "top-right",
-      autoClose: false,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      isLoading: true,
-    });
+			console.log("Deploying with:", { name, symbol, cap: cap.toString() });
+			console.log("Bytecode sample:", bytecode.slice(0, 10));
 
-    try {
-      setLoading(true);
-      const response = await clientAxios.put("/adminRoute", {
-        data,
-        previd: admins.id,
-      });
+			const provider = new ethers.providers.Web3Provider(window.ethereum);
+			const signer = provider.getSigner();
 
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.SUCCESS,
-        render: "Admin updated success",
-        autoClose: 5000,
-      });
-    } catch (error) {
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.ERROR,
-        render: "Error ",
-        autoClose: 5000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+			const factory = new ethers.ContractFactory(abi, bytecode, signer);
+			const contract = await factory.deploy(name, symbol, cap, cap);
+			await contract.deployed();
+			console.log(`Token deployed at ${contract.address}`);
 
-  const handleDeleteAdmin = async () => {
-    const toastId = toast("Deleting admin...", {
-      position: "top-right",
-      autoClose: false,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      isLoading: true,
-    });
+			toast.update(toastId, {
+				isLoading: false,
+				type: toast.TYPE.SUCCESS,
+				render: `Token deployed at ${contract.address}`,
+				autoClose: 6000,
+			});
+		} catch (err) {
+			console.error("DEPLOY ERROR", err);
+			toast.update(toastId, {
+				isLoading: false,
+				type: toast.TYPE.ERROR,
+				render: `Error: ${err.message}`,
+				autoClose: 6000,
+			});
+		}
+	};
 
-    try {
-      setLoading(true);
-      const response = await clientAxios.delete("/adminRoute", {
-        params: {
-          id,
-        },
-      });
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.SUCCESS,
-        render: "Admin deleted successfully",
-        autoClose: 5000,
-      });
+	return (
+		<HomeLayout>
+			<ToastContainer />
+			<div className="z-1 w-full overflow-x-scroll lg:overflow-x-hidden">
+				<h1 className="text-2xl font-bold text-center mb-4">{t("launch")}</h1>
 
-      router.back();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+				<form
+					className="p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] rounded-xl border-2 border-gray-200"
+					onSubmit={handleSubmit(() => {})}
+				>
+					{account?.address && (
+						<div className="flex items-center justify-center">
+							<label className="w-24 font-bold">{t("deployer")}</label>
+							<p>{account.address}</p>
+						</div>
+					)}
 
-  return (
-   <HomeLayout>
-    <Head>
-        <title>Openvino - Admin info</title>
-      </Head>
- 
-      <ToastContainer />
-      <div className="z-1 mt-[10rem] ml-[6rem] w-full overflow-x-scrolllg: overflow-x-hidden">
-        <div className="">
-          <h1 className="text-2xl font-bold text-center mb-4">
-            {t("edit_admin")}
-          </h1>
+					<div className="flex flex-col lg:flex-row justify-center gap-4">
+						<div className="flex items-center">
+							<label className="w-24 font-bold">{t("token_name")}:</label>
+							<input
+								required
+								{...register("name")}
+								className="w-64 px-2 py-1 border rounded-md"
+							/>
+						</div>
+						<div className="flex items-center">
+							<label className="w-24 font-bold">{t("token_symbol")}:</label>
+							<input
+								required
+								{...register("symbol")}
+								className="w-64 px-2 py-1 border rounded-md"
+							/>
+						</div>
+					</div>
 
-          <form
-            className=" p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] border-solid rounded-xl border-gray-200 border-2"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("clave")}</label>
-                <input
-                  required
-                  type="text"
-                  defaultValue={admins?.id}
-                  id="id"
-                  name="id"
-                  {...register("id")}
-                  className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                />
-              </div>
+					<div className="flex flex-col lg:flex-row justify-center gap-4">
+						<div className="flex items-center">
+							<label className="w-24 font-bold">{t("token_cap")}:</label>
+							<input
+								required
+								type="number"
+								step="any"
+								{...register("cap")}
+								className="w-64 px-2 py-1 border rounded-md"
+							/>
+						</div>
+						<div className="flex items-center">
+							<label className="w-24 font-bold">{t("token_image")}:</label>
+							<input
+								required
+								{...register("image")}
+								className="w-64 px-2 py-1 border rounded-md"
+							/>
+						</div>
+					</div>
 
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("nombre")}:</label>
-                <input
-                  required
-                  type="text"
-                  id="name"
-                  name="name"
-                  {...register("name")}
-                  className="w-64 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("apellido")}</label>
-                <input
-                  required
-                  type="text"
-                  id="last_name"
-                  defaultValue={admins?.last_name}
-                  name="last_name"
-                  {...register("last_name")}
-                  className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <label className="w-24 font-bold">Email:</label>
-                <input
-                  required
-                  type="text"
-                  id="email"
-                  defaultValue={admins?.email}
-                  name="email"
-                  {...register("email")}
-                  className="w-64 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-
-            <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("imagenPerfil")}</label>
-                <input
-                  required
-                  defaultValue={admins?.profile_img}
-                  type="text"
-                  id="profile_img"
-                  name="profile_img"
-                  {...register("profile_img")}
-                  className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                />
-              </div>
-
-              {profile?.is_admin === true ? (
-                <div className="flex items-center">
-                  <label className="w-24 font-bold">{t("bodega")}</label>
-
-                  <select
-                    className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                    defaultValue={admins?.winery_id}
-                    name="winery_id"
-                    id="winery_id"
-                    {...register("winery_id")}
-                  >
-                    <option>{t("select")}</option>
-
-                    {wineries &&
-                      wineries.map((element, index) => (
-                        <option key={index} value={element.id}>
-                          {element.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-              ) : (
-                <div className="flex justify-center w-[22rem] "></div>
-              )}
-            </div>
-
-            {profile?.is_admin === true && (
-              <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-                <div className="flex items-center">
-                  <label className="w-24 font-bold">{t("es_admin")}</label>
-
-                  <select
-                    className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                    name="is_admin"
-                    id="is_admin"
-                    {...register("is_admin")}
-                  >
-                    <option>{t("select")}</option>
-                    <option value={"true"}>{t("SI")}</option>
-                    <option value={"false"}>No</option>
-                  </select>
-                </div>
-
-                <div className="flex justify-center w-[22rem] "></div>
-              </div>
-            )}
-
-            <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  router.back();
-                }}
-                className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
-              >
-                {t("volver")}
-              </button>
-              <button
-                disabled={loading}
-                type="submit"
-                className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
-              >
-                {t("guardar")}
-              </button>
-
-              <button
-                type="button"
-                className="px-4 py-2 ml-4 bg-red-600 text-white rounded-md"
-                onClick={handleDeleteAdmin}
-              >
-                Eliminar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-   </HomeLayout>
-  );
+					<div className="flex justify-center mt-4">
+						<button
+							type="button"
+							onClick={() => router.back()}
+							className="px-4 py-2 bg-gray-300 rounded-md"
+						>
+							{t("volver")}
+						</button>
+						<button
+							type="button"
+							onClick={handleDeployToken}
+							className="px-4 py-2 ml-4 bg-green-700 text-white rounded-md"
+						>
+							{t("deploy_contract")}
+						</button>
+					</div>
+				</form>
+			</div>
+		</HomeLayout>
+	);
 };
 
-export default AdminUser;
+export default Launch;

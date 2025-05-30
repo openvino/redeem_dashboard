@@ -12,6 +12,7 @@ import { Montserrat } from "next/font/google";
 import { ToastContainer, toast } from "react-toastify";
 import { ThirdwebProvider } from "thirdweb/react";
 import SessionSync from "@/components/Session";
+import { chain, client } from "@/config/thirdwebClient";
 const roboto = Montserrat({
 	subsets: ["latin"],
 
@@ -29,7 +30,7 @@ export default function App({ Component, pageProps }) {
 
 	return (
 		// Application providers
-		<ThirdwebProvider>
+		<ThirdwebProvider client={client} activeChain={chain}>
 			<I18nextProvider i18n={i18n}>
 				<SessionProvider>
 					<Provider store={store}>

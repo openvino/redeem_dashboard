@@ -13,8 +13,8 @@ export const ROUTE_CONSTANTS = {
 	LABEL_NEW_WINARY: "crear_bodega",
 
 	PROVISIONING_ROUTE: "/provisioning",
-	NEW_PROVISIONING_ROUTE: "/deploy",
-	LABEL_NEW_PROVISIONING: "deploy",
+	NEW_PROVISIONING_ROUTE: "/launch",
+	LABEL_NEW_PROVISIONING: "launch",
 };
 
 const routeKeys = Object.keys(ROUTE_CONSTANTS)
