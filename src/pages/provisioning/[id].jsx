@@ -159,6 +159,7 @@ const Launch = () => {
 					onSubmit={handleSubmit((e) => e.preventDefault())}
 				>
 					{/* Token */}
+					<h2 className="text-xl font-semibold">{t("token_config")}</h2>
 					<div className="grid lg:grid-cols-3 gap-4">
 						<div>
 							<label className="font-bold">{t("token_name")}</label>
@@ -192,9 +193,7 @@ const Launch = () => {
 					<h2 className="text-xl font-semibold">{t("crowdsale_config")}</h2>
 					<div className="grid lg:grid-cols-2 gap-4">
 						<div>
-							<label className="font-bold">
-								{t("rate")} ({t("tokens")}/ETH)
-							</label>
+							<label className="font-bold">{t("rate")}</label>
 							<input
 								type="number"
 								{...register("rate")}

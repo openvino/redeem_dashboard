@@ -45,7 +45,7 @@
 	"launch": "Lanzar y desplegar",
 	"token_name": "Nombre del token",
 	"token_symbol": "Símbolo",
-	"token_cap": "Cap",
+	"token_cap": "Cantidad a mintear",
 	"token_img": "Imágen del token",
 	"deploy_contract": "Deploy",
 
@@ -73,5 +73,8 @@
 	"opening_time": "Fecha de inicio",
 	"closing_time": "Fecha de finalización",
 	"tokens_to_crowdsale": "Tokens en crowdsale",
-	"deploy_contracts": "Desplegar!"
+	"deploy_contracts": "Desplegar!",
+	"crowdsale_config": "Parámetros del Crowdsale",
+	"token_config": "Parámetros del token",
+	"rate": "Tokens / ETH"
 }

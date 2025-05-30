@@ -44,10 +44,10 @@
 	"edit_admin": "Edit admin",
 	"deploy": "New Deploy",
 	"launch": "Launch tokens and deploy contracts",
-	"token_name": "Nombre del token",
-	"token_symbol": "Símbolo",
+	"token_name": "Token's name",
+	"token_symbol": "Symbol",
 	"deploy_contract": "Deploy",
-	"token_cap": "Cap",
+	"token_cap": "Amount of tokens",
 	"token_img": "Token Image",
 	"deployer": "Deployer",
 	"telefono": "Phone",
@@ -73,5 +73,8 @@
 	"opening_time": "Opening Time",
 	"closing_time": "End Time",
 	"tokens_to_crowdsale": "Tokens in crowdsale",
-	"deploy_contracts": "Deploy!"
+	"deploy_contracts": "Deploy!",
+	"crowdsale_config": "Crowdsale params",
+	"token_config": "Token params",
+	"rate": "Tokens / ETH"
 }
