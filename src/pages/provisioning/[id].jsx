@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import useAdmins from "@/hooks/useAdmins";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import useProfile from "@/hooks/useProfile";
+import { useActiveAccount } from "thirdweb/react";
+import { ethers } from "ethers";
+import HomeLayout from "@/components/HomeLayout";
+import useAdmins from "@/hooks/useAdmins";
 import useWineries from "@/hooks/useWineries";
+import useProfile from "@/hooks/useProfile";
+import MTBArtifact from "../../../contracts/artifacts/MTB.json";
+import CrowdsaleArtifact from "../../../contracts/artifacts/Crowdsale.json";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import clientAxios from "@/config/clientAxios";
-import HomeLayout from "@/components/HomeLayout";
-import { useActiveAccount } from "thirdweb/react";
-import rawMTB from "../../../contracts/artifacts/MTB.json";
-import { ethers } from "ethers";
 
 const Launch = () => {
 	const router = useRouter();
 	const account = useActiveAccount();
 	const { id } = router.query;
-
 	const { admins } = useAdmins(id);
 	const { wineries } = useWineries();
 	const { profile } = useProfile();
@@ -25,8 +24,8 @@ const Launch = () => {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 
-	// ABI del constructor
-	const constructorFragment = {
+	// --- Inject constructor fragment so ethers knows constructor signature ---
+	const tokenConstructorFragment = {
 		type: "constructor",
 		stateMutability: "nonpayable",
 		inputs: [
@@ -36,8 +35,25 @@ const Launch = () => {
 			{ internalType: "uint256", name: "initialMintAmount", type: "uint256" },
 		],
 	};
-	const abi = [constructorFragment, ...rawMTB.abi];
-	const bytecode = rawMTB.data.bytecode.object;
+	const tokenAbi = [tokenConstructorFragment, ...MTBArtifact.abi];
+	const tokenBytecode =
+		MTBArtifact.data?.bytecode?.object ?? MTBArtifact.bytecode;
+
+	const crowdConstructorFragment = {
+		type: "constructor",
+		stateMutability: "nonpayable",
+		inputs: [
+			{ internalType: "address payable", name: "_wallet", type: "address" },
+			{ internalType: "MTB", name: "_token", type: "address" },
+			{ internalType: "uint256", name: "_cap", type: "uint256" },
+			{ internalType: "uint256", name: "_openingTime", type: "uint256" },
+			{ internalType: "uint256", name: "_closingTime", type: "uint256" },
+			{ internalType: "uint256", name: "_rate", type: "uint256" },
+		],
+	};
+	const crowdAbi = [crowdConstructorFragment, ...CrowdsaleArtifact.abi];
+	const crowdBytecode =
+		CrowdsaleArtifact.data?.bytecode?.object ?? CrowdsaleArtifact.bytecode;
 
 	useEffect(() => {
 		if (admins) {
@@ -49,10 +65,10 @@ const Launch = () => {
 			setValue("profile_img", admins.profile_img);
 			setValue("is_admin", admins.is_admin ? "true" : "false");
 		}
-	}, [admins]);
+	}, [admins, setValue]);
 
-	const handleDeployToken = async () => {
-		const toastId = toast("Deploying token...", {
+	const handleDeployAll = async () => {
+		const toastId = toast("Deploying token & crowdsale…", {
 			position: "top-right",
 			autoClose: false,
 			isLoading: true,
@@ -60,42 +76,75 @@ const Launch = () => {
 		});
 
 		try {
-			if (!account) throw new Error("No wallet detected");
+			if (!account) throw new Error("Connect your wallet first");
 
-			const { name: _n, symbol: _s, cap: _c } = getValues();
-			const name = _n?.trim(),
-				symbol = _s?.trim(),
-				capInput = String(_c ?? "").trim();
+			const v = getValues();
+			// Token params
+			const name = v.name?.trim();
+			const symbol = v.symbol?.trim();
+			const capInput = String(v.cap || "").trim();
+			if (!name || !symbol || !capInput || isNaN(Number(capInput)))
+				throw new Error("Token name, symbol and cap required");
+			const capBN = ethers.utils.parseEther(capInput);
 
-			if (!name || !symbol || !capInput || isNaN(Number(capInput))) {
-				throw new Error("Missing or invalid fields");
-			}
+			// Crowdsale params
+			const rate = Number(String(v.rate || "").trim());
+			const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
+			const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
+			const tokensBN = ethers.utils.parseEther(
+				String(v.tokensToCrowdsale || "").trim()
+			);
+			if (rate <= 0 || !v.openingTime || !v.closingTime || tokensBN.lte(0))
+				throw new Error("Fill all crowdsale fields correctly");
+			if (openingTs >= closingTs) throw new Error("Opening ≥ closing");
+			if (tokensBN.gt(capBN)) throw new Error("Crowd tokens exceed supply");
 
-			const cap = ethers.utils.parseEther(capInput);
-
-			console.log("Deploying with:", { name, symbol, cap: cap.toString() });
-			console.log("Bytecode sample:", bytecode.slice(0, 10));
+			const weiCapBN = tokensBN.div(rate);
+			if (weiCapBN.isZero()) throw new Error("Rate too high for tokens");
 
 			const provider = new ethers.providers.Web3Provider(window.ethereum);
 			const signer = provider.getSigner();
 
-			const factory = new ethers.ContractFactory(abi, bytecode, signer);
-			const contract = await factory.deploy(name, symbol, cap, cap);
-			await contract.deployed();
-			console.log(`Token deployed at ${contract.address}`);
+			// Deploy Token
+			const tokenFactory = new ethers.ContractFactory(
+				tokenAbi,
+				tokenBytecode,
+				signer
+			);
+			const token = await tokenFactory.deploy(name, symbol, capBN, capBN);
+			await token.deployed();
+
+			// Deploy Crowdsale
+			const crowdFactory = new ethers.ContractFactory(
+				crowdAbi,
+				crowdBytecode,
+				signer
+			);
+			const crowdsale = await crowdFactory.deploy(
+				account.address,
+				token.address,
+				weiCapBN,
+				openingTs,
+				closingTs,
+				rate
+			);
+			await crowdsale.deployed();
+
+			// Fund Crowdsale
+			await (await token.transfer(crowdsale.address, tokensBN)).wait();
 
 			toast.update(toastId, {
 				isLoading: false,
 				type: toast.TYPE.SUCCESS,
-				render: `Token deployed at ${contract.address}`,
-				autoClose: 6000,
+				render: `✅ Token: ${token.address}\n✅ Crowdsale: ${crowdsale.address}`,
+				autoClose: 8000,
 			});
 		} catch (err) {
 			console.error("DEPLOY ERROR", err);
 			toast.update(toastId, {
 				isLoading: false,
 				type: toast.TYPE.ERROR,
-				render: `Error: ${err.message}`,
+				render: err.message,
 				autoClose: 6000,
 			});
 		}
@@ -104,74 +153,101 @@ const Launch = () => {
 	return (
 		<HomeLayout>
 			<ToastContainer />
-			<div className="z-1 w-full overflow-x-scroll lg:overflow-x-hidden">
-				<h1 className="text-2xl font-bold text-center mb-4">{t("launch")}</h1>
-
+			<div className="p-4 w-full overflow-x-auto lg:overflow-x-hidden">
+				<h1 className="text-2xl font-bold text-center mb-6">{t("launch")}</h1>
 				<form
-					className="p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] rounded-xl border-2 border-gray-200"
-					onSubmit={handleSubmit(() => {})}
+					className="space-y-6 bg-[#F1EDE2] p-6 rounded-xl border-2 border-gray-200"
+					onSubmit={handleSubmit((e) => e.preventDefault())}
 				>
-					{account?.address && (
-						<div className="flex items-center justify-center">
-							<label className="w-24 font-bold">{t("deployer")}</label>
-							<p>{account.address}</p>
-						</div>
-					)}
-
-					<div className="flex flex-col lg:flex-row justify-center gap-4">
-						<div className="flex items-center">
-							<label className="w-24 font-bold">{t("token_name")}:</label>
+					{/* Token */}
+					<div className="grid lg:grid-cols-3 gap-4">
+						<div>
+							<label className="font-bold">{t("token_name")}</label>
 							<input
-								required
 								{...register("name")}
-								className="w-64 px-2 py-1 border rounded-md"
+								className="w-full mt-1 p-2 border rounded"
+								required
 							/>
 						</div>
-						<div className="flex items-center">
-							<label className="w-24 font-bold">{t("token_symbol")}:</label>
+						<div>
+							<label className="font-bold">{t("token_symbol")}</label>
 							<input
-								required
 								{...register("symbol")}
-								className="w-64 px-2 py-1 border rounded-md"
+								className="w-full mt-1 p-2 border rounded"
+								required
 							/>
 						</div>
-					</div>
-
-					<div className="flex flex-col lg:flex-row justify-center gap-4">
-						<div className="flex items-center">
-							<label className="w-24 font-bold">{t("token_cap")}:</label>
+						<div>
+							<label className="font-bold">{t("token_cap")}</label>
 							<input
-								required
 								type="number"
 								step="any"
 								{...register("cap")}
-								className="w-64 px-2 py-1 border rounded-md"
-							/>
-						</div>
-						<div className="flex items-center">
-							<label className="w-24 font-bold">{t("token_image")}:</label>
-							<input
+								className="w-full mt-1 p-2 border rounded"
 								required
-								{...register("image")}
-								className="w-64 px-2 py-1 border rounded-md"
 							/>
 						</div>
 					</div>
 
-					<div className="flex justify-center mt-4">
+					{/* Crowdsale */}
+					<h2 className="text-xl font-semibold">{t("crowdsale_config")}</h2>
+					<div className="grid lg:grid-cols-2 gap-4">
+						<div>
+							<label className="font-bold">
+								{t("rate")} ({t("tokens")}/ETH)
+							</label>
+							<input
+								type="number"
+								{...register("rate")}
+								className="w-full mt-1 p-2 border rounded"
+								required
+							/>
+						</div>
+						<div>
+							<label className="font-bold">{t("opening_time")}</label>
+							<input
+								type="datetime-local"
+								{...register("openingTime")}
+								className="w-full mt-1 p-2 border rounded"
+								required
+							/>
+						</div>
+						<div>
+							<label className="font-bold">{t("closing_time")}</label>
+							<input
+								type="datetime-local"
+								{...register("closingTime")}
+								className="w-full mt-1 p-2 border rounded"
+								required
+							/>
+						</div>
+						<div className="lg:col-span-2">
+							<label className="font-bold">{t("tokens_to_crowdsale")}</label>
+							<input
+								type="number"
+								step="any"
+								{...register("tokensToCrowdsale")}
+								className="w-full mt-1 p-2 border rounded"
+								required
+							/>
+						</div>
+					</div>
+
+					<div className="flex justify-end space-x-4">
 						<button
 							type="button"
 							onClick={() => router.back()}
-							className="px-4 py-2 bg-gray-300 rounded-md"
+							className="px-6 py-2 bg-gray-300 rounded"
 						>
 							{t("volver")}
 						</button>
 						<button
 							type="button"
-							onClick={handleDeployToken}
-							className="px-4 py-2 ml-4 bg-green-700 text-white rounded-md"
+							onClick={handleDeployAll}
+							disabled={loading}
+							className="px-6 py-2 bg-green-700 text-white rounded"
 						>
-							{t("deploy_contract")}
+							{t("deploy_contracts")}
 						</button>
 					</div>
 				</form>
