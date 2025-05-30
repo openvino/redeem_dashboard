@@ -69,5 +69,9 @@
 	"vco_price": "VCO Price",
 	"action": "Actions",
 	"shipping_paid_status": "Shipping paid",
-	"pickup": "Winery pickup"
+	"pickup": "Winery pickup",
+	"opening_time": "Opening Time",
+	"closing_time": "End Time",
+	"tokens_to_crowdsale": "Tokens in crowdsale",
+	"deploy_contracts": "Deploy!"
 }

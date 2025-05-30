@@ -24,7 +24,6 @@ const Launch = () => {
 	const { t } = useTranslation();
 	const [loading, setLoading] = useState(false);
 
-	// --- Inject constructor fragment so ethers knows constructor signature ---
 	const tokenConstructorFragment = {
 		type: "constructor",
 		stateMutability: "nonpayable",

@@ -69,5 +69,9 @@
 	"vco_price": "Precio VCO",
 	"action": "Acciones",
 	"shipping_paid_status": "Envío pagado",
-	"pickup": "Retiro en bodega"
+	"pickup": "Retiro en bodega",
+	"opening_time": "Fecha de inicio",
+	"closing_time": "Fecha de finalización",
+	"tokens_to_crowdsale": "Tokens en crowdsale",
+	"deploy_contracts": "Desplegar!"
 }

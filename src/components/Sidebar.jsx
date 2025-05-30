@@ -24,7 +24,7 @@ const Sidebar = () => {
 		{
 			href: "/provisioning",
 			icon: <FaRocket size={20} />,
-			title: "Deploy!",
+			title: "Launch!",
 		},
 
 		// {
