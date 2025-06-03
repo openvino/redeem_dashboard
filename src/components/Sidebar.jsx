@@ -26,11 +26,11 @@ const Sidebar = () => {
 			icon: <FaRocket size={20} />,
 			title: "Launch!",
 		},
-    // {
-    //   href: "/shipping",
-    //   icon: <FaShippingFast size={20} />,
-    //   title: "Shipping",
-    // },
+    {
+      href: "/shipping",
+      icon: <FaShippingFast size={20} />,
+      title: "Shipping",
+    },
     {
       href: "/tokens",
       icon: (

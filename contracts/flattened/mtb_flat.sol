@@ -168,7 +168,7 @@ interface IERC20Errors {
     error ERC20InvalidReceiver(address receiver);
 
     /**
-     * @dev Indicates a failure with the `spender`’s `allowance`. Used in transfers.
+     * @dev Indicates a failure with the `spender`ÔÇÖs `allowance`. Used in transfers.
      * @param spender Address that may be allowed to operate on tokens without being their owner.
      * @param allowance Amount of tokens a `spender` is allowed to operate with.
      * @param needed Minimum amount required to perform a transfer.
@@ -227,7 +227,7 @@ interface IERC721Errors {
     error ERC721InvalidReceiver(address receiver);
 
     /**
-     * @dev Indicates a failure with the `operator`’s approval. Used in transfers.
+     * @dev Indicates a failure with the `operator`ÔÇÖs approval. Used in transfers.
      * @param operator Address that may be allowed to operate on tokens without being their owner.
      * @param tokenId Identifier number of a token.
      */
@@ -273,7 +273,7 @@ interface IERC1155Errors {
     error ERC1155InvalidReceiver(address receiver);
 
     /**
-     * @dev Indicates a failure with the `operator`’s approval. Used in transfers.
+     * @dev Indicates a failure with the `operator`ÔÇÖs approval. Used in transfers.
      * @param operator Address that may be allowed to operate on tokens without being their owner.
      * @param owner Address of the current owner of a token.
      */
@@ -1204,7 +1204,7 @@ library ECDSA {
     ) internal pure returns (address recovered, RecoverError err, bytes32 errArg) {
         // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
         // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
-        // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
+        // the valid range for s in (301): 0 < s < secp256k1n ├À 2 + 1, and for v in (302): v Ôêê {27, 28}. Most
         // signatures from current libraries generate a unique signature with an s-value in the lower half order.
         //
         // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
@@ -2532,7 +2532,7 @@ library Math {
     /**
      * @dev Return the 512-bit addition of two uint256.
      *
-     * The result is stored in two 256 variables such that sum = high * 2²⁵⁶ + low.
+     * The result is stored in two 256 variables such that sum = high * 2┬▓ÔüÁÔüÂ + low.
      */
     function add512(uint256 a, uint256 b) internal pure returns (uint256 high, uint256 low) {
         assembly ("memory-safe") {
@@ -2544,12 +2544,12 @@ library Math {
     /**
      * @dev Return the 512-bit multiplication of two uint256.
      *
-     * The result is stored in two 256 variables such that product = high * 2²⁵⁶ + low.
+     * The result is stored in two 256 variables such that product = high * 2┬▓ÔüÁÔüÂ + low.
      */
     function mul512(uint256 a, uint256 b) internal pure returns (uint256 high, uint256 low) {
-        // 512-bit multiply [high low] = x * y. Compute the product mod 2²⁵⁶ and mod 2²⁵⁶ - 1, then use
+        // 512-bit multiply [high low] = x * y. Compute the product mod 2┬▓ÔüÁÔüÂ and mod 2┬▓ÔüÁÔüÂ - 1, then use
         // the Chinese Remainder Theorem to reconstruct the 512 bit result. The result is stored in two 256
-        // variables such that product = high * 2²⁵⁶ + low.
+        // variables such that product = high * 2┬▓ÔüÁÔüÂ + low.
         assembly ("memory-safe") {
             let mm := mulmod(a, b, not(0))
             low := mul(a, b)
@@ -2622,7 +2622,7 @@ library Math {
     }
 
     /**
-     * @dev Unsigned saturating addition, bounds to `2²⁵⁶ - 1` instead of overflowing.
+     * @dev Unsigned saturating addition, bounds to `2┬▓ÔüÁÔüÂ - 1` instead of overflowing.
      */
     function saturatingAdd(uint256 a, uint256 b) internal pure returns (uint256) {
         (bool success, uint256 result) = tryAdd(a, b);
@@ -2638,7 +2638,7 @@ library Math {
     }
 
     /**
-     * @dev Unsigned saturating multiplication, bounds to `2²⁵⁶ - 1` instead of overflowing.
+     * @dev Unsigned saturating multiplication, bounds to `2┬▓ÔüÁÔüÂ - 1` instead of overflowing.
      */
     function saturatingMul(uint256 a, uint256 b) internal pure returns (uint256) {
         (bool success, uint256 result) = tryMul(a, b);
@@ -2725,7 +2725,7 @@ library Math {
                 return low / denominator;
             }
 
-            // Make sure the result is less than 2²⁵⁶. Also prevents denominator == 0.
+            // Make sure the result is less than 2┬▓ÔüÁÔüÂ. Also prevents denominator == 0.
             if (denominator <= high) {
                 Panic.panic(ternary(denominator == 0, Panic.DIVISION_BY_ZERO, Panic.UNDER_OVERFLOW));
             }
@@ -2756,30 +2756,30 @@ library Math {
                 // Divide [high low] by twos.
                 low := div(low, twos)
 
-                // Flip twos such that it is 2²⁵⁶ / twos. If twos is zero, then it becomes one.
+                // Flip twos such that it is 2┬▓ÔüÁÔüÂ / twos. If twos is zero, then it becomes one.
                 twos := add(div(sub(0, twos), twos), 1)
             }
 
             // Shift in bits from high into low.
             low |= high * twos;
 
-            // Invert denominator mod 2²⁵⁶. Now that denominator is an odd number, it has an inverse modulo 2²⁵⁶ such
-            // that denominator * inv ≡ 1 mod 2²⁵⁶. Compute the inverse by starting with a seed that is correct for
-            // four bits. That is, denominator * inv ≡ 1 mod 2⁴.
+            // Invert denominator mod 2┬▓ÔüÁÔüÂ. Now that denominator is an odd number, it has an inverse modulo 2┬▓ÔüÁÔüÂ such
+            // that denominator * inv Ôëí 1 mod 2┬▓ÔüÁÔüÂ. Compute the inverse by starting with a seed that is correct for
+            // four bits. That is, denominator * inv Ôëí 1 mod 2Ôü┤.
             uint256 inverse = (3 * denominator) ^ 2;
 
             // Use the Newton-Raphson iteration to improve the precision. Thanks to Hensel's lifting lemma, this also
             // works in modular arithmetic, doubling the correct bits in each step.
-            inverse *= 2 - denominator * inverse; // inverse mod 2⁸
-            inverse *= 2 - denominator * inverse; // inverse mod 2¹⁶
-            inverse *= 2 - denominator * inverse; // inverse mod 2³²
-            inverse *= 2 - denominator * inverse; // inverse mod 2⁶⁴
-            inverse *= 2 - denominator * inverse; // inverse mod 2¹²⁸
-            inverse *= 2 - denominator * inverse; // inverse mod 2²⁵⁶
+            inverse *= 2 - denominator * inverse; // inverse mod 2Ôü©
+            inverse *= 2 - denominator * inverse; // inverse mod 2┬╣ÔüÂ
+            inverse *= 2 - denominator * inverse; // inverse mod 2┬│┬▓
+            inverse *= 2 - denominator * inverse; // inverse mod 2ÔüÂÔü┤
+            inverse *= 2 - denominator * inverse; // inverse mod 2┬╣┬▓Ôü©
+            inverse *= 2 - denominator * inverse; // inverse mod 2┬▓ÔüÁÔüÂ
 
             // Because the division is now exact we can divide by multiplying with the modular inverse of denominator.
-            // This will give us the correct result modulo 2²⁵⁶. Since the preconditions guarantee that the outcome is
-            // less than 2²⁵⁶, this is the final result. We don't need to compute the high bits of the result and high
+            // This will give us the correct result modulo 2┬▓ÔüÁÔüÂ. Since the preconditions guarantee that the outcome is
+            // less than 2┬▓ÔüÁÔüÂ, this is the final result. We don't need to compute the high bits of the result and high
             // is no longer required.
             result = low * inverse;
             return result;
@@ -2833,7 +2833,7 @@ library Math {
             // When the gcd is 1, then the inverse of a modulo n exists and it's x.
             // ax + ny = 1
             // ax = 1 + (-y)n
-            // ax ≡ 1 (mod n) # x is the inverse of a modulo n
+            // ax Ôëí 1 (mod n) # x is the inverse of a modulo n
 
             // If the remainder is 0 the gcd is n right away.
             uint256 remainder = a % n;
@@ -2876,7 +2876,7 @@ library Math {
      * @dev Variant of {invMod}. More efficient, but only works if `p` is known to be a prime greater than `2`.
      *
      * From https://en.wikipedia.org/wiki/Fermat%27s_little_theorem[Fermat's little theorem], we know that if p is
-     * prime, then `a**(p-1) ≡ 1 mod p`. As a consequence, we have `a * a**(p-2) ≡ 1 mod p`, which means that
+     * prime, then `a**(p-1) Ôëí 1 mod p`. As a consequence, we have `a * a**(p-2) Ôëí 1 mod p`, which means that
      * `a**(p-2)` is the modular multiplicative inverse of a in Fp.
      *
      * NOTE: this function does NOT check that `p` is a prime greater than `2`.
@@ -3008,16 +3008,16 @@ library Math {
                 return a;
             }
 
-            // In this function, we use Newton's method to get a root of `f(x) := x² - a`. It involves building a
+            // In this function, we use Newton's method to get a root of `f(x) := x┬▓ - a`. It involves building a
             // sequence x_n that converges toward sqrt(a). For each iteration x_n, we also define the error between
-            // the current value as `ε_n = | x_n - sqrt(a) |`.
+            // the current value as `╬Á_n = | x_n - sqrt(a) |`.
             //
             // For our first estimation, we consider `e` the smallest power of 2 which is bigger than the square root
-            // of the target. (i.e. `2**(e-1) ≤ sqrt(a) < 2**e`). We know that `e ≤ 128` because `(2¹²⁸)² = 2²⁵⁶` is
+            // of the target. (i.e. `2**(e-1) Ôëñ sqrt(a) < 2**e`). We know that `e Ôëñ 128` because `(2┬╣┬▓Ôü©)┬▓ = 2┬▓ÔüÁÔüÂ` is
             // bigger than any uint256.
             //
             // By noticing that
-            // `2**(e-1) ≤ sqrt(a) < 2**e → (2**(e-1))² ≤ a < (2**e)² → 2**(2*e-2) ≤ a < 2**(2*e)`
+            // `2**(e-1) Ôëñ sqrt(a) < 2**e ÔåÆ (2**(e-1))┬▓ Ôëñ a < (2**e)┬▓ ÔåÆ 2**(2*e-2) Ôëñ a < 2**(2*e)`
             // we can deduce that `e - 1` is `log2(a) / 2`. We can thus compute `x_n = 2**(e-1)` using a method similar
             // to the msb function.
             uint256 aa = a;
@@ -3051,57 +3051,57 @@ library Math {
                 xn <<= 1;
             }
 
-            // We now have x_n such that `x_n = 2**(e-1) ≤ sqrt(a) < 2**e = 2 * x_n`. This implies ε_n ≤ 2**(e-1).
+            // We now have x_n such that `x_n = 2**(e-1) Ôëñ sqrt(a) < 2**e = 2 * x_n`. This implies ╬Á_n Ôëñ 2**(e-1).
             //
             // We can refine our estimation by noticing that the middle of that interval minimizes the error.
-            // If we move x_n to equal 2**(e-1) + 2**(e-2), then we reduce the error to ε_n ≤ 2**(e-2).
-            // This is going to be our x_0 (and ε_0)
-            xn = (3 * xn) >> 1; // ε_0 := | x_0 - sqrt(a) | ≤ 2**(e-2)
+            // If we move x_n to equal 2**(e-1) + 2**(e-2), then we reduce the error to ╬Á_n Ôëñ 2**(e-2).
+            // This is going to be our x_0 (and ╬Á_0)
+            xn = (3 * xn) >> 1; // ╬Á_0 := | x_0 - sqrt(a) | Ôëñ 2**(e-2)
 
             // From here, Newton's method give us:
             // x_{n+1} = (x_n + a / x_n) / 2
             //
             // One should note that:
-            // x_{n+1}² - a = ((x_n + a / x_n) / 2)² - a
-            //              = ((x_n² + a) / (2 * x_n))² - a
-            //              = (x_n⁴ + 2 * a * x_n² + a²) / (4 * x_n²) - a
-            //              = (x_n⁴ + 2 * a * x_n² + a² - 4 * a * x_n²) / (4 * x_n²)
-            //              = (x_n⁴ - 2 * a * x_n² + a²) / (4 * x_n²)
-            //              = (x_n² - a)² / (2 * x_n)²
-            //              = ((x_n² - a) / (2 * x_n))²
-            //              ≥ 0
-            // Which proves that for all n ≥ 1, sqrt(a) ≤ x_n
+            // x_{n+1}┬▓ - a = ((x_n + a / x_n) / 2)┬▓ - a
+            //              = ((x_n┬▓ + a) / (2 * x_n))┬▓ - a
+            //              = (x_nÔü┤ + 2 * a * x_n┬▓ + a┬▓) / (4 * x_n┬▓) - a
+            //              = (x_nÔü┤ + 2 * a * x_n┬▓ + a┬▓ - 4 * a * x_n┬▓) / (4 * x_n┬▓)
+            //              = (x_nÔü┤ - 2 * a * x_n┬▓ + a┬▓) / (4 * x_n┬▓)
+            //              = (x_n┬▓ - a)┬▓ / (2 * x_n)┬▓
+            //              = ((x_n┬▓ - a) / (2 * x_n))┬▓
+            //              ÔëÑ 0
+            // Which proves that for all n ÔëÑ 1, sqrt(a) Ôëñ x_n
             //
             // This gives us the proof of quadratic convergence of the sequence:
-            // ε_{n+1} = | x_{n+1} - sqrt(a) |
+            // ╬Á_{n+1} = | x_{n+1} - sqrt(a) |
             //         = | (x_n + a / x_n) / 2 - sqrt(a) |
-            //         = | (x_n² + a - 2*x_n*sqrt(a)) / (2 * x_n) |
-            //         = | (x_n - sqrt(a))² / (2 * x_n) |
-            //         = | ε_n² / (2 * x_n) |
-            //         = ε_n² / | (2 * x_n) |
+            //         = | (x_n┬▓ + a - 2*x_n*sqrt(a)) / (2 * x_n) |
+            //         = | (x_n - sqrt(a))┬▓ / (2 * x_n) |
+            //         = | ╬Á_n┬▓ / (2 * x_n) |
+            //         = ╬Á_n┬▓ / | (2 * x_n) |
             //
             // For the first iteration, we have a special case where x_0 is known:
-            // ε_1 = ε_0² / | (2 * x_0) |
-            //     ≤ (2**(e-2))² / (2 * (2**(e-1) + 2**(e-2)))
-            //     ≤ 2**(2*e-4) / (3 * 2**(e-1))
-            //     ≤ 2**(e-3) / 3
-            //     ≤ 2**(e-3-log2(3))
-            //     ≤ 2**(e-4.5)
+            // ╬Á_1 = ╬Á_0┬▓ / | (2 * x_0) |
+            //     Ôëñ (2**(e-2))┬▓ / (2 * (2**(e-1) + 2**(e-2)))
+            //     Ôëñ 2**(2*e-4) / (3 * 2**(e-1))
+            //     Ôëñ 2**(e-3) / 3
+            //     Ôëñ 2**(e-3-log2(3))
+            //     Ôëñ 2**(e-4.5)
             //
-            // For the following iterations, we use the fact that, 2**(e-1) ≤ sqrt(a) ≤ x_n:
-            // ε_{n+1} = ε_n² / | (2 * x_n) |
-            //         ≤ (2**(e-k))² / (2 * 2**(e-1))
-            //         ≤ 2**(2*e-2*k) / 2**e
-            //         ≤ 2**(e-2*k)
-            xn = (xn + a / xn) >> 1; // ε_1 := | x_1 - sqrt(a) | ≤ 2**(e-4.5)  -- special case, see above
-            xn = (xn + a / xn) >> 1; // ε_2 := | x_2 - sqrt(a) | ≤ 2**(e-9)    -- general case with k = 4.5
-            xn = (xn + a / xn) >> 1; // ε_3 := | x_3 - sqrt(a) | ≤ 2**(e-18)   -- general case with k = 9
-            xn = (xn + a / xn) >> 1; // ε_4 := | x_4 - sqrt(a) | ≤ 2**(e-36)   -- general case with k = 18
-            xn = (xn + a / xn) >> 1; // ε_5 := | x_5 - sqrt(a) | ≤ 2**(e-72)   -- general case with k = 36
-            xn = (xn + a / xn) >> 1; // ε_6 := | x_6 - sqrt(a) | ≤ 2**(e-144)  -- general case with k = 72
+            // For the following iterations, we use the fact that, 2**(e-1) Ôëñ sqrt(a) Ôëñ x_n:
+            // ╬Á_{n+1} = ╬Á_n┬▓ / | (2 * x_n) |
+            //         Ôëñ (2**(e-k))┬▓ / (2 * 2**(e-1))
+            //         Ôëñ 2**(2*e-2*k) / 2**e
+            //         Ôëñ 2**(e-2*k)
+            xn = (xn + a / xn) >> 1; // ╬Á_1 := | x_1 - sqrt(a) | Ôëñ 2**(e-4.5)  -- special case, see above
+            xn = (xn + a / xn) >> 1; // ╬Á_2 := | x_2 - sqrt(a) | Ôëñ 2**(e-9)    -- general case with k = 4.5
+            xn = (xn + a / xn) >> 1; // ╬Á_3 := | x_3 - sqrt(a) | Ôëñ 2**(e-18)   -- general case with k = 9
+            xn = (xn + a / xn) >> 1; // ╬Á_4 := | x_4 - sqrt(a) | Ôëñ 2**(e-36)   -- general case with k = 18
+            xn = (xn + a / xn) >> 1; // ╬Á_5 := | x_5 - sqrt(a) | Ôëñ 2**(e-72)   -- general case with k = 36
+            xn = (xn + a / xn) >> 1; // ╬Á_6 := | x_6 - sqrt(a) | Ôëñ 2**(e-144)  -- general case with k = 72
 
-            // Because e ≤ 128 (as discussed during the first estimation phase), we know have reached a precision
-            // ε_6 ≤ 2**(e-144) < 1. Given we're operating on integers, then we can ensure that xn is now either
+            // Because e Ôëñ 128 (as discussed during the first estimation phase), we know have reached a precision
+            // ╬Á_6 Ôëñ 2**(e-144) < 1. Given we're operating on integers, then we can ensure that xn is now either
             // sqrt(a) or sqrt(a) + 1.
             return xn - SafeCast.toUint(xn > a / xn);
         }
@@ -4494,16 +4494,10 @@ abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712, Nonces {
 }
 
 
-// File contracts/mtb.sol
+// File contracts/MTB.sol
 
 // Original license: SPDX_License_Identifier: MIT
 pragma solidity ^0.8.22;
-
-
-
-
-
-
 contract MTB is 
     ERC20, 
     ERC20Burnable, 

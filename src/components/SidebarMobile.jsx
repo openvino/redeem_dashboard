@@ -1,6 +1,6 @@
 // components/SidebarMobile.tsx
 import { useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaRocket, FaTimes } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -22,6 +22,11 @@ export default function SidebarMobile() {
       icon: <RiMoneyDollarCircleLine size={20} />,
       title: "Orders",
     },
+      {
+          href: "/provisioning",
+          icon: <FaRocket size={20} />,
+          title: "Launch!",
+        },
     {
       href: "/tokens",
       icon: (
