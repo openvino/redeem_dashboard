@@ -1,4 +1,4 @@
-import { FaWineGlass, FaUser, FaWineBottle, FaShippingFast } from "react-icons/fa";
+import { FaWineGlass, FaUser, FaWineBottle, FaShippingFast, FaRocket } from "react-icons/fa";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { IoMdSettings } from "react-icons/io";
 
@@ -8,9 +8,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 const Sidebar = () => {
-  const session = useSession();
+	const session = useSession();
 
-  const router = useRouter();
+	const router = useRouter();
 
   const menuItems = [
     { href: "/dashboard", icon: <FaWineGlass size={20} />, title: "Home" },
@@ -22,10 +22,15 @@ const Sidebar = () => {
       title: "Orders",
     },
     {
-      href: "/shipping",
-      icon: <FaShippingFast size={20} />,
-      title: "Shipping",
-    },
+			href: "/provisioning",
+			icon: <FaRocket size={20} />,
+			title: "Launch!",
+		},
+    // {
+    //   href: "/shipping",
+    //   icon: <FaShippingFast size={20} />,
+    //   title: "Shipping",
+    // },
     {
       href: "/tokens",
       icon: (
@@ -42,38 +47,37 @@ const Sidebar = () => {
     },
   ];
 
-  if (session.data?.is_admin) {
-    menuItems.push({
-      href: "/wineries",
-      icon: <IoMdSettings size={25} />,
-      title: "Settings",
-    });
-  }
+	if (session.data?.is_admin) {
+		menuItems.push({
+			href: "/wineries",
+			icon: <IoMdSettings size={20} />,
+			title: "Settings",
+		});
+	}
 
-  return (
-    <div className="hidden md:flex p-5 bg-[#F1EDE2] border-r  flex-col  shadow-xl">
-      <div className="flex flex-col items-center justify-center gap-5 ">
-        {menuItems.map((item, index) => (
-          <Link key={index} href={item.href}>
-            <div
-              title={item.title}
-              className={`h-12 w-12 flex justify-center items-center cursor-pointer rounded-lg
+	return (
+		<div className="hidden md:flex p-5 bg-[#F1EDE2] border-r  flex-col  shadow-xl">
+			<div className="flex flex-col items-center justify-center gap-5 ">
+				{menuItems.map((item, index) => (
+					<Link key={index} href={item.href}>
+						<div
+							title={item.title}
+							className={`h-12 w-12 flex justify-center items-center cursor-pointer rounded-lg
                             ${
                               router.pathname.includes(item.href)
                                 ? "bg-[#840C4A] text-white"
                                 : "bg-white hover:bg-gray-200 text-[#840C4A]  "
                             }
                   `}
-            >
-              {item.icon}
-            </div>
-            <p className="text-[.6rem] mt-1  text-center">{item.title}</p>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
+						>
+							{item.icon}
+						</div>
+						<p className="text-[.6rem] mt-1  text-center">{item.title}</p>
+					</Link>
+				))}
+			</div>
+		</div>
+	);
 };
 
 export default Sidebar;
-

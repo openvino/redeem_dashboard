@@ -3,36 +3,38 @@ import clientAxios from "@/config/clientAxios";
 import { useSession } from "next-auth/react";
 
 const useProfile = () => {
-  const [profile, setProfile] = useState();
-  const { data: session, status } = useSession();
+	const [profile, setProfile] = useState();
+	const { data: session, status } = useSession();
 
-  const fetchProfile = async () => {
-    try {
-      if (status === "authenticated" && session) {
-        const response = await clientAxios.post("/loginRoute", {
-          public_key: session.address,
-          headers: {
-            Cookie: session.cookie,
-          },
-        });
-        setProfile(response.data);
-      }
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  };
+	const fetchProfile = async () => {
+		try {
+			console.log("session", session, "status", status);
 
-  useEffect(() => {
-    if (status !== "loading") {
-      fetchProfile();
-    }
-  }, [status, session]);
+			if (status === "authenticated" && session) {
+				const response = await clientAxios.post("/loginRoute", {
+					public_key: session.address.toLowerCase(),
+					headers: {
+						Cookie: session.cookie,
+					},
+				});
+				setProfile(response.data);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	};
 
-  return {
-    profile,
-    session,
-    status,
-  };
+	useEffect(() => {
+		if (status !== "loading") {
+			fetchProfile();
+		}
+	}, [status, session]);
+
+	return {
+		profile,
+		session,
+		status,
+	};
 };
 
 export default useProfile;
