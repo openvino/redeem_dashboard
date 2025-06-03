@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import clientAxios from "@/config/clientAxios";
 import { useSession } from "next-auth/react";
 
-const useTokenShipping = ( tokenId ) => {
+const useTokenShipping = (tokenId) => {
   const [tokens, setTokens] = useState();
   const { data: session, status } = useSession();
 
@@ -19,7 +19,7 @@ const useTokenShipping = ( tokenId ) => {
         setTokens(response.data);
       }
     } catch (error) {
-      throw new Error(error.message);
+      console.log(error);
     }
   };
 

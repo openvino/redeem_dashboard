@@ -20,7 +20,7 @@ export async function getTokenShippingInfo(tokenId) {
   const { rows } = await conn.query(query, [tokenId.toLowerCase()]);
 
   if (rows.length === 0) {
-    throw new Error("token not found");
+    return [];
   }
   const tokens = rows;
 
