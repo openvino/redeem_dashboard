@@ -129,14 +129,15 @@ const Launch = () => {
 				type: "info",
 				autoClose: 2000,
 			});
-
+			let tokenVerified = false;
+			const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 			const tokenCtorEncoded = ethers.utils.defaultAbiCoder
 				.encode(
 					["string", "string", "uint256", "uint256"],
 					[name, symbol, capBN, capBN]
 				)
 				.replace(/^0x/, "");
-
+			await delay(15000);
 			const tokenVerifyResponse = await axios.post(
 				`${openvinoApiURL}/verify-contract`,
 				{
@@ -218,6 +219,7 @@ const Launch = () => {
 			await crowdsale.deployed();
 			setCrowdsaleAddress(crowdsale.address);
 			console.log("Crowdsale address:", crowdsale.address);
+
 			toast.update(toastId, {
 				render: t("crowdsale_deployed"),
 				isLoading: false,
@@ -238,7 +240,7 @@ const Launch = () => {
 					[walletAddress, token.address, weiCapBN, openingTs, closingTs, rate]
 				)
 				.replace(/^0x/, "");
-
+			await delay(15000);
 			const crowdVerifyResponse = await axios.post(
 				`${openvinoApiURL}/verify-contract`,
 				{
@@ -317,6 +319,7 @@ const Launch = () => {
 				autoClose: 2000,
 			});
 
+			await delay(15000);
 			await provider.getBlockNumber();
 			const txTransfer = await token.transfer(crowdsale.address, tokensBN);
 			await txTransfer.wait();
