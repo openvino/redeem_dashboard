@@ -187,32 +187,29 @@ const Topbar = () => {
 							<div>
 								<SidebarMobile />
 							</div>
-							<div className="  relative inline-block ">
-								<FormField
-									type="text"
-									className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]  `}
-									placeholder={t("buscar")}
-									onFocus={() => {
-										setIsFocused(true);
-									}}
-									onBlur={() => {
-										setIsFocused(false);
-									}}
-									ref={inputRef}
-									onChange={handleFilter}
-								/>
-								<span
-									id="search-icon"
-									className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer ${
-										isFocused ? "opacity-0" : "opacity-100"
-									}`}
-									onClick={() => {
-										inputRef.current.focus();
-									}}
-								>
-									<FaSearch className="hidden md:block" />
-								</span>
-							</div>
+							{router.pathname === "/dashboard" && (
+								<div className="relative inline-block">
+									<FormField
+										type="text"
+										className={`w-full rounded-lg border-none pl-10 focus:outline-[#925d78]`}
+										placeholder={t("buscar")}
+										onFocus={() => setIsFocused(true)}
+										onBlur={() => setIsFocused(false)}
+										ref={inputRef}
+										onChange={handleFilter}
+									/>
+									<span
+										id="search-icon"
+										className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer ${
+											isFocused ? "opacity-0" : "opacity-100"
+										}`}
+										onClick={() => inputRef.current?.focus()}
+									>
+										<FaSearch className="hidden md:block" />
+									</span>
+								</div>
+							)}
+
 							<ConnectButton
 								client={client}
 								locale="es_ES"
@@ -252,7 +249,6 @@ const Topbar = () => {
 									/>
 								</div>
 							) : null}
-
 							<div
 								onClick={() => setShowMenu(!showMenu)}
 								className="relative shadow-xl  rounded-full hover:transform hover:scale-110 transition-all duration-500"
@@ -278,7 +274,6 @@ const Topbar = () => {
 									</div>
 								)} */}
 							</div>
-
 							<button onClick={toggleLanguage}>
 								{selectLanguage ? "EN" : "ES"}
 							</button>

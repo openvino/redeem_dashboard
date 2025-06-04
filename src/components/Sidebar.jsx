@@ -1,4 +1,10 @@
-import { FaWineGlass, FaUser, FaWineBottle, FaShippingFast, FaRocket } from "react-icons/fa";
+import {
+	FaWineGlass,
+	FaUser,
+	FaWineBottle,
+	FaShippingFast,
+	FaRocket,
+} from "react-icons/fa";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { IoMdSettings } from "react-icons/io";
 
@@ -12,40 +18,40 @@ const Sidebar = () => {
 
 	const router = useRouter();
 
-  const menuItems = [
-    { href: "/dashboard", icon: <FaWineGlass size={20} />, title: "Home" },
-    { href: "/admin", icon: <FaUser size={20} />, title: "Admin" },
-    // { href: "/redeems", icon: <FaWineBottle size={20} />, title: "Redeems" },
-    {
-      href: "/orders",
-      icon: <RiMoneyDollarCircleLine size={20} />,
-      title: "Orders",
-    },
-    {
-			href: "/provisioning",
+	const menuItems = [
+		{ href: "/dashboard", icon: <FaWineGlass size={20} />, title: "Home" },
+		{ href: "/admin", icon: <FaUser size={20} />, title: "Admin" },
+		// { href: "/redeems", icon: <FaWineBottle size={20} />, title: "Redeems" },
+		{
+			href: "/orders",
+			icon: <RiMoneyDollarCircleLine size={20} />,
+			title: "Orders",
+		},
+		{
+			href: "/provisioning/launch",
 			icon: <FaRocket size={20} />,
 			title: "Launch!",
 		},
-    {
-      href: "/shipping",
-      icon: <FaShippingFast size={20} />,
-      title: "Shipping",
-    },
-    {
-      href: "/tokens",
-      icon: (
-        <div className="w-6 h-6 relative">
-          <Image
-            src="/assets/mtb.png"
-            fill
-            alt="mtb23"
-            className="object-contain"
-          />
-        </div>
-      ),
-      title: "Tokens",
-    },
-  ];
+		{
+			href: "/shipping",
+			icon: <FaShippingFast size={20} />,
+			title: "Shipping",
+		},
+		{
+			href: "/tokens",
+			icon: (
+				<div className="w-6 h-6 relative">
+					<Image
+						src="/assets/mtb.png"
+						fill
+						alt="mtb23"
+						className="object-contain"
+					/>
+				</div>
+			),
+			title: "Tokens",
+		},
+	];
 
 	if (session.data?.is_admin) {
 		menuItems.push({
@@ -64,10 +70,10 @@ const Sidebar = () => {
 							title={item.title}
 							className={`h-12 w-12 flex justify-center items-center cursor-pointer rounded-lg
                             ${
-                              router.pathname.includes(item.href)
-                                ? "bg-[#840C4A] text-white"
-                                : "bg-white hover:bg-gray-200 text-[#840C4A]  "
-                            }
+															router.pathname.includes(item.href)
+																? "bg-[#840C4A] text-white"
+																: "bg-white hover:bg-gray-200 text-[#840C4A]  "
+														}
                   `}
 						>
 							{item.icon}
