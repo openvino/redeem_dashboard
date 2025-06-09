@@ -44,7 +44,7 @@ export default async function handler(req, res) {
                 from: '"OpenVino" <redeem@openvino.org>',
                 to: email,
                 subject: subject,
-                text: "OpenVino",
+                text: "no-reply@openvino.org",
                 html: message
             });
 
