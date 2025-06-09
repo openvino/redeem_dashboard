@@ -41,10 +41,10 @@ export default async function handler(req, res) {
             });
 
             let info = await transporter.sendMail({
-                from: '"Openvino" <redeem@openvino.org>',
+                from: '"OpenVino" <no-reply@openvino.org>',
                 to: email,
                 subject: subject,
-                text: "Openvino",
+                text: "OpenVino",
                 html: message
             });
 
