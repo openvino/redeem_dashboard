@@ -41,7 +41,7 @@ export default async function handler(req, res) {
             });
 
             let info = await transporter.sendMail({
-                from: '"OpenVino" <no-reply@openvino.org>',
+                from: '"OpenVino" <redeem@openvino.org>',
                 to: email,
                 subject: subject,
                 text: "OpenVino",
