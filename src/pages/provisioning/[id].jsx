@@ -129,14 +129,15 @@ const Launch = () => {
 				type: "info",
 				autoClose: 2000,
 			});
-
+			let tokenVerified = false;
+			const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 			const tokenCtorEncoded = ethers.utils.defaultAbiCoder
 				.encode(
 					["string", "string", "uint256", "uint256"],
 					[name, symbol, capBN, capBN]
 				)
 				.replace(/^0x/, "");
-
+			await delay(15000);
 			const tokenVerifyResponse = await axios.post(
 				`${openvinoApiURL}/verify-contract`,
 				{
@@ -152,40 +153,41 @@ const Launch = () => {
 				},
 				{ headers: { "x-api-key": openvinoApiKey } }
 			);
+			console.log("Token Verify response: ", tokenVerifyResponse.data);
 
-			let tokenVerified = false;
-			const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-			while (!tokenVerified) {
-				const checkStatus = await axios.get(
-					`${openvinoApiURL}/checkverifystatus`,
-					{
-						params: {
-							network: activeNetwork,
-							guid: tokenVerifyResponse.data.guid,
-						},
-						headers: { "x-api-key": openvinoApiKey },
-					}
-				);
+			// let tokenVerified = false;
+			// const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+			// while (!tokenVerified) {
+			// 	const checkStatus = await axios.get(
+			// 		`${openvinoApiURL}/checkverifystatus`,
+			// 		{
+			// 			params: {
+			// 				network: activeNetwork,
+			// 				guid: tokenVerifyResponse.data.guid,
+			// 			},
+			// 			headers: { "x-api-key": openvinoApiKey },
+			// 		}
+			// 	);
 
-				if (checkStatus.data.status === "1") {
-					tokenVerified = true;
-					toast.update(toastId, {
-						render: t("token_verified_success"),
-						isLoading: false,
-						type: "success",
-						autoClose: 2000,
-					});
-				} else if (
-					checkStatus.data.status === "0" &&
-					checkStatus.data.result.toLowerCase().includes("pending")
-				) {
-					await delay(5000);
-				} else {
-					throw new Error(
-						`Fallo la verificación del Token: ${checkStatus.data.result}`
-					);
-				}
-			}
+			// 	if (checkStatus.data.status === "1") {
+			// 		tokenVerified = true;
+			// 		toast.update(toastId, {
+			// 			render: t("token_verified_success"),
+			// 			isLoading: false,
+			// 			type: "success",
+			// 			autoClose: 2000,
+			// 		});
+			// 	} else if (
+			// 		checkStatus.data.status === "0" &&
+			// 		checkStatus.data.result.toLowerCase().includes("pending")
+			// 	) {
+			// 		await delay(5000);
+			// 	} else {
+			// 		throw new Error(
+			// 			`Fallo la verificación del Token: ${checkStatus.data.result}`
+			// 		);
+			// 	}
+			// }
 
 			toast.update(toastId, {
 				render: t("token_verified_guid"),
@@ -217,6 +219,7 @@ const Launch = () => {
 			await crowdsale.deployed();
 			setCrowdsaleAddress(crowdsale.address);
 			console.log("Crowdsale address:", crowdsale.address);
+
 			toast.update(toastId, {
 				render: t("crowdsale_deployed"),
 				isLoading: false,
@@ -237,14 +240,13 @@ const Launch = () => {
 					[walletAddress, token.address, weiCapBN, openingTs, closingTs, rate]
 				)
 				.replace(/^0x/, "");
-
+			await delay(15000);
 			const crowdVerifyResponse = await axios.post(
 				`${openvinoApiURL}/verify-contract`,
 				{
 					network: activeNetwork,
 					address: crowdsale.address,
 					contractName: "contracts/Crowdsale.sol:Crowdsale",
-
 					compilerVersion: "v0.8.22+commit.4fc1097e",
 					codeformat: "solidity-standard-json-input",
 					optimizationUsed: "1",
@@ -254,52 +256,54 @@ const Launch = () => {
 				{ headers: { "x-api-key": openvinoApiKey } }
 			);
 
-			let crowdsaleVerify = false;
-			const delayCrowdsale = (ms) =>
-				new Promise((resolve) => setTimeout(resolve, ms));
-			while (!crowdsaleVerify) {
-				const checkStatus = await axios.get(
-					`${openvinoApiURL}/checkverifystatus`,
-					{
-						params: {
-							network: activeNetwork,
-							guid: crowdVerifyResponse.data.guid,
-						},
-						headers: { "x-api-key": openvinoApiKey },
-					}
-				);
-				console.log("Estado de verificacion de crowdsale:", checkStatus);
+			console.log("Crowdsale Verify response: ", crowdVerifyResponse.data);
 
-				if (checkStatus.data.status === "1") {
-					crowdsaleVerify = true;
-					toast.update(toastId, {
-						render: t("crowdsale_verified_success"),
-						isLoading: false,
-						type: "success",
-						autoClose: 2000,
-					});
-				} else if (
-					checkStatus.data.status === "0" &&
-					checkStatus.data.result.toLowerCase().includes("pending")
-				) {
-					await delayCrowdsale(1000);
-				} else if (
-					checkStatus.data.status === "0" &&
-					checkStatus.data.result.toLowerCase().includes("verified")
-				) {
-					crowdsaleVerify = true;
-					toast.update(toastId, {
-						render: t("crowdsale_verified_success"),
-						isLoading: false,
-						type: "success",
-						autoClose: 2000,
-					});
-				} else {
-					throw new Error(
-						`Fallo la verificación del Crowdsale: ${checkStatus.data.result}`
-					);
-				}
-			}
+			// let crowdsaleVerify = false;
+			//   const delayCrowdsale = (ms) =>
+			//     new Promise((resolve) => setTimeout(resolve, ms));
+			//   while (!crowdsaleVerify) {
+			//     const checkStatus = await axios.get(
+			//       `${openvinoApiURL}/checkverifystatus`,
+			//       {
+			//         params: {
+			//           network: activeNetwork,
+			//           guid: crowdVerifyResponse.data.guid,
+			//         },
+			//         headers: { "x-api-key": openvinoApiKey },
+			//       }
+			//     );
+			//     console.log("Estado de verificacion de crowdsale:", checkStatus);
+
+			//     if (checkStatus.data.status === "1") {
+			//       crowdsaleVerify = true;
+			//       toast.update(toastId, {
+			//         render: t("crowdsale_verified_success"),
+			//         isLoading: false,
+			//         type: "success",
+			//         autoClose: 2000,
+			//       });
+			//     } else if (
+			//       checkStatus.data.status === "0" &&
+			//       checkStatus.data.result.toLowerCase().includes("pending")
+			//     ) {
+			//       await delayCrowdsale(10000);
+			//     } else if (
+			//       checkStatus.data.status === "0" &&
+			//       checkStatus.data.result.toLowerCase().includes("verified")
+			//     ) {
+			//       crowdsaleVerify = true;
+			//       toast.update(toastId, {
+			//         render: t("crowdsale_verified_success"),
+			//         isLoading: false,
+			//         type: "success",
+			//         autoClose: 2000,
+			//       });
+			//     } else {
+			//       throw new Error(
+			//         `Fallo la verificación del Crowdsale: ${checkStatus.data.result}`
+			//       );
+			//     }
+			//   }
 
 			toast.update(toastId, {
 				render: t("crowdsale_verified_guid"),
@@ -315,6 +319,7 @@ const Launch = () => {
 				autoClose: 2000,
 			});
 
+			await delay(15000);
 			await provider.getBlockNumber();
 			const txTransfer = await token.transfer(crowdsale.address, tokensBN);
 			await txTransfer.wait();
