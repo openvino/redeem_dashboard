@@ -28,7 +28,7 @@ const Sidebar = () => {
 			title: "Orders",
 		},
 		{
-			href: "/provisioning/launch",
+			href: "/provisioning/VARSI22",
 			icon: <FaRocket size={20} />,
 			title: "Launch!",
 		},

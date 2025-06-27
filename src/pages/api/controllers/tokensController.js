@@ -59,3 +59,13 @@ export async function updateShipping(body) {
 
   return true;
 }
+
+
+export const getTokenInfo = async (id) => {
+  const query = `SELECT * FROM token_launch WHERE id = $1;`;
+  const { rows } = await conn.query(query, [id]);
+
+  console.log(rows);
+  
+  return rows[0];
+};
