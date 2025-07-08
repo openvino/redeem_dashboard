@@ -1,4 +1,4 @@
-export const MTB_ABI = [
+export const OVT_ABI = [
 	"function name() view returns (string)",
 	"function symbol() view returns (string)",
 	"function cap() view returns (uint)",
