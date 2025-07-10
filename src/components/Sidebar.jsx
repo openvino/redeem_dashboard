@@ -15,20 +15,23 @@ import { useRouter } from "next/router";
 
 const Sidebar = () => {
 	const session = useSession();
+	console.log(session);
+
+	const wineryId = session.data?.winery_id;
 
 	const router = useRouter();
 
 	const menuItems = [
 		{ href: "/dashboard", icon: <FaWineGlass size={20} />, title: "Home" },
 		{ href: "/admin", icon: <FaUser size={20} />, title: "Admin" },
-		// { href: "/redeems", icon: <FaWineBottle size={20} />, title: "Redeems" },
+
 		{
 			href: "/orders",
 			icon: <RiMoneyDollarCircleLine size={20} />,
 			title: "Orders",
 		},
 		{
-			href: "/provisioning/VARSI22",
+			href: `/provisioning/${wineryId}`,
 			icon: <FaRocket size={20} />,
 			title: "Launch!",
 		},
@@ -72,9 +75,8 @@ const Sidebar = () => {
                             ${
 															router.pathname.includes(item.href)
 																? "bg-[#840C4A] text-white"
-																: "bg-white hover:bg-gray-200 text-[#840C4A]  "
-														}
-                  `}
+																: "bg-white hover:bg-gray-200 text-[#840C4A]"
+														}`}
 						>
 							{item.icon}
 						</div>

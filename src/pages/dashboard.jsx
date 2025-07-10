@@ -8,7 +8,12 @@ import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
 import { getCountries, getProvinces } from "../redux/actions/winaryActions";
 import HomeLayout from "@/components/HomeLayout";
-import { buildColumnas, columnas, countryAndProvinceNames } from "@/utils";
+import {
+	buildColumnas,
+	columnas,
+	countryAndProvinceNames,
+	filterData,
+} from "@/utils";
 let flag = true;
 
 const Dashboard = () => {
@@ -32,21 +37,9 @@ const Dashboard = () => {
 
 	const redeems = useSelector((state) => state.winaryAdress.redeems);
 
-	const filterData = (data) => {
-		if (filters.filter) {
-			const searchString = filters.filter.toLowerCase();
-
-			return data.filter((obj) =>
-				Object.values(obj).some((value) =>
-					String(value).toLowerCase().includes(searchString)
-				)
-			);
-		} else {
-			return data;
-		}
-	};
 	const data = filterData(
-		countryAndProvinceNames(dataFormater(redeems, []), countries, provinces)
+		countryAndProvinceNames(dataFormater(redeems, []), countries, provinces),
+		filters
 	);
 
 	return (

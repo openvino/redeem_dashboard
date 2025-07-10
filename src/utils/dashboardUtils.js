@@ -36,3 +36,17 @@ export const countryAndProvinceNames = (data, countries, provinces) => {
 
 	return newData;
 };
+
+export const filterData = (data, filters) => {
+	if (filters?.filter) {
+		const searchString = filters.filter.toLowerCase();
+
+		return data.filter((obj) =>
+			Object.values(obj).some((value) =>
+				String(value).toLowerCase().includes(searchString)
+			)
+		);
+	} else {
+		return data;
+	}
+};
