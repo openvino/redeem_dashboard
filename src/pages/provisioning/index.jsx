@@ -1,45 +1,23 @@
-import React, { useEffect } from "react";
-import useAdmins from "@/hooks/useAdmins";
+import React, { useEffect, useState } from "react";
 import Table from "@/components/Table";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import Head from "next/head";
-import { useTranslation } from "react-i18next";
 import { scrollStyle } from "@/styles/table";
 import HomeLayout from "@/components/HomeLayout";
-const Provisioning = () => {
-	const { t } = useTranslation();
-	const { admins } = useAdmins();
+import {
+	getAllLaunchingTokens,
+	tokensLaunching,
+	tokensLaunchingAll,
+} from "@/utils/provisioningUtils";
+import useProvisioning from "@/hooks/useProvisioning";
+import { ROUTE_CONSTANTS } from "@/utils";
+import { isAdminUser } from "@/utils/authUtils";
 
-	const columnas = [
-		{
-			title: t("action"),
-			field: "acciones",
-		},
-		{
-			title: t("clave"),
-			field: "id",
-		},
-		{
-			title: "ENS",
-			field: "ens",
-		},
-		{
-			title: t("nombre"),
-			field: "name",
-		},
-		{
-			title: t("apellido"),
-			field: "last_name",
-		},
-		{
-			title: "Email",
-			field: "email",
-		},
-		{
-			title: t("bodega"),
-			field: "winery_id",
-		},
-	];
+const Provisioning = () => {
+	const { rows, tokens, setTokens, session } = useProvisioning();
+
+	const winery_id = session.data?.winery_id;
+	let columnas = rows;
 
 	useEffect(() => {
 		const styleElement = document.createElement("style");
@@ -50,18 +28,29 @@ const Provisioning = () => {
 			document.head.removeChild(styleElement);
 		};
 	}, []);
+
+	useEffect(() => {
+		const tokensPromise = isAdminUser(session)
+			? getAllLaunchingTokens()
+			: tokensLaunching(winery_id);
+		tokensPromise.then((tokensAll) => {
+			setTokens(tokensAll);
+			console.log(tokensAll);
+		});
+	}, []);
+
 	return (
 		<HomeLayout>
 			<Head>
-				<title>Openvino - Admin users</title>
+				<title>Wine Token Provisioning</title>
 			</Head>
 			<div className="border rounded-lg overflow-x-scroll custom-scroll">
-				{admins?.length && (
+				{tokens?.length && (
 					<Table
 						columnas={columnas}
-						data={admins}
+						data={tokens}
 						n={10}
-						route="/provisioning"
+						route={ROUTE_CONSTANTS.PROVISIONING_ROUTE}
 					/>
 				)}
 			</div>

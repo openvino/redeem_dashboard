@@ -1,56 +1,98 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { useActiveAccount } from "thirdweb/react";
 import { ethers } from "ethers";
 import axios from "axios";
 import HomeLayout from "@/components/HomeLayout";
-import OpenvinoTokenArtifact from "../../../contracts/artifacts/OVT.json";
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { activeNetwork, openvinoApiKey, openvinoApiURL } from "@/config";
-import clientAxios from "@/config/clientAxios";
+
+import {
+	createTokenForLaunch,
+	updateTokenInfo,
+} from "@/utils/provisioningUtils";
+import useLaunch from "@/hooks/useLaunch";
+import { isAdminUser } from "@/utils/authUtils";
+import { formatDateForInput } from "@/utils/dateUtils";
+import { useIpfsUpload } from "@/hooks/useIpfsUpload";
+import { ethers5Adapter } from "thirdweb/adapters/ethers5";
+import { chain, client } from "@/config/thirdwebClient";
 
 const Launch = () => {
-	const [token, setToken] = useState({});
-	const [loading, setLoading] = useState(false);
-	const [tokenAddress, setTokenAddress] = useState("");
-	const [crowdsaleAddress, setCrowdsaleAddress] = useState("");
 	const router = useRouter();
-	const account = useActiveAccount();
-	const { id } = router.query;
-	const { t } = useTranslation();
-	const { register, handleSubmit, setValue, getValues, reset } = useForm({
-		defaultValues: {
-			id: "",
-			name: "",
-			symbol: "",
-			cap: "",
-			redeemWalletAddress: "",
-			tokenImage: "",
-			walletAddress: "",
-			pricePerToken: "",
-			rate: "",
-			openingTime: "",
-			closingTime: "",
-			tokensToCrowdsale: "",
-		},
-	});
+	const { id, edit } = router.query;
+
+	const {
+		token,
+		setToken,
+		loading,
+		setLoading,
+		tokenAddress,
+		setTokenAddress,
+		crowdsaleAddress,
+		setCrowdsaleAddress,
+		register,
+		handleSubmit,
+		setValue,
+		getValues,
+		reset,
+		account,
+		t,
+		tokenAbi,
+		tokenBytecode,
+		crowdBytecode,
+		crowdAbi,
+		session,
+		wineries,
+		selectedWinery,
+		setSelectedWinery,
+	} = useLaunch(id);
+
+	const { uploadImage, uploading, ipfsUrl } = useIpfsUpload();
+
+	const [isEditMode, setIsEditMode] = useState(false);
+	const [isViewMode, setIsViewMode] = useState(false);
+	const [isCreateMode, setIsCreateMode] = useState(false);
+	const [deploymentComplete, setDeploymentComplete] = useState(false);
+	const [disableDeploy, setDisableDeploy] = useState(false);
+	const [transferDisabled, setTransferDisabled] = useState(true);
+	const [transferDone, setTransferDone] = useState(false);
 
 	useEffect(() => {
-		console.log(id);
-		if (id) {
-			tokensLaunching(id);
+		if (tokenAddress && crowdsaleAddress) {
+			setDeploymentComplete(true);
 		}
-	}, []);
+	}, [tokenAddress, crowdsaleAddress]);
+
+	useEffect(() => {
+		console.log(token);
+
+		if (token?.transfered_to_crowdsale) {
+			setTransferDone(true);
+			setTransferDisabled(true);
+		}
+	}, [token]);
+	useEffect(() => {
+		if (!router.isReady) return;
+
+		const editParam = router.query.edit;
+		const idParam = router.query.id;
+
+		setIsEditMode(editParam === "true" && isAdminUser(session));
+		setIsViewMode(idParam && editParam !== "true");
+		setIsCreateMode(idParam === "launch" && isAdminUser(session));
+	}, [router.isReady, router.query, session]);
 
 	useEffect(() => {
 		if (token) {
-			const isValidDate = (date) => {
-				const d = new Date(date);
-				return d instanceof Date && !isNaN(d);
-			};
+			if (token.transfered_to_crowdsale) {
+				setDisableDeploy(true);
+				setTransferDisabled(true);
+			} else if (token.tokenAddress && token.crowdsaleAddress) {
+				setDisableDeploy(true);
+				setTransferDisabled(false);
+			}
 
 			reset({
 				id: token.id,
@@ -62,143 +104,103 @@ const Launch = () => {
 				walletAddress: token.walletAddress,
 				pricePerToken: token.pricePerToken,
 				rate: token.rate,
-				openingTime: token.openingTime,
-				closingTime: isValidDate(token.closingTime)
-					? new Date(token.closingTime).toISOString().split("T")[0]
-					: "",
+				openingTime: formatDateForInput(token.openingTime),
+				closingTime: formatDateForInput(token.closingTime),
 				tokensToCrowdsale: token.tokensToCrowdsale,
 			});
 			const newPrice = 1 / token.rate;
 			setValue("pricePerToken", parseFloat(newPrice.toFixed(8)));
 		}
-	}, [token, reset]);
+	}, [token, reset, setValue]);
 
-	const tokenAbi =
-		OpenvinoTokenArtifact.output.contracts["contracts/OpenVinoToken.sol"]
-			.OpenVinoToken.abi;
-
-	const tokenBytecode =
-		OpenvinoTokenArtifact.output.contracts["contracts/OpenVinoToken.sol"]
-			.OpenVinoToken.evm.bytecode.object;
-
-	const crowdBytecode =
-		OpenvinoTokenArtifact.output.contracts["contracts/Crowdsale.sol"].Crowdsale
-			.evm.bytecode.object;
-
-	const crowdAbi =
-		OpenvinoTokenArtifact.output.contracts["contracts/Crowdsale.sol"].Crowdsale
-			.abi;
-	const tokensLaunching = async (winery_id) => {
-		try {
-			const response = await clientAxios.get(`/tokenLaunchRoute`, {
-				params: { winery_id },
-			});
-
-			console.log(response.data);
-
-			setToken(response.data);
-
-			return response.data;
-		} catch (error) {
-			console.error(error);
-		}
+	const isFieldDisabled = () => {
+		if (isViewMode && !isEditMode && !isCreateMode) return true;
+		if (isCreateMode || isEditMode) return false;
+		return true;
 	};
-	const updateTokenInfo = async (symbol, tokenFields) => {
-		try {
-			const response = await clientAxios.patch(`/tokenLaunchRoute`, {
-				params: { id: symbol, ...tokenFields },
-			});
 
-			console.log(response.data);
-
-			setToken(response.data);
-
-			return response.data;
-		} catch (error) {
-			console.error(error);
-		}
-	};
-	const deployToken = async () => {
-		if (!account) throw new Error("Conecta tu wallet primero");
+	const deployToken = async (toastId) => {
+		if (!account) throw new Error("Connect wallet");
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
+		console.log(signer);
 
 		const v = getValues();
 		const name = v.name?.trim();
 		const symbol = v.symbol?.trim();
 		const capInput = String(v.cap || "").trim();
-
 		if (!name || !symbol || !capInput || isNaN(Number(capInput))) {
-			throw new Error("Nombre, símbolo y cap del token son obligatorios");
+			throw new Error("Missing name, symbol or cap");
 		}
 
 		const capBN = ethers.utils.parseEther(capInput);
-		const provider = new ethers.providers.Web3Provider(window.ethereum);
-		const signer = provider.getSigner();
 
-		const toastId = toast.loading(t("deploying_token"), { theme: "dark" });
+		toast.update(toastId, {
+			render: "Deploying token contract...",
+			isLoading: true,
+		});
 
-		try {
-			const tokenFactory = new ethers.ContractFactory(
-				tokenAbi,
-				tokenBytecode,
-				signer
-			);
-			const token = await tokenFactory.deploy(name, symbol, capBN, capBN);
-			await token.deployed();
+		const tokenFactory = new ethers.ContractFactory(
+			tokenAbi,
+			tokenBytecode,
+			signer
+		);
 
-			setTokenAddress(token.address);
-			console.log("✅ Token address:", token.address);
+		console.log("tokenFactory", tokenFactory);
 
-			toast.update(toastId, {
-				render: t("token_deployed"),
-				isLoading: false,
-				type: "success",
-				autoClose: 2000,
-			});
+		const token = await tokenFactory.deploy(name, symbol, capBN, capBN);
+		console.log("token", token);
 
-			const tokenCtorEncoded = ethers.utils.defaultAbiCoder
-				.encode(
-					["string", "string", "uint256", "uint256"],
-					[name, symbol, capBN, capBN]
-				)
-				.replace(/^0x/, "");
+		await token.deployed();
 
-			await axios.post(
-				`${openvinoApiURL}/verify-contract`,
-				{
-					network: activeNetwork,
-					address: token.address,
-					contractName: "contracts/OpenVinoToken.sol:OpenVinoToken",
-					compilerVersion: "v0.8.22+commit.4fc1097e",
-					codeformat: "solidity-standard-json-input",
-					optimizationUsed: "1",
-					runs: "200",
-					constructorArgs: tokenCtorEncoded,
-				},
-				{ headers: { "x-api-key": openvinoApiKey } }
-			);
+		setTokenAddress(token.address);
 
-			await updateTokenInfo(symbol, { token_address: token.address });
-			return token;
-		} catch (error) {
-			toast.update(toastId, {
-				render: error.message || "Error al desplegar el token",
-				isLoading: false,
-				type: "error",
-				autoClose: 2000,
-			});
-			throw error;
-		}
+		toast.update(toastId, {
+			render: "Token deployed, verifying on BaseScan...",
+			isLoading: true,
+		});
+
+		const tokenCtorEncoded = ethers.utils.defaultAbiCoder
+			.encode(
+				["string", "string", "uint256", "uint256"],
+				[name, symbol, capBN, capBN]
+			)
+			.replace(/^0x/, "");
+
+		await new Promise((res) => setTimeout(res, 15000));
+
+		await axios.post(
+			`${openvinoApiURL}/verify-contract`,
+			{
+				network: activeNetwork,
+				address: token.address,
+				contractName: "contracts/OpenVinoToken.sol:OpenVinoToken",
+				compilerVersion: "v0.8.22+commit.4fc1097e",
+				codeformat: "solidity-standard-json-input",
+				optimizationUsed: "1",
+				runs: "200",
+				constructorArgs: tokenCtorEncoded,
+			},
+			{ headers: { "x-api-key": openvinoApiKey } }
+		);
+
+		await updateTokenInfo(symbol, { token_address: token.address });
+		return token;
 	};
 
-	const deployCrowdsale = async (token) => {
+	const deployCrowdsale = async (token, toastId) => {
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
 		const v = getValues();
 		const symbol = v.symbol?.trim();
 		const walletAddress = v.walletAddress?.trim();
-		if (!walletAddress)
-			throw new Error("La dirección de wallet es obligatoria");
-		if (!ethers.utils.isAddress(walletAddress)) {
-			throw new Error("walletAddress no es una dirección válida");
-		}
+		if (!walletAddress) throw new Error("Wallet address missing");
 
 		const rate = Number(String(v.rate || "").trim());
 		const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
@@ -206,25 +208,10 @@ const Launch = () => {
 		const tokensBN = ethers.utils.parseEther(
 			String(v.tokensToCrowdsale || "").trim()
 		);
-		const capBN = ethers.utils.parseEther(String(v.cap || "").trim());
 
-		if (rate <= 0 || !v.openingTime || !v.closingTime || tokensBN.lte(0)) {
-			throw new Error("Completa correctamente todos los campos del crowdsale");
-		}
-		if (openingTs >= closingTs)
-			throw new Error("La apertura debe ser antes del cierre");
-		if (tokensBN.gt(capBN))
-			throw new Error("Los tokens para crowdsale exceden el cap");
-
-		const weiCapBN = tokensBN.div(rate);
-		if (weiCapBN.isZero())
-			throw new Error("Rate demasiado alto para los tokens");
-
-		const provider = new ethers.providers.Web3Provider(window.ethereum);
-		const signer = provider.getSigner();
-
-		const toastId = toast.loading(t("sign_crowdsale_deploy"), {
-			theme: "dark",
+		toast.update(toastId, {
+			render: "Deploying crowdsale contract...",
+			isLoading: true,
 		});
 
 		const crowdFactory = new ethers.ContractFactory(
@@ -235,7 +222,7 @@ const Launch = () => {
 		const crowdsale = await crowdFactory.deploy(
 			walletAddress,
 			token.address,
-			weiCapBN,
+			tokensBN.div(rate),
 			openingTs,
 			closingTs,
 			rate
@@ -243,84 +230,413 @@ const Launch = () => {
 		await crowdsale.deployed();
 
 		setCrowdsaleAddress(crowdsale.address);
-		console.log("Crowdsale address:", crowdsale.address);
 		await updateTokenInfo(symbol, { crowdsale_address: crowdsale.address });
-		toast.update(toastId, {
-			render: t("crowdsale_deployed"),
-			isLoading: false,
-			type: "success",
-			autoClose: 2000,
-		});
 
-		const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-		const crowdCtorEncoded = ethers.utils.defaultAbiCoder
-			.encode(
-				["address", "address", "uint256", "uint256", "uint256", "uint256"],
-				[walletAddress, token.address, weiCapBN, openingTs, closingTs, rate]
-			)
-			.replace(/^0x/, "");
-		await delay(15000);
-
-		await axios.post(
-			`${openvinoApiURL}/verify-contract`,
-			{
-				network: activeNetwork,
-				address: crowdsale.address,
-				contractName: "contracts/Crowdsale.sol:Crowdsale",
-				compilerVersion: "v0.8.22+commit.4fc1097e",
-				codeformat: "solidity-standard-json-input",
-				optimizationUsed: "1",
-				runs: "200",
-				constructorArgs: crowdCtorEncoded,
-			},
-			{ headers: { "x-api-key": openvinoApiKey } }
-		);
+		await new Promise((res) => setTimeout(res, 8000));
 
 		return crowdsale;
 	};
-	const handleDeployAll = async () => {
+
+	const transferTokensToCrowdsale = async () => {
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
+		const toastId = toast.loading("🔄 Checking transfer feasibility...", {
+			theme: "dark",
+		});
 		setLoading(true);
 
 		try {
-			const token = await deployToken();
-			const crowdsale = await deployCrowdsale(token);
-
-			const toastId = toast.loading(t("sign_token_transfer_to_crowdsale"), {
-				theme: "dark",
-			});
+			const code = await signer.provider.getCode(crowdsaleAddress);
+			if (code === "0x") {
+				throw new Error("Crowdsale contract not found on-chain.");
+			}
 
 			const tokensBN = ethers.utils.parseEther(
-				String(getValues().tokensToCrowdsale || "").trim()
+				String(getValues().tokensToCrowdsale).trim()
 			);
-			const provider = new ethers.providers.Web3Provider(window.ethereum);
-			await provider.getBlockNumber();
 
-			const txTransfer = await token.transfer(crowdsale.address, tokensBN);
-			await txTransfer.wait();
+			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+
+			try {
+				await tokenContract.estimateGas.transfer(crowdsaleAddress, tokensBN);
+				console.log("✅ Gas estimation succeeded, proceeding to transfer");
+			} catch (err) {
+				console.error("❌ Gas estimation failed:", err);
+				throw new Error(
+					"Cannot transfer tokens: gas estimation failed. Make sure the contract is ready."
+				);
+			}
 
 			toast.update(toastId, {
-				render: t("tokens_transferred_to_crowdsale"),
-				isLoading: false,
-				type: "success",
-				autoClose: 2000,
+				render: "🚀 Transferring tokens to crowdsale...",
+				isLoading: true,
 			});
 
-			toast.success(t("deployment_and_verification_done"), { theme: "dark" });
+			const tx = await tokenContract.transfer(crowdsaleAddress, tokensBN);
+			await tx.wait();
+
+			console.log("✅ Tokens transferred!");
+			toast.update(toastId, {
+				render: "✅ Tokens successfully transferred to crowdsale!",
+				isLoading: false,
+				type: "success",
+				autoClose: 4000,
+			});
+
+			await updateTokenInfo(getValues().symbol, {
+				transfered_to_crowdsale: true,
+			});
+			setTransferDisabled(true);
+			setTransferDone(true);
 		} catch (error) {
-			console.error("DEPLOY & VERIFY ERROR", error);
-			toast.error("Error durante despliegue/verificación");
+			console.error("🚨 Transfer failed:", error);
+			toast.update(toastId, {
+				render: `❌ ${error.message || "Transfer failed"}`,
+				isLoading: false,
+				type: "error",
+				autoClose: 5000,
+			});
+			setTransferDisabled(false);
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const readFileAsBase64 = (file) => {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.onload = () => resolve(reader.result);
-			reader.onerror = reject;
-			reader.readAsDataURL(file);
+	const handleDeployAll = async () => {
+		setLoading(true);
+		const toastId = toast.loading("⏳ Starting deployment...", {
+			theme: "dark",
 		});
+
+		try {
+			const v = getValues();
+			if (!v.tokensToCrowdsale || isNaN(v.tokensToCrowdsale)) {
+				throw new Error("Invalid number of tokens to transfer");
+			}
+
+			const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+			// Deploy token
+			const token = await deployToken(toastId);
+			setTokenAddress(token.address);
+
+			// Confirm token deployment
+			toast.update(toastId, {
+				render: "Waiting for token propagation...",
+				isLoading: true,
+			});
+			while (true) {
+				const code = await provider.getCode(token.address);
+				if (code !== "0x") break;
+				await new Promise((res) => setTimeout(res, 4000));
+			}
+
+			// Deploy crowdsale
+			const crowdsale = await deployCrowdsale(token, toastId);
+			setCrowdsaleAddress(crowdsale.address);
+
+			// Confirm crowdsale deployment
+			toast.update(toastId, {
+				render: "Waiting for crowdsale propagation...",
+				isLoading: true,
+			});
+			while (true) {
+				const code = await provider.getCode(crowdsale.address);
+				if (code !== "0x") break;
+				await new Promise((res) => setTimeout(res, 4000));
+			}
+
+			toast.update(toastId, {
+				render: "✅ Deployment completed! You can now transfer tokens.",
+				isLoading: false,
+				type: "success",
+				autoClose: 4000,
+			});
+
+			setDisableDeploy(true);
+			setTransferDisabled(false);
+			setDeploymentComplete(true);
+		} catch (error) {
+			console.error("🚨 DEPLOY ERROR", error);
+			toast.update(toastId, {
+				render: `❌ ${error.message || "Deployment failed"}`,
+				isLoading: false,
+				type: "error",
+				autoClose: 5000,
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const createTokenInDatabase = async () => {
+		const v = getValues();
+		const name = v.name?.trim();
+		const symbol = v.symbol?.trim();
+		const cap = v.cap;
+		const redeemWalletAddress = v.redeemWalletAddress?.trim();
+		const tokenImage = v.tokenImage?.trim();
+		const walletAddress = v.walletAddress?.trim();
+		const rate = v.rate;
+		const openingTime = v.openingTime;
+		const closingTime = v.closingTime;
+		const tokensToCrowdsale = v.tokensToCrowdsale;
+		if (!name || !symbol || !cap || !redeemWalletAddress || !selectedWinery) {
+			toast.error("Missing required fields");
+			return;
+		}
+		setLoading(true);
+		const toastId = toast.loading(
+			isEditMode
+				? "Updating token in database..."
+				: "Saving token in database...",
+			{ theme: "dark" }
+		);
+		try {
+			if (isEditMode) {
+				await updateTokenInfo(symbol, {
+					name,
+					symbol,
+					cap,
+					redeemWalletAddress,
+					tokenImage,
+					walletAddress,
+					rate,
+					openingTime,
+					closingTime,
+					tokensToCrowdsale,
+					winery_id: selectedWinery,
+				});
+			} else {
+				await createTokenForLaunch(symbol, {
+					name,
+					symbol,
+					cap,
+					redeemWalletAddress,
+					tokenImage,
+					walletAddress,
+					rate,
+					openingTime,
+					closingTime,
+					tokensToCrowdsale,
+					winery_id: selectedWinery,
+					token_address: "",
+					crowdsale_address: "",
+				});
+			}
+			toast.update(toastId, {
+				render: isEditMode
+					? "Token updated successfully!"
+					: "Token saved successfully!",
+				isLoading: false,
+				type: "success",
+				autoClose: 2000,
+			});
+			router.push("/provisioning");
+		} catch (err) {
+			console.error("Error saving token:", err);
+			toast.update(toastId, {
+				render: isEditMode ? "Failed to update token" : "Failed to save token",
+				isLoading: false,
+				type: "error",
+				autoClose: 3000,
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const finalizeAndRenewCrowdsale = async () => {
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
+		const toastId = toast.loading("🔄 Finalizing crowdsale...", {
+			theme: "dark",
+		});
+		setLoading(true);
+
+		try {
+			const crowdsaleContract = new ethers.Contract(
+				crowdsaleAddress,
+				crowdAbi,
+				signer
+			);
+
+			// ✅ Finalizar si no está finalizado
+			const alreadyFinalized = await crowdsaleContract.isFinalized();
+			if (!alreadyFinalized) {
+				const finalizeTx = await crowdsaleContract.finalize();
+				await finalizeTx.wait();
+
+				toast.update(toastId, {
+					render: "✅ Crowdsale finalized! Retrieving tokens...",
+					isLoading: true,
+				});
+			} else {
+				console.log("⚠️ Crowdsale already finalized. Skipping finalize...");
+				toast.update(toastId, {
+					render: "⚠️ Crowdsale already finalized. Renewing...",
+					isLoading: true,
+				});
+			}
+
+			// ✅ Obtener balance actual de la wallet
+			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+
+			const walletAddress = await signer.getAddress();
+			const walletBalance = await tokenContract.balanceOf(walletAddress);
+			const totalTokens = ethers.utils.formatEther(walletBalance);
+
+			console.log(`🎉 Wallet balance: ${totalTokens} tokens`);
+
+			// ✅ Actualizar DB con tokens y habilitar transferencia
+			await updateTokenInfo(getValues().symbol, {
+				cap: totalTokens,
+				tokensToCrowdsale: totalTokens,
+				transfered_to_crowdsale: false,
+			});
+			setToken((prev) => ({
+				...prev,
+				cap: totalTokens,
+				tokensToCrowdsale: totalTokens,
+				transfered_to_crowdsale: false,
+			}));
+
+			// ✅ Crear nuevo crowdsale
+			const v = getValues();
+			const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
+			const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
+
+			const crowdFactory = new ethers.ContractFactory(
+				crowdAbi,
+				crowdBytecode,
+				signer
+			);
+
+			toast.update(toastId, {
+				render: "🚀 Deploying new crowdsale...",
+				isLoading: true,
+			});
+
+			const newCrowdsale = await crowdFactory.deploy(
+				v.walletAddress,
+				tokenAddress,
+				ethers.utils.parseEther(totalTokens).div(v.rate),
+				openingTs,
+				closingTs,
+				v.rate
+			);
+			await newCrowdsale.deployed();
+
+			// ✅ Actualizar DB con nueva dirección del crowdsale
+			await updateTokenInfo(getValues().symbol, {
+				crowdsale_address: newCrowdsale.address,
+			});
+			setCrowdsaleAddress(newCrowdsale.address);
+
+			toast.update(toastId, {
+				render: "✅ Crowdsale renewed successfully!",
+				isLoading: false,
+				type: "success",
+				autoClose: 4000,
+			});
+
+			setTransferDisabled(false);
+			setTransferDone(false);
+		} catch (error) {
+			console.error("🚨 Finalize & Renew failed:", error);
+			toast.update(toastId, {
+				render: `❌ ${error.message || "Finalize & Renew failed"}`,
+				isLoading: false,
+				type: "error",
+				autoClose: 5000,
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const finalizeCrowdsale = async () => {
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
+		const toastId = toast.loading("🔒 Finalizing crowdsale...", {
+			theme: "dark",
+		});
+		setLoading(true);
+
+		try {
+			const signer = ethers5Adapter.toEthers({
+				client,
+				chain: getChain(),
+			});
+
+			const crowdsaleContract = new ethers.Contract(
+				crowdsaleAddress,
+				crowdAbi,
+				signer
+			);
+
+			const alreadyFinalized = await crowdsaleContract.isFinalized();
+			if (alreadyFinalized) {
+				toast.update(toastId, {
+					render: "⚠️ Crowdsale already finalized.",
+					isLoading: false,
+					type: "info",
+					autoClose: 3000,
+				});
+				setLoading(false);
+				return;
+			}
+
+			const finalizeTx = await crowdsaleContract.finalize();
+			await finalizeTx.wait();
+
+			toast.update(toastId, {
+				render: "✅ Crowdsale finalized!",
+				isLoading: false,
+				type: "success",
+				autoClose: 4000,
+			});
+
+			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+
+			const walletAddress = await signer.getAddress();
+			const walletBalance = await tokenContract.balanceOf(walletAddress);
+			const totalTokens = ethers.utils.formatEther(walletBalance);
+
+			await updateTokenInfo(getValues().symbol, {
+				cap: totalTokens,
+				transfered_to_crowdsale: false,
+				crowdsale_address: "",
+			});
+
+			setToken((prev) => ({
+				...prev,
+				cap: totalTokens,
+				crowdsaleAddress: "",
+				transfered_to_crowdsale: false,
+			}));
+			setTransferDisabled(true);
+			setDisableDeploy(false);
+		} catch (error) {
+			console.error("🚨 Finalize failed:", error);
+			toast.update(toastId, {
+				render: `❌ ${error.message || "Finalize failed"}`,
+				isLoading: false,
+				type: "error",
+				autoClose: 5000,
+			});
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -335,24 +651,29 @@ const Launch = () => {
 					{/* Token Config */}
 					<h2 className="text-xl font-semibold">{t("token_config")}</h2>
 					<div className="grid lg:grid-cols-3 gap-4">
+						{/* Nombre */}
 						<div>
 							<label className="font-bold">{t("token_name")}</label>
 							<input
 								{...register("name")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
+
+						{/* Símbolo */}
 						<div>
 							<label className="font-bold">{t("token_symbol")}</label>
 							<input
 								{...register("symbol")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
+
+						{/* Cap */}
 						<div>
 							<label className="font-bold">{t("token_cap")}</label>
 							<input
@@ -361,9 +682,11 @@ const Launch = () => {
 								{...register("cap")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
+
+						{/* Redeem Wallet */}
 						<div>
 							<label className="font-bold">{t("REDEEM_wallet_address")}</label>
 							<input
@@ -371,25 +694,70 @@ const Launch = () => {
 								{...register("redeemWalletAddress")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
+
+						{/* Logo */}
 						<div>
 							<label className="font-bold">{t("token_logo")}</label>
-
 							<input
 								type="file"
 								accept="image/*"
-								{...register("tokenImage")}
+								onChange={async (e) => {
+									const file = e.target.files[0];
+									if (!file) return;
+									try {
+										const url = await uploadImage(file);
+										setValue("tokenImage", url);
+										toast.success("Logo uploaded to IPFS");
+									} catch {
+										toast.error("Error uploading logo to IPFS");
+									}
+								}}
 								className="w-full mt-1 p-2 border rounded bg-white"
-								disabled
+								disabled={isFieldDisabled() || uploading}
 							/>
+							{uploading && (
+								<p className="text-sm text-gray-500 mt-2">Uploading...</p>
+							)}
+							{ipfsUrl && (
+								<div className="mt-2">
+									<img
+										src={ipfsUrl}
+										alt="Token Logo Preview"
+										className="rounded-lg shadow w-32 h-32 object-contain border"
+									/>
+									<p className="text-xs break-all mt-1">{ipfsUrl}</p>
+								</div>
+							)}
+						</div>
+
+						{/* Winery */}
+						<div>
+							<label className="font-bold">{t("select_winery")}</label>
+							<select
+								value={selectedWinery}
+								onChange={(e) => {
+									setSelectedWinery(e.target.value);
+									setValue("winery_id", e.target.value);
+								}}
+								className="w-full mt-1 p-2 border rounded bg-white"
+								disabled={isFieldDisabled()}
+							>
+								{wineries.map((wineryId) => (
+									<option key={wineryId} value={wineryId}>
+										{wineryId}
+									</option>
+								))}
+							</select>
 						</div>
 					</div>
 
 					{/* Crowdsale Config */}
 					<h2 className="text-xl font-semibold">{t("crowdsale_config")}</h2>
 					<div className="grid lg:grid-cols-2 gap-4">
+						{/* Wallet Address */}
 						<div>
 							<label className="font-bold">{t("VCO_wallet_address")}</label>
 							<input
@@ -397,72 +765,78 @@ const Launch = () => {
 								{...register("walletAddress")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
+
+						{/* Price per Token */}
 						<div>
 							<label className="font-bold">{t("price_per_token")}</label>
-
 							<input
 								type="number"
 								step="any"
 								{...register("pricePerToken")}
-								// onChange={(e) => {
-								// 	const price = parseFloat(e.target.value);
-								// 	if (!isNaN(price) && price > 0) {
-								// 		const newRate = Math.floor(1 / price);
-								// 		setValue("rate", newRate);
-								// 	} else {
-								// 		setValue("rate", 0);
-								// 	}
-								// }}
+								onChange={(e) => {
+									const price = parseFloat(e.target.value);
+									if (!isNaN(price) && price > 0) {
+										const newRate = Math.floor(1 / price);
+										setValue("rate", newRate);
+									} else {
+										setValue("rate", 0);
+									}
+								}}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
 
+						{/* Rate */}
 						<div>
 							<label className="font-bold">{t("rate_tokens_per_eth")}</label>
-
 							<input
 								type="number"
 								{...register("rate")}
-								// onChange={(e) => {
-								// 	const rate = parseFloat(e.target.value);
-								// 	if (!isNaN(rate) && rate > 0) {
-								// 		const newPrice = 1 / rate;
-								// 		setValue("pricePerToken", parseFloat(newPrice.toFixed(8))); // más preciso
-								// 	} else {
-								// 		setValue("pricePerToken", 0);
-								// 	}
-								// }}
+								onChange={(e) => {
+									const rate = parseFloat(e.target.value);
+									if (!isNaN(rate) && rate > 0) {
+										const newPrice = 1 / rate;
+										setValue("pricePerToken", parseFloat(newPrice.toFixed(8)));
+									} else {
+										setValue("pricePerToken", 0);
+									}
+								}}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
 
+						{/* Opening Time */}
 						<div>
 							<label className="font-bold">{t("opening_time")}</label>
 							<input
-								type="text"
-								value={new Date(token.openingTime).toLocaleString()} // o usa tu formato preferido
+								type="datetime-local"
+								{...register("openingTime")}
 								className="w-full mt-1 p-2 border rounded"
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
+
+						{/* Closing Time */}
 						<div>
 							<label className="font-bold">{t("closing_time")}</label>
 							<input
-								type="text"
-								value={new Date(token.closingTime).toLocaleString()}
+								type="datetime-local"
+								{...register("closingTime")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
-						<div className="lg:col-span-[1]">
+
+						{/* Tokens to Crowdsale */}
+						<div className="lg:col-span-1">
 							<label className="font-bold">{t("tokens_to_crowdsale")}</label>
 							<input
 								type="number"
@@ -470,35 +844,118 @@ const Launch = () => {
 								{...register("tokensToCrowdsale")}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled
+								disabled={isFieldDisabled()}
 							/>
 						</div>
 					</div>
-
-					<div className="flex justify-end space-x-4">
+					{/* Token Address (solo si existe) */}
+					{token?.token_address && (
+						<div className="lg:col-span-3">
+							<label className="font-bold">{t("token_address")}</label>
+							<input
+								type="text"
+								value={token?.token_address}
+								className="w-full mt-1 p-2 border rounded bg-gray-100"
+								disabled
+							/>
+						</div>
+					)}
+					{token?.crowdsale_address && (
+						<div className="lg:col-span-3">
+							<label className="font-bold">{t("crowdsale_address")}</label>
+							<input
+								type="text"
+								value={token?.crowdsale_address}
+								className="w-full mt-1 p-2 border rounded bg-gray-100"
+								disabled
+							/>
+						</div>
+					)}
+					{/* Buttons */}
+					<div className="flex justify-between space-x-4 mt-4">
+						{/* Volver */}
 						<button
 							type="button"
 							onClick={() => router.back()}
 							className="px-6 py-2 bg-gray-300 rounded"
-							disabled
 						>
 							{t("volver")}
 						</button>
-						<button
-							type="button"
-							onClick={handleDeployAll}
-							disabled={loading}
-							className="px-6 py-2 bg-green-700 text-white rounded"
-						>
-							{t("deploy_token")}
-						</button>
+
+						{/* Guardar token en DB en modos crear o editar */}
+						{(isCreateMode || isEditMode) && (
+							<button
+								type="button"
+								onClick={createTokenInDatabase}
+								disabled={loading}
+								className={`px-6 py-2 rounded text-white ${
+									loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
+								}`}
+							>
+								{t("save_token")}
+							</button>
+						)}
+
+						{/* Deploy y Transfer solo en modo vista */}
+						{isViewMode && (
+							<>
+								<button
+									type="button"
+									onClick={handleDeployAll}
+									disabled={loading || disableDeploy}
+									className={`px-6 py-2 rounded text-white ${
+										loading || disableDeploy
+											? "bg-gray-400 cursor-not-allowed"
+											: "bg-green-700"
+									}`}
+								>
+									Deploy Contracts
+								</button>
+
+								<button
+									type="button"
+									onClick={transferTokensToCrowdsale}
+									disabled={loading || transferDisabled}
+									className={`px-6 py-2 rounded text-white ${
+										loading || transferDisabled
+											? "bg-gray-400 cursor-not-allowed"
+											: "bg-blue-600"
+									}`}
+								>
+									Transfer Tokens to Crowdsale
+								</button>
+							</>
+						)}
+						{isViewMode && transferDone && (
+							<button
+								type="button"
+								onClick={finalizeAndRenewCrowdsale}
+								disabled={loading}
+								className={`px-6 py-2 rounded text-white ${
+									loading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700"
+								}`}
+							>
+								Finalize & Renew
+							</button>
+						)}
+						{isViewMode && transferDone && (
+							<button
+								type="button"
+								onClick={finalizeCrowdsale}
+								disabled={loading}
+								className={`px-6 py-2 rounded text-white ${
+									loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600"
+								}`}
+							>
+								Finalize Crowdsale
+							</button>
+						)}
 					</div>
 				</form>
 				{(tokenAddress || crowdsaleAddress) && (
 					<div className="mt-8 space-y-2 text-center">
 						{tokenAddress && (
 							<>
-								{console.log("Token address:", tokenAddress)}
 								<p>
 									{t("token_address")}:{" "}
 									<a
@@ -518,7 +975,6 @@ const Launch = () => {
 						)}
 						{crowdsaleAddress && (
 							<>
-								{console.log("Crowdsale address:", crowdsaleAddress)}
 								<p>
 									{t("crowdsale_address")}:{" "}
 									<a

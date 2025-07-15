@@ -1,4 +1,4 @@
-import { tokenLaunching } from "../controllers/tokensController";
+import { tokensLaunchingAll } from "../controllers/tokensController";
 import tokenVerify from "../helpers/tokenVerify";
 
 export default async function handler(req, res) {
@@ -8,12 +8,9 @@ export default async function handler(req, res) {
 	}
 
 	if (req.method === "GET") {
-		const { id } = req.query;
-		console.log(id);
-
 		try {
-			const tokenInfo = await tokenLaunching(id);
-			return res.status(200).json(tokenInfo);
+			const tokensInfo = await tokensLaunchingAll();
+			return res.status(200).json(tokensInfo);
 		} catch (error) {
 			console.error("Error en GET:", error);
 			return res.status(400).json({ error: error.message });

@@ -1,23 +1,20 @@
 import React from "react";
 import Link from "next/link";
-import { FaPencilAlt } from "react-icons/fa";
-import {
-	MdSkipNext,
-	MdSkipPrevious,
-	MdNavigateNext,
-	MdNavigateBefore,
-} from "react-icons/md";
+import { FaPencilAlt, FaRocket } from "react-icons/fa";
+
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { ROUTE_CONSTANTS, tableRoutes } from "@/utils/tableUtils";
 import { useTable } from "@/hooks/useTable";
+import { isAdminUser } from "@/utils/authUtils";
+import { useSession } from "next-auth/react";
 
 const Table = ({ data, columnas, n, route = "/detail" }) => {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const showModal = useSelector((state) => state.notification.showModal);
-
+	const session = useSession();
 	const {
 		tooltip,
 		handleMouseEnter,
@@ -46,7 +43,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 				<table className="w-full divide-y divide-gray-200 border border-gray-100">
 					<thead>
 						<tr>
-							{columnas.map((columna) => (
+							{columnas?.map((columna) => (
 								<th
 									key={columna.field}
 									onClick={() => handleOrdenarColumna(columna.field)}
@@ -63,12 +60,95 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 						</tr>
 					</thead>
 					<tbody className="text-sm">
+						{orderPagedData().length === 0 ? (
+							<tr>
+								<td
+									colSpan={columnas.length}
+									className="text-center py-4 text-gray-500 italic"
+								>
+									{t("ups_no_hay_nada_aqui")}
+								</td>
+							</tr>
+						) : (
+							orderPagedData().map((fila, index) => (
+								<tr
+									key={index}
+									className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+								>
+									{columnas?.map((columna) => {
+										if (columna.field === "acciones") {
+											return (
+												<td
+													key={columna.field}
+													className="px-0 py-1 text-[0.75rem] text-gray-900 text-center"
+												>
+													<Link href={`${route}/${fila.id}`}>
+														<div className="inline-flex items-center px-0">
+															{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+															)}
+															{/* Botón de Launch */}
+															{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																<Link href={`${route}/${fila.id}`}>
+																	<FaRocket
+																		className="text-gray-400 cursor-pointer hover:text-gray-700"
+																		title="Launch Token"
+																	/>
+																</Link>
+															)}
+
+															{/* Botón de Edit solo en Provisioning */}
+															{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
+																isAdminUser(session) && (
+																	<Link href={`${route}/${fila.id}?edit=true`}>
+																		<FaPencilAlt
+																			className="text-gray-400 cursor-pointer hover:text-gray-700"
+																			title="Edit Token"
+																		/>
+																	</Link>
+																)}
+														</div>
+													</Link>
+												</td>
+											);
+										}
+										return (
+											<td
+												key={columna.field}
+												className="px-2 py-1 text-[0.9rem] text-gray-900 text-center"
+												style={{
+													maxWidth: "5rem",
+													overflow: "hidden",
+													textOverflow: "ellipsis",
+													whiteSpace: "nowrap",
+												}}
+												onMouseEnter={(e) =>
+													handleMouseEnter(fila[columna.field], e)
+												}
+												onMouseLeave={handleMouseLeave}
+											>
+												<div>
+													{columna.field === "created_at"
+														? new Date(fila[columna.field]).toLocaleDateString(
+																"es-AR"
+														  )
+														: fila[columna.field]}
+												</div>
+											</td>
+										);
+									})}
+								</tr>
+							))
+						)}
+					</tbody>
+
+					{/* <tbody className="text-sm">
 						{orderPagedData().map((fila, index) => (
 							<tr
 								key={index}
 								className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
 							>
-								{columnas.map((columna) => {
+								{columnas?.map((columna) => {
 									if (columna.field === "acciones") {
 										return (
 											<td
@@ -77,7 +157,12 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 											>
 												<Link href={`${route}/${fila.id}`}>
 													<div className="inline-flex items-center px-0">
-														<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+														{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+															<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+														)}
+														{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+															<FaRocket className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+														)}
 													</div>
 												</Link>
 											</td>
@@ -110,7 +195,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 								})}
 							</tr>
 						))}
-					</tbody>
+					</tbody> */}
 				</table>
 			</div>
 
@@ -135,14 +220,16 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 			>
 				{renderbuttonsPages()}
 
-				{route !== ROUTE_CONSTANTS.DETAIL_ROUTE && (
-					<button
-						className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
-						onClick={() => router.push(tableRoutes[route]?.actionRoute)}
-					>
-						{t(tableRoutes[route]?.label)}
-					</button>
-				)}
+				{route !== ROUTE_CONSTANTS.DETAIL_ROUTE &&
+					route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
+					isAdminUser(session) && (
+						<button
+							className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
+							onClick={() => router.push(tableRoutes[route]?.actionRoute)}
+						>
+							{t(tableRoutes[route]?.label)}
+						</button>
+					)}
 			</div>
 		</>
 	);

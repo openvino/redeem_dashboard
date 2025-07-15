@@ -60,15 +60,31 @@ export async function updateShipping(body) {
 	return true;
 }
 
-export const tokensLaunching = async (id) => {
+export const tokensLaunching = async (wineryId) => {
+	const query = `SELECT * FROM token_launch WHERE winery_id = $1;`;
+	const { rows } = await conn.query(query, [wineryId]);
+
+	console.log(rows);
+
+	return rows;
+};
+export const tokensLaunchingAll = async () => {
+	const query = `SELECT * FROM token_launch;`;
+	const { rows } = await conn.query(query);
+
+	console.log(rows);
+
+	return rows;
+};
+export const tokenLaunching = async (id) => {
 	console.log(id);
 
-	const query = `SELECT * FROM token_launch WHERE winery_id = $1;`;
+	const query = `SELECT * FROM token_launch WHERE id = $1;`;
 	const { rows } = await conn.query(query, [id]);
 
 	console.log(rows);
 
-	return rows[0]; //todo multiple tokens logic
+	return rows[0];
 };
 
 export const updateLaunchingToken = async (id, fieldsToUpdate) => {
@@ -84,7 +100,7 @@ export const updateLaunchingToken = async (id, fieldsToUpdate) => {
 	}
 
 	const setClause = columns
-		.map((col, index) => `${col} = $${index + 1}`)
+		.map((col, index) => `"${col}" = $${index + 1}`)
 		.join(", ");
 
 	const query = `
@@ -107,6 +123,75 @@ export const updateLaunchingToken = async (id, fieldsToUpdate) => {
 		return rows[0];
 	} catch (error) {
 		console.error("Error al actualizar token_launch:", error);
+		throw error;
+	}
+};
+
+export const createLaunchingToken = async (body) => {
+	const {
+		id,
+		name,
+		symbol,
+		cap,
+		redeemWalletAddress,
+		tokenImage,
+		walletAddress,
+		rate,
+		openingTime,
+		closingTime,
+		tokensToCrowdsale,
+		token_address,
+		crowdsale_address,
+		winery_id,
+	} = body;
+
+	const query = `
+  INSERT INTO token_launch (
+    id,
+    name,
+    symbol,
+    cap,
+    "redeemWalletAddress",
+    "tokenImage",
+    "walletAddress",
+    rate,
+    "openingTime",
+    "closingTime",
+    "tokensToCrowdsale",
+    token_address,
+    crowdsale_address,
+    winery_id
+  )
+  VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+  )
+  RETURNING *;
+`;
+
+	const values = [
+		id,
+		name,
+		symbol,
+		cap,
+		redeemWalletAddress,
+		tokenImage,
+		walletAddress,
+		rate,
+		openingTime,
+		closingTime,
+		tokensToCrowdsale,
+		token_address,
+		crowdsale_address,
+		winery_id,
+	];
+
+	try {
+		const { rows } = await conn.query(query, values);
+
+		console.log(`Registro creado para id = ${id}:`, rows[0]);
+		return rows[0];
+	} catch (error) {
+		console.error("Error al crear token_launch:", error);
 		throw error;
 	}
 };
