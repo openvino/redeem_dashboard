@@ -88,12 +88,19 @@ export const tokenLaunching = async (id) => {
 };
 
 export const updateLaunchingToken = async (id, fieldsToUpdate) => {
+	console.log({ id, ...fieldsToUpdate });
+
 	if (!id) {
 		throw new Error("ID is required to update record");
 	}
 
 	const columns = Object.keys(fieldsToUpdate);
-	const values = Object.values(fieldsToUpdate);
+	const values = Object.values(fieldsToUpdate).map((v) => {
+		if (typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v)) {
+			return v.replace("T", " ") + ":00";
+		}
+		return v;
+	});
 
 	if (columns.length === 0) {
 		throw new Error("No fields provided for update");

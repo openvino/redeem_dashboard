@@ -190,7 +190,6 @@ const Launch = () => {
 		await updateTokenInfo(symbol, { token_address: token.address });
 		return token;
 	};
-
 	const deployCrowdsale = async (token, toastId) => {
 		const signer = await ethers5Adapter.signer.toEthers({
 			client: client,
@@ -203,8 +202,18 @@ const Launch = () => {
 		if (!walletAddress) throw new Error("Wallet address missing");
 
 		const rate = Number(String(v.rate || "").trim());
-		const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
-		const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
+
+		// 🛠 Fix: convertir fechas a timestamp correctamente
+		const toTimestamp = (dateString) => {
+			if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(dateString)) {
+				dateString = dateString.replace(" ", "T") + ":00"; // Forzar ISO format
+			}
+			return Math.floor(new Date(dateString).getTime() / 1000);
+		};
+
+		const openingTs = toTimestamp(v.openingTime);
+		const closingTs = toTimestamp(v.closingTime);
+
 		const tokensBN = ethers.utils.parseEther(
 			String(v.tokensToCrowdsale || "").trim()
 		);
@@ -236,6 +245,52 @@ const Launch = () => {
 
 		return crowdsale;
 	};
+
+	// const deployCrowdsale = async (token, toastId) => {
+	// 	const signer = await ethers5Adapter.signer.toEthers({
+	// 		client: client,
+	// 		chain: chain,
+	// 		account: account,
+	// 	});
+	// 	const v = getValues();
+	// 	const symbol = v.symbol?.trim();
+	// 	const walletAddress = v.walletAddress?.trim();
+	// 	if (!walletAddress) throw new Error("Wallet address missing");
+
+	// 	const rate = Number(String(v.rate || "").trim());
+	// 	const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
+	// 	const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
+	// 	const tokensBN = ethers.utils.parseEther(
+	// 		String(v.tokensToCrowdsale || "").trim()
+	// 	);
+
+	// 	toast.update(toastId, {
+	// 		render: "Deploying crowdsale contract...",
+	// 		isLoading: true,
+	// 	});
+
+	// 	const crowdFactory = new ethers.ContractFactory(
+	// 		crowdAbi,
+	// 		crowdBytecode,
+	// 		signer
+	// 	);
+	// 	const crowdsale = await crowdFactory.deploy(
+	// 		walletAddress,
+	// 		token.address,
+	// 		tokensBN.div(rate),
+	// 		openingTs,
+	// 		closingTs,
+	// 		rate
+	// 	);
+	// 	await crowdsale.deployed();
+
+	// 	setCrowdsaleAddress(crowdsale.address);
+	// 	await updateTokenInfo(symbol, { crowdsale_address: crowdsale.address });
+
+	// 	await new Promise((res) => setTimeout(res, 8000));
+
+	// 	return crowdsale;
+	// };
 
 	const transferTokensToCrowdsale = async () => {
 		const signer = await ethers5Adapter.signer.toEthers({
@@ -448,7 +503,6 @@ const Launch = () => {
 			setLoading(false);
 		}
 	};
-
 	const finalizeAndRenewCrowdsale = async () => {
 		const signer = await ethers5Adapter.signer.toEthers({
 			client: client,
@@ -467,25 +521,24 @@ const Launch = () => {
 				signer
 			);
 
-			// ✅ Finalizar si no está finalizado
 			const alreadyFinalized = await crowdsaleContract.isFinalized();
 			if (!alreadyFinalized) {
 				const finalizeTx = await crowdsaleContract.finalize();
 				await finalizeTx.wait();
 
 				toast.update(toastId, {
-					render: "✅ Crowdsale finalized! Retrieving tokens...",
+					render: "Crowdsale finalized! Retrieving tokens...",
 					isLoading: true,
 				});
 			} else {
-				console.log("⚠️ Crowdsale already finalized. Skipping finalize...");
+				console.log("Crowdsale already finalized. Skipping finalize...");
 				toast.update(toastId, {
-					render: "⚠️ Crowdsale already finalized. Renewing...",
+					render: "Crowdsale already finalized. Renewing...",
 					isLoading: true,
 				});
 			}
 
-			// ✅ Obtener balance actual de la wallet
+			// Obtener balance actual de la wallet
 			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
 
 			const walletAddress = await signer.getAddress();
@@ -494,7 +547,7 @@ const Launch = () => {
 
 			console.log(`🎉 Wallet balance: ${totalTokens} tokens`);
 
-			// ✅ Actualizar DB con tokens y habilitar transferencia
+			// Actualizar DB con tokens y habilitar transferencia
 			await updateTokenInfo(getValues().symbol, {
 				cap: totalTokens,
 				tokensToCrowdsale: totalTokens,
@@ -507,10 +560,17 @@ const Launch = () => {
 				transfered_to_crowdsale: false,
 			}));
 
-			// ✅ Crear nuevo crowdsale
+			// 🛠 Fix: convertir fechas a timestamp correctamente
+			const toTimestamp = (dateString) => {
+				if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(dateString)) {
+					dateString = dateString.replace(" ", "T") + ":00"; // Forzar ISO format
+				}
+				return Math.floor(new Date(dateString).getTime() / 1000);
+			};
+
 			const v = getValues();
-			const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
-			const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
+			const openingTs = toTimestamp(v.openingTime);
+			const closingTs = toTimestamp(v.closingTime);
 
 			const crowdFactory = new ethers.ContractFactory(
 				crowdAbi,
@@ -560,6 +620,127 @@ const Launch = () => {
 			setLoading(false);
 		}
 	};
+
+	// const finalizeAndRenewCrowdsale = async () => {
+	// 	const signer = await ethers5Adapter.signer.toEthers({
+	// 		client: client,
+	// 		chain: chain,
+	// 		account: account,
+	// 	});
+	// 	const toastId = toast.loading("🔄 Finalizing crowdsale...", {
+	// 		theme: "dark",
+	// 	});
+	// 	setLoading(true);
+
+	// 	try {
+	// 		const crowdsaleContract = new ethers.Contract(
+	// 			crowdsaleAddress,
+	// 			crowdAbi,
+	// 			signer
+	// 		);
+
+	// 		const alreadyFinalized = await crowdsaleContract.isFinalized();
+	// 		if (!alreadyFinalized) {
+	// 			const finalizeTx = await crowdsaleContract.finalize();
+	// 			await finalizeTx.wait();
+
+	// 			toast.update(toastId, {
+	// 				render: "Crowdsale finalized! Retrieving tokens...",
+	// 				isLoading: true,
+	// 			});
+	// 		} else {
+	// 			console.log("Crowdsale already finalized. Skipping finalize...");
+	// 			toast.update(toastId, {
+	// 				render: "Crowdsale already finalized. Renewing...",
+	// 				isLoading: true,
+	// 			});
+	// 		}
+
+	// 		// Obtener balance actual de la wallet
+	// 		const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+
+	// 		const walletAddress = await signer.getAddress();
+	// 		const walletBalance = await tokenContract.balanceOf(walletAddress);
+	// 		const totalTokens = ethers.utils.formatEther(walletBalance);
+
+	// 		console.log(`🎉 Wallet balance: ${totalTokens} tokens`);
+
+	// 		// Actualizar DB con tokens y habilitar transferencia
+	// 		await updateTokenInfo(getValues().symbol, {
+	// 			cap: totalTokens,
+	// 			tokensToCrowdsale: totalTokens,
+	// 			transfered_to_crowdsale: false,
+	// 		});
+	// 		setToken((prev) => ({
+	// 			...prev,
+	// 			cap: totalTokens,
+	// 			tokensToCrowdsale: totalTokens,
+	// 			transfered_to_crowdsale: false,
+	// 		}));
+
+	// 		// ✅ Crear nuevo crowdsale
+	// 		const v = getValues();
+	// 		// const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
+	// 		// const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
+	// 		const toTimestamp = (dateString) => {
+	// 			// Si viene como "YYYY-MM-DD HH:MM", agregar ":00" y forzar formato ISO
+	// 			if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(dateString)) {
+	// 				dateString = dateString.replace(" ", "T") + ":00";
+	// 			}
+	// 			return Math.floor(new Date(dateString).getTime() / 1000);
+	// 		};
+
+	// 		const openingTs = toTimestamp(v.openingTime);
+	// 		const closingTs = toTimestamp(v.closingTime);
+
+	// 		const crowdFactory = new ethers.ContractFactory(
+	// 			crowdAbi,
+	// 			crowdBytecode,
+	// 			signer
+	// 		);
+
+	// 		toast.update(toastId, {
+	// 			render: "🚀 Deploying new crowdsale...",
+	// 			isLoading: true,
+	// 		});
+
+	// 		const newCrowdsale = await crowdFactory.deploy(
+	// 			v.walletAddress,
+	// 			tokenAddress,
+	// 			ethers.utils.parseEther(totalTokens).div(v.rate),
+	// 			openingTs,
+	// 			closingTs,
+	// 			v.rate
+	// 		);
+	// 		await newCrowdsale.deployed();
+
+	// 		// ✅ Actualizar DB con nueva dirección del crowdsale
+	// 		await updateTokenInfo(getValues().symbol, {
+	// 			crowdsale_address: newCrowdsale.address,
+	// 		});
+	// 		setCrowdsaleAddress(newCrowdsale.address);
+
+	// 		toast.update(toastId, {
+	// 			render: "✅ Crowdsale renewed successfully!",
+	// 			isLoading: false,
+	// 			type: "success",
+	// 			autoClose: 4000,
+	// 		});
+
+	// 		setTransferDisabled(false);
+	// 		setTransferDone(false);
+	// 	} catch (error) {
+	// 		console.error("🚨 Finalize & Renew failed:", error);
+	// 		toast.update(toastId, {
+	// 			render: `❌ ${error.message || "Finalize & Renew failed"}`,
+	// 			isLoading: false,
+	// 			type: "error",
+	// 			autoClose: 5000,
+	// 		});
+	// 	} finally {
+	// 		setLoading(false);
+	// 	}
+	// };
 
 	const finalizeCrowdsale = async () => {
 		const signer = await ethers5Adapter.signer.toEthers({

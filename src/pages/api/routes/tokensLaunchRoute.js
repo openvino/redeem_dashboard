@@ -97,6 +97,8 @@ export default async function handler(req, res) {
 
 		const { id, ...fieldsToUpdate } = req.body.params;
 
+		console.log({ id, ...fieldsToUpdate });
+
 		if (!id) {
 			return res.status(400).json({ error: "ID is required to update record" });
 		}
