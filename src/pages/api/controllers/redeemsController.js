@@ -87,14 +87,12 @@ export const getAllRedeems = async () => {
   }
 };
 export const getAllLogs = async () => {
-  console.log("getAllLogs");
 
   let query = `SELECT *`;
   // let query = `SELECT redeem_logs.id, redeem_logs.customer_id, redeem_logs.year, redeem_logs.street, redeem_logs.number, redeem_logs.country_id, redeem_logs.province_id, redeem_logs.zip, redeem_logs.telegram_id, redeem_logs.amount, redeem_logs.created_at, redeem_logs.updated_at, redeem_logs.winerie_id, redeem_logs.city, redeem_logs.phone, redeem_logs.signature, redeem_logs.burn_tx_hash, redeem_logs.shipping_tx_hash, redeem_logs.error_message, redeem_logs.shipping_paid_status, redeem_logs.pickup`;
   query += `FROM redeem_logs `;
   try {
     const log = await conn.query(query);
-    console.log(log.rows);
     if (log.rows.length > 0) {
       return log.rows;
     } else {

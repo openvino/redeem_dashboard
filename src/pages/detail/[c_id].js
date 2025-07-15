@@ -1,24 +1,18 @@
-import { useSession, signOut, getSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import clientAxios from "@/config/clientAxios";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
 import { useForm } from "react-hook-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { getRedeems } from "@/redux/actions/winaryActions";
 import Head from "next/head";
-
-import {
-  closeNotification,
-  showNotification,
-} from "@/redux/actions/notificationActions";
+import HomeLayout from "@/components/HomeLayout";
+import FormField from "@/components/FormField";
 
 function Detail({ redeems, countries, provinces }) {
-  const allRedeems = useSelector((state) => state.winaryAdress.redeems);
   const { t } = useTranslation();
   const session = useSession();
   const router = useRouter();
@@ -67,7 +61,7 @@ function Detail({ redeems, countries, provinces }) {
       isLoading: true,
     });
     try {
-      const response = await clientAxios.put("/redeemRoute", {
+      await clientAxios.put("/redeemRoute", {
         data,
       });
 
@@ -102,7 +96,7 @@ function Detail({ redeems, countries, provinces }) {
   }, [redeem, session]);
 
   return (
-    <>
+    <HomeLayout>
       <Head>
         <title>OpenVino - Detail redeems</title>
       </Head>
@@ -120,141 +114,81 @@ function Detail({ redeems, countries, provinces }) {
       />
       {/* Same as */}
       <ToastContainer />
-      <Topbar />
-      <Sidebar />
-      <div
-        className="
-      z-1 lg:overflow-x-hidden
-      mt-[8rem]
-      ml-[6rem]
-      overflow-x-scroll
-    "
-      >
+      <div className="z-1">
         <h1 className="text-2xl font-bold text-center mb-4">{t("detalle")}</h1>
 
         <form
-          className="space-y-2 flex justify-center flex-col"
+          className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">Id:</label>
-              <input
-                required
-                disabled
-                type="text"
-                id="id"
-                name="id"
-                value={redeem.id}
-                {...register("id")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("monto")}:</label>
-              <input
-                required
-                disabled
-                type="text"
-                id="amount"
-                name="amount"
-                value={redeem.amount}
-                {...register("amount")}
-                className="flex-1 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
-              />
-            </div>
+          {/* ID + Monto */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label="Id:"
+              disabled
+              value={redeem.id}
+              {...register("id")}
+            />
+            <FormField
+              label={t("monto")}
+              disabled
+              value={redeem.amount}
+              {...register("amount")}
+            />
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("nombre")}:</label>
-              <input
-                required
-                type="text"
-                id="name"
-                name="name"
-                defaultValue={redeem.name}
-                {...register("name")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">Customer_id:</label>
-              <input
-                required
-                disabled
-                type="text"
-                id="customer_id"
-                name="customer_id"
-                defaultValue={redeem.customer_id}
-                {...register("customer_id")}
-                className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
-              />
-            </div>
+          {/* Nombre + Customer_id */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label={t("nombre")}
+              defaultValue={redeem.name}
+              {...register("name")}
+            />
+            <FormField
+              label="Customer ID:"
+              disabled
+              defaultValue={redeem.customer_id}
+              {...register("customer_id")}
+            />
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex space-between">
-              <label className="w-24 font-bold">Email:</label>
-              <input
-                required
-                type="text"
-                id="email"
-                name="email"
-                defaultValue={redeem.email}
-                {...register("email")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">Telegram:</label>
-              <input
-                type="text"
-                id="telegram_id"
-                name="telegram_id"
-                defaultValue={redeem.telegram_id}
-                {...register("telegram_id")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
+          {/* Email + Telegram */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label="Email:"
+              defaultValue={redeem.email}
+              {...register("email")}
+            />
+            <FormField
+              label="Telegram:"
+              defaultValue={redeem.telegram_id}
+              {...register("telegram_id")}
+            />
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("tel")}</label>
-              <input
-                required
-                type="number"
-                id="phone"
-                name="phone"
-                defaultValue={redeem.phone}
-                {...register("phone")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("ciudad")}</label>
-              <input
-                type="text"
-                id="city"
-                name="city"
-                defaultValue={redeem.city}
-                {...register("city")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
+          {/* Teléfono + Ciudad */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label={t("tel")}
+              type="number"
+              defaultValue={redeem.phone}
+              {...register("phone")}
+            />
+            <FormField
+              label={t("ciudad")}
+              defaultValue={redeem.city}
+              {...register("city")}
+            />
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("pais")}:</label>
-
+          {/* País + Provincia */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">
+                {t("pais")}:
+              </label>
               <select
-                className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#840C4A]"
                 defaultValue={redeem.country_id}
                 onChange={(e) => {
                   setCountrieSelector(e.target.value);
@@ -268,11 +202,12 @@ function Detail({ redeems, countries, provinces }) {
                 ))}
               </select>
             </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("provincia")}:</label>
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">
+                {t("provincia")}:
+              </label>
               <select
-                className="flex-1 md:w-[199px] px-2 py-1 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#840C4A]"
                 value={provinceSelector}
                 onChange={(e) => {
                   setProvinceSelector(e.target.value);
@@ -280,8 +215,8 @@ function Detail({ redeems, countries, provinces }) {
                 }}
               >
                 {provinces
-                  .filter((province) =>
-                    province.province_id.startsWith(countrieSelector + "-")
+                  .filter((p) =>
+                    p.province_id.startsWith(countrieSelector + "-")
                   )
                   .map((province, id) => (
                     <option key={id} value={province.province_id}>
@@ -292,85 +227,52 @@ function Detail({ redeems, countries, provinces }) {
             </div>
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("calle")}:</label>
-              <input
-                required
-                type="text"
-                id="street"
-                name="street"
-                defaultValue={redeem.street}
-                {...register("street")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("numero")}:</label>
-              <input
-                required
-                type="text"
-                id="number"
-                name="number"
-                defaultValue={redeem.number}
-                {...register("number")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
+          {/* Calle + Número */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label={t("calle")}
+              defaultValue={redeem.street}
+              {...register("street")}
+            />
+            <FormField
+              label={t("numero")}
+              defaultValue={redeem.number}
+              {...register("number")}
+            />
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("cp")}:</label>
-              <input
-                required
-                type="text"
-                id="zip"
-                name="zip"
-                defaultValue={redeem.zip}
-                {...register("zip")}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <label className="w-24 font-bold">Token:</label>
-              <input
-                required
-                disabled
-                type="text"
-                id="year"
-                name="year"
-                defaultValue={redeem.year}
-                {...register("year")}
-                className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
-              />
-            </div>
+          {/* CP + Token */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label={t("cp")}
+              defaultValue={redeem.zip}
+              {...register("zip")}
+            />
+            <FormField
+              label="Token:"
+              disabled
+              defaultValue={redeem.year}
+              {...register("year")}
+            />
           </div>
 
-          <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10">
-            <div className="flex items-center">
-              <label className="w-24 font-bold">{t("creado")}:</label>
-              <input
-                required
-                disabled
-                type="text"
-                id="created_at"
-                name="created_at"
-                defaultValue={redeem.created_at.substring(0, 10)}
-                className="flex-1 px-2 py-1 border disabled:bg-gray-200 border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="flex items-center">
-              <label className="w-24 font-bold" htmlFor="status">
-                {t("estado")}
+          {/* Creado + Estado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              label={t("creado")}
+              disabled
+              defaultValue={redeem.created_at.substring(0, 10)}
+              {...register("created_at")}
+            />
+            <div>
+              <label className="block font-medium text-gray-700 mb-1">
+                {t("estado")}:
               </label>
               <select
                 id="status"
                 name="status"
                 defaultValue={redeem.status}
-                className="flex-1 px-2 py-1 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#840C4A]"
                 {...register("status")}
               >
                 <option value="pending">Pending</option>
@@ -379,26 +281,26 @@ function Detail({ redeems, countries, provinces }) {
               </select>
             </div>
           </div>
-          <div className="flex justify-center">
+
+          {/* Botones */}
+          <div className="flex justify-end gap-4 mt-6">
             <button
               type="button"
-              onClick={() => {
-                router.push("/");
-              }}
-              className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
+              onClick={() => router.push("/")}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
             >
               {t("volver")}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 ml-4 bg-[#840C4A] text-white rounded-md"
+              className="px-4 py-2 bg-[#840C4A] text-white rounded-md hover:bg-[#6c093d] transition"
             >
               {t("guardar")}
             </button>
           </div>
         </form>
       </div>
-    </>
+    </HomeLayout>
   );
 }
 

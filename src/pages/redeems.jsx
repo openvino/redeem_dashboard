@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import Head from "next/head.js";
 import { scrollStyle } from "@/styles/table.js";
+import HomeLayout from "@/components/HomeLayout.jsx";
 const redeems = ({ redeems }) => {
   const { t } = useTranslation();
   const filters = useSelector((state) => state.filter);
@@ -35,77 +36,21 @@ const redeems = ({ redeems }) => {
     return newData;
   };
   const columnas = [
-    {
-      title: "",
-      field: "acciones",
-    },
-
-    {
-      title: t("nombre"),
-      field: "name",
-    },
-    {
-      title: t("monto"),
-      field: "amount",
-    },
-    {
-      title: t("pais"),
-      field: "country_id",
-    },
-    {
-      title: t("provincia"),
-      field: "province_id",
-    },
-    {
-      title: t("ciudad"),
-      field: "city",
-    },
-    {
-      title: t("telefono"),
-      field: "phone",
-    },
-
-    {
-      title: "Email",
-      field: "email",
-    },
-
-    {
-      title: t("calle"),
-
-      field: "street",
-    },
-    {
-      title: t("numero"),
-
-      field: "number",
-    },
-
-    {
-      title: "Telegram_ID",
-      field: "telegram_id",
-    },
-
-    {
-      title: t("cp"),
-
-      field: "zip",
-    },
-    {
-      title: t("año"),
-
-      field: "year",
-    },
-    {
-      title: t("creado"),
-
-      field: "created_at",
-    },
-    {
-      title: t("estado"),
-
-      field: "status",
-    },
+    { title: "", field: "acciones" },
+    { title: t("nombre"), field: "name" },
+    { title: t("monto"), field: "amount" },
+    { title: t("pais"), field: "country_id" },
+    { title: t("provincia"), field: "province_id" },
+    { title: t("ciudad"), field: "city" },
+    { title: t("telefono"), field: "phone" },
+    { title: "Email", field: "email" },
+    { title: t("calle"), field: "street" },
+    { title: t("numero"), field: "number" },
+    { title: "Telegram_ID", field: "telegram_id" },
+    { title: t("cp"), field: "zip" },
+    { title: t("año"), field: "year" },
+    { title: t("creado"), field: "created_at" },
+    { title: t("estado"), field: "status" },
   ];
 
   const filterData = (data) => {
@@ -122,29 +67,18 @@ const redeems = ({ redeems }) => {
     }
   };
   const data = filterData(countryAndProvinceNames(dataFormater(redeems)));
-  useEffect(() => {
-    const styleElement = document.createElement("style");
-    styleElement.innerHTML = scrollStyle;
-    document.head.appendChild(styleElement);
-
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
+ 
   return (
-    <>
+    <HomeLayout>
       <Head>
         <title>OpenVino - Redeems</title>
       </Head>
       <div className="">
-        <Sidebar />
-        <Topbar />
-
-        <div className="top-4 overflow-x-scroll custom-scroll ml-20">
+        <div className=" custom-scroll ">
           <Table data={data} columnas={columnas} n={15} />
         </div>
       </div>
-    </>
+    </HomeLayout>
   );
 };
 
@@ -163,7 +97,6 @@ export async function getServerSideProps(context) {
   }
   const { req } = context;
   const { cookie } = req.headers;
-  console.log(session);
 
   const response = await clientAxios.get("/redeemRoute", {
     params: {

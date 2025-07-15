@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import useAdmins from "@/hooks/useAdmins";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
 import Head from "next/head";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -11,39 +9,46 @@ import useWineries from "@/hooks/useWineries";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import clientAxios from "@/config/clientAxios";
+import HomeLayout from "@/components/HomeLayout";
+import FormField from "@/components/FormField";
 
 const AdminUser = () => {
   const router = useRouter();
-
   const { id } = router.query;
-
   const { admins } = useAdmins(id);
-
   const { wineries } = useWineries();
-
   const { profile } = useProfile();
-
-  const { register, handleSubmit, setValue } = useForm();
-
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: {
+      id: "",
+      name: "",
+      last_name: "",
+      winery_id: "",
+      email: "",
+      profile_img: "",
+      is_admin: "false",
+    },
+  });
   const { t } = useTranslation();
-
   const [loading, setLoading] = useState();
 
   useEffect(() => {
     if (admins) {
-      setValue("id", admins.id, { shouldDirty: false });
-      setValue("name", admins.name, { shouldDirty: false });
-      setValue("last_name", admins.last_name, { shouldDirty: false });
-      setValue("winery_id", admins.winery_id, { shouldDirty: false });
-      setValue("email", admins.email, { shouldDirty: false });
-
-      setValue("profile_img", admins.profile_img, { shouldDirty: false });
-      setValue("is_admin", admins.is_admin == true ? "true" : "false", {
-        shouldDirty: false,
+      reset({
+        id: admins.id || "",
+        name: admins.name || "",
+        last_name: admins.last_name || "",
+        winery_id: admins.winery_id || "",
+        email: admins.email || "",
+        profile_img: admins.profile_img || "",
+        is_admin: admins.is_admin ? "true" : "false",
       });
     }
-  }, [admins]);
+  }, [admins, reset]);
   const onSubmit = async (data) => {
+
+    
+
     const toastId = toast("Updating winary data...", {
       position: "top-right",
       autoClose: false,
@@ -81,6 +86,7 @@ const AdminUser = () => {
     }
   };
 
+
   const handleDeleteAdmin = async () => {
     const toastId = toast("Deleting admin...", {
       position: "top-right",
@@ -96,7 +102,7 @@ const AdminUser = () => {
 
     try {
       setLoading(true);
-      const response = await clientAxios.delete("/adminRoute", {
+      await clientAxios.delete("/adminRoute", {
         params: {
           id,
         },
@@ -115,127 +121,84 @@ const AdminUser = () => {
   };
 
   return (
-    <>
+    <HomeLayout>
       <Head>
         <title>Openvino - Admin info</title>
       </Head>
-      <Topbar />
 
-      <Sidebar />
       <ToastContainer />
-      <div className="z-1 mt-[10rem] ml-[6rem] w-full overflow-x-scrolllg: overflow-x-hidden">
+      <div className=" w-full overflow-x-scrolllg: overflow-x-hidden">
         <div className="">
           <h1 className="text-2xl font-bold text-center mb-4">
             {t("edit_admin")}
           </h1>
 
           <form
-            className=" p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] border-solid rounded-xl border-gray-200 border-2"
+            className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("clave")}</label>
-                <input
-                  required
-                  type="text"
-                  defaultValue={admins?.id}
-                  id="id"
-                  name="id"
-                  {...register("id")}
-                  className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("nombre")}:</label>
-                <input
-                  required
-                  type="text"
-                  id="name"
-                  name="name"
-                  {...register("name")}
-                  className="w-64 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
-                />
-              </div>
-            </div>
-            <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("apellido")}</label>
-                <input
-                  required
-                  type="text"
-                  id="last_name"
-                  defaultValue={admins?.last_name}
-                  name="last_name"
-                  {...register("last_name")}
-                  className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                />
-              </div>
-
-              <div className="flex items-center">
-                <label className="w-24 font-bold">Email:</label>
-                <input
-                  required
-                  type="text"
-                  id="email"
-                  defaultValue={admins?.email}
-                  name="email"
-                  {...register("email")}
-                  className="w-64 px-2 py-1 disabled:bg-gray-200 border border-gray-300 rounded-md"
-                />
-              </div>
+            {/* ID */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                label={t("clave")}
+                {...register("id")}
+              />
+              <FormField
+                label={t("nombre")}
+                {...register("name")}
+              />
             </div>
 
-            <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-              <div className="flex items-center">
-                <label className="w-24 font-bold">{t("imagenPerfil")}</label>
-                <input
-                  required
-                  defaultValue={admins?.profile_img}
-                  type="text"
-                  id="profile_img"
-                  name="profile_img"
-                  {...register("profile_img")}
-                  className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                />
-              </div>
+            {/* Apellido + Email */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                label={t("apellido")}
+                {...register("last_name")}
+              />
+              <FormField
+                label="Email:"
+                {...register("email")}
+              />
+            </div>
+
+            {/* Imagen de perfil + Bodega (condicional) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                label={t("imagenPerfil")}
+                {...register("profile_img")}
+              />
 
               {profile?.is_admin === true ? (
-                <div className="flex items-center">
-                  <label className="w-24 font-bold">{t("bodega")}</label>
-
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">
+                    {t("bodega")}
+                  </label>
                   <select
-                    className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                    defaultValue={admins?.winery_id}
-                    name="winery_id"
-                    id="winery_id"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#840C4A]"
                     {...register("winery_id")}
                   >
                     <option>{t("select")}</option>
-
-                    {wineries &&
-                      wineries.map((element, index) => (
-                        <option key={index} value={element.id}>
-                          {element.name}
-                        </option>
-                      ))}
+                    {wineries?.map((element, index) => (
+                      <option key={index} value={element.id}>
+                        {element.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               ) : (
-                <div className="flex justify-center w-[22rem] "></div>
+                <div className="w-full h-0" />
               )}
             </div>
 
+            {/* es_admin (condicional) */}
             {profile?.is_admin === true && (
-              <div className="flex lg:flex-row flex-col w-full justify-center gap-3 md:gap-10 ">
-                <div className="flex items-center">
-                  <label className="w-24 font-bold">{t("es_admin")}</label>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">
+                    {t("es_admin")}
+                  </label>
                   <select
-                    className="w-64 px-2 py-1 border border-gray-300 rounded-md disabled:bg-gray-200"
-                    name="is_admin"
-                    id="is_admin"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#840C4A]"
                     {...register("is_admin")}
                   >
                     <option>{t("select")}</option>
@@ -243,18 +206,16 @@ const AdminUser = () => {
                     <option value={"false"}>No</option>
                   </select>
                 </div>
-
-                <div className="flex justify-center w-[22rem] "></div>
+                <div className="w-full h-0" />
               </div>
             )}
 
-            <div className="flex justify-center">
+            {/* Botones */}
+            <div className="flex justify-center mt-6">
               <button
                 type="button"
-                onClick={() => {
-                  router.back();
-                }}
-                className="px-4 py-2  bg-gray-300 text-gray-800 rounded-md"
+                onClick={() => router.back()}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md"
               >
                 {t("volver")}
               </button>
@@ -265,7 +226,6 @@ const AdminUser = () => {
               >
                 {t("guardar")}
               </button>
-
               <button
                 type="button"
                 className="px-4 py-2 ml-4 bg-red-600 text-white rounded-md"
@@ -277,7 +237,7 @@ const AdminUser = () => {
           </form>
         </div>
       </div>
-    </>
+    </HomeLayout>
   );
 };
 

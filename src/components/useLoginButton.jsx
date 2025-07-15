@@ -74,6 +74,7 @@ const useLoginButton = () => {
           className="w-auto h-auto"
           width={100}
           height={100}
+          alt="logo"
         />{" "}
         Ingresar con metamask
       </button>

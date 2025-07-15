@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import useWineries from "@/hooks/useWineries";
 import { ToastContainer, toast } from "react-toastify";
 import clientAxios from "@/config/clientAxios";
+import HomeLayout from "@/components/HomeLayout";
 
 const addUser = () => {
   const { profile, session, status } = useProfile();
@@ -52,14 +53,11 @@ const addUser = () => {
     } finally {
       setLoading(false);
     }
-
-    console.log(data);
   };
 
   useEffect(() => {
     if (status !== "loading") {
       if (!session.is_admin && profile) {
-        console.log(profile);
         setValue("winery_id", profile.winery_id, { shouldDirty: false });
         setValue("is_admin", false, { shouldDirty: false });
       }
@@ -67,16 +65,13 @@ const addUser = () => {
   }, [session, profile]);
 
   return (
-    <>
+    <HomeLayout>
       <Head>
         <title>Openvino - Admin</title>
       </Head>
       <div className="flex ">
-        <Sidebar />
-        <Topbar />
-
         <ToastContainer />
-        <div className="z-1 mt-[10rem] ml-[6rem] w-full overflow-x-scrolllg: overflow-x-hidden">
+        <div className="z-1  w-full overflow-x-scrolllg: overflow-x-hidden">
           <div className="">
             <form
               className=" p-2 space-y-2 flex flex-col bg-[#F1EDE2] w-[99%] border-solid rounded-xl border-gray-200 border-2"
@@ -216,7 +211,7 @@ const addUser = () => {
           </div>
         </div>
       </div>
-    </>
+    </HomeLayout>
   );
 };
 

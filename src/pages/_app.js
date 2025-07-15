@@ -10,33 +10,38 @@ import Loader from "../components/Loader";
 import { useState } from "react";
 import { Montserrat } from "next/font/google";
 import { ToastContainer, toast } from "react-toastify";
+import { ThirdwebProvider } from "thirdweb/react";
+import SessionSync from "@/components/Session";
+import { chain, client } from "@/config/thirdwebClient";
 const roboto = Montserrat({
-  subsets: ["latin"],
+	subsets: ["latin"],
 
-  weight: ["400", "700"],
+	weight: ["400", "700"],
 });
 export default function App({ Component, pageProps }) {
-  const [loading, setLoading] = useState(false);
-  // Route change event listener
-  Router.events.on("routeChangeStart", (url) => {
-    setLoading(true);
-  });
-  Router.events.on("routeChangeComplete", (url) => {
-    setLoading(false);
-  });
+	const [loading, setLoading] = useState(false);
+	// Route change event listener
+	Router.events.on("routeChangeStart", (url) => {
+		setLoading(true);
+	});
+	Router.events.on("routeChangeComplete", (url) => {
+		setLoading(false);
+	});
 
-  return (
-    // Application providers
-    <I18nextProvider i18n={i18n}>
-      <SessionProvider>
-        <Provider store={store}>
-          {loading && <Loader />}
-          <main className={roboto.className}>
-            <Component {...pageProps} />
-            <ToastContainer autoClose={2000} hideProgressBar={true} />
-          </main>
-        </Provider>
-      </SessionProvider>
-    </I18nextProvider>
-  );
+	return (
+		<ThirdwebProvider client={client} activeChain={chain}>
+			<I18nextProvider i18n={i18n}>
+				<SessionProvider>
+					<Provider store={store}>
+						{loading && <Loader />}
+						<main className={roboto.className}>
+							<SessionSync />
+							<Component {...pageProps} />
+							<ToastContainer autoClose={2000} hideProgressBar={true} />
+						</main>
+					</Provider>
+				</SessionProvider>
+			</I18nextProvider>
+		</ThirdwebProvider>
+	);
 }

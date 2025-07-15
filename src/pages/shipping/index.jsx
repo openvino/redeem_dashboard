@@ -1,63 +1,47 @@
 import React from "react";
-import Topbar from "@/components/Topbar";
-import Sidebar from "@/components/Sidebar";
-import useAdmins from "@/hooks/useAdmins";
-import Table from "@/components/Table";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 import { useTranslation } from "react-i18next";
-const Admin = () => {
+import HomeLayout from "@/components/HomeLayout";
+import useTokens from "@/hooks/useTokens";
+import Image from "next/image";
+import { useRouter } from "next/router";
+const Shipping = () => {
   const { t } = useTranslation();
-  const { admins } = useAdmins();
-
-  const columnas = [
-    {
-      title: t("action"),
-      field: "acciones",
-    },
-    {
-      title: t("clave"),
-      field: "id",
-    },
-    {
-      title: "ENS",
-      field: "ens",
-    },
-    {
-      title: t("nombre"),
-      field: "name",
-    },
-    {
-      title: t("apellido"),
-      field: "last_name",
-    },
-    {
-      title: "Email",
-      field: "email",
-    },
-    {
-      title: t("bodega"),
-      field: "winery_id",
-    },
-  ];
+  const router = useRouter();
+  const { tokens } = useTokens();
 
   return (
-    <>
-      <Topbar />
-      <Sidebar />
+    <HomeLayout>
       <Head>
-        <title>Openvino - Admin users</title>
+        <title>Openvino - Shipping costs</title>
       </Head>
-      <div className="ml-8 md:ml-16 top-4 border rounded-lg">
-        {admins?.length && (
-          <Table columnas={columnas} data={admins} n={10} route="/admin" />
-        )}
+      <h1 className=" text-xl font-bold m-2">Shipping costs</h1>
+
+      <div className="grid grid-cols-4 place-items-center gap-4 mt-10">
+        {tokens?.length &&
+          tokens.map((token) => (
+            <div
+              onClick={() => router.push(`/shipping/${token.id}`)}
+              key={token.id}
+              className="flex flex-col items-center cursor-pointer"
+            >
+              <Image
+                src={`/assets/${token.id.toLowerCase()}.png`}
+                width={220}
+                height={220}
+                alt={token.id}
+              />
+
+              <p className="mt-2">{token.id}</p>
+            </div>
+          ))}
       </div>
-    </>
+    </HomeLayout>
   );
 };
 
-export default Admin;
+export default Shipping;
 export async function getServerSideProps(context) {
   const session = await getSession(context);
 

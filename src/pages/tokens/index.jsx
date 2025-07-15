@@ -1,16 +1,10 @@
-const { ethers } = require('ethers');
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TokenInfoComponent from '@/components/TokenInfoComponent';
-import Topbar from '@/components/Topbar';
-import Sidebar from '@/components/Sidebar';
 import { MTB18Address, MTB18_ETH_PAIR } from '../../../contracts';
 import useTokenInformation from '@/hooks/useTokenInformation';
-import Loader from '@/components/Loader';
 import LoadingSpinner from '@/components/Spinner';
-import {
-  closeNotification,
-  showNotification,
-} from '@/redux/actions/notificationActions';
+
+import HomeLayout from '@/components/HomeLayout';
 
 const Tokens = () => {
   const [address, setAddress] = useState(MTB18Address);
@@ -27,10 +21,9 @@ const Tokens = () => {
   };
 
   return (
-    <>
-      <Topbar />
-      <Sidebar />
-      <div className="z-1 mt-[8rem]  ml-[4.5rem] sm:ml-[6rem] w-[80%] md:w-[90%] overflow-x-hidden rounded-xl">
+   <HomeLayout>
+ 
+      <div className="z-1 rounded-xl">
         {tokenInfo && !loading ? (
           <div className="w-full flex justify-start ml-5 overflow-x-hidden">
             <TokenInfoComponent
@@ -45,7 +38,7 @@ const Tokens = () => {
           </div>
         )}
       </div>
-    </>
+   </HomeLayout>
   );
 };
 
