@@ -29,8 +29,6 @@ export const tokenLaunching = async (id) => {
 	}
 };
 export const getAllLaunchingTokens = async () => {
-	console.log("tokensLaunchingAll");
-
 	try {
 		const response = await clientAxios.get(`/tokensLaunchAll`, {});
 

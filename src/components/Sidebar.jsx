@@ -15,7 +15,6 @@ import { useRouter } from "next/router";
 
 const Sidebar = () => {
 	const session = useSession();
-	console.log(session);
 
 	const wineryId = session.data?.winery_id;
 
