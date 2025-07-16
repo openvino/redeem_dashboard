@@ -43,7 +43,7 @@ const SessionSync = () => {
 					previousAddress.current = currentAddress;
 				} else {
 					console.log("Login fallido:", res);
-					toast.error("Wallet no autorizada");
+					// toast.error("Wallet no autorizada");
 					signOut({ redirect: false }).finally(() => {
 						router.replace("/");
 					});
