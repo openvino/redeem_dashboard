@@ -14,7 +14,7 @@ import {
 } from "@/utils/provisioningUtils";
 import useLaunch from "@/hooks/useLaunch";
 import { isAdminUser } from "@/utils/authUtils";
-import { formatDateForInput } from "@/utils/dateUtils";
+import { formatDateForInput, toTimestamp } from "@/utils/dateUtils";
 import { useIpfsUpload } from "@/hooks/useIpfsUpload";
 import { ethers5Adapter } from "thirdweb/adapters/ethers5";
 import { chain, client } from "@/config/thirdwebClient";
@@ -149,10 +149,7 @@ const Launch = () => {
 			signer
 		);
 
-		console.log("tokenFactory", tokenFactory);
-
 		const token = await tokenFactory.deploy(name, symbol, capBN, capBN);
-		console.log("token", token);
 
 		await token.deployed();
 
@@ -188,8 +185,15 @@ const Launch = () => {
 		);
 
 		await updateTokenInfo(symbol, { token_address: token.address });
+		setToken((prevToken) => {
+			return {
+				...prevToken,
+				token_address: token.address,
+			};
+		});
 		return token;
 	};
+
 	const deployCrowdsale = async (token, toastId) => {
 		const signer = await ethers5Adapter.signer.toEthers({
 			client: client,
@@ -203,16 +207,8 @@ const Launch = () => {
 
 		const rate = Number(String(v.rate || "").trim());
 
-		// 🛠 Fix: convertir fechas a timestamp correctamente
-		const toTimestamp = (dateString) => {
-			if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(dateString)) {
-				dateString = dateString.replace(" ", "T") + ":00"; // Forzar ISO format
-			}
-			return Math.floor(new Date(dateString).getTime() / 1000);
-		};
-
-		const openingTs = toTimestamp(v.openingTime);
-		const closingTs = toTimestamp(v.closingTime);
+		const openingTs = Math.floor(toTimestamp(v.openingTime));
+		const closingTs = Math.floor(toTimestamp(v.closingTime));
 
 		const tokensBN = ethers.utils.parseEther(
 			String(v.tokensToCrowdsale || "").trim()
@@ -240,57 +236,16 @@ const Launch = () => {
 
 		setCrowdsaleAddress(crowdsale.address);
 		await updateTokenInfo(symbol, { crowdsale_address: crowdsale.address });
-
+		setToken((prevToken) => {
+			return {
+				...prevToken,
+				crowdsale_address: crowdsale.address,
+			};
+		});
 		await new Promise((res) => setTimeout(res, 8000));
 
 		return crowdsale;
 	};
-
-	// const deployCrowdsale = async (token, toastId) => {
-	// 	const signer = await ethers5Adapter.signer.toEthers({
-	// 		client: client,
-	// 		chain: chain,
-	// 		account: account,
-	// 	});
-	// 	const v = getValues();
-	// 	const symbol = v.symbol?.trim();
-	// 	const walletAddress = v.walletAddress?.trim();
-	// 	if (!walletAddress) throw new Error("Wallet address missing");
-
-	// 	const rate = Number(String(v.rate || "").trim());
-	// 	const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
-	// 	const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
-	// 	const tokensBN = ethers.utils.parseEther(
-	// 		String(v.tokensToCrowdsale || "").trim()
-	// 	);
-
-	// 	toast.update(toastId, {
-	// 		render: "Deploying crowdsale contract...",
-	// 		isLoading: true,
-	// 	});
-
-	// 	const crowdFactory = new ethers.ContractFactory(
-	// 		crowdAbi,
-	// 		crowdBytecode,
-	// 		signer
-	// 	);
-	// 	const crowdsale = await crowdFactory.deploy(
-	// 		walletAddress,
-	// 		token.address,
-	// 		tokensBN.div(rate),
-	// 		openingTs,
-	// 		closingTs,
-	// 		rate
-	// 	);
-	// 	await crowdsale.deployed();
-
-	// 	setCrowdsaleAddress(crowdsale.address);
-	// 	await updateTokenInfo(symbol, { crowdsale_address: crowdsale.address });
-
-	// 	await new Promise((res) => setTimeout(res, 8000));
-
-	// 	return crowdsale;
-	// };
 
 	const transferTokensToCrowdsale = async () => {
 		const signer = await ethers5Adapter.signer.toEthers({
@@ -298,7 +253,7 @@ const Launch = () => {
 			chain: chain,
 			account: account,
 		});
-		const toastId = toast.loading("🔄 Checking transfer feasibility...", {
+		const toastId = toast.loading(t("Wait please..."), {
 			theme: "dark",
 		});
 		setLoading(true);
@@ -313,29 +268,33 @@ const Launch = () => {
 				String(getValues().tokensToCrowdsale).trim()
 			);
 
-			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+			const tokenContract = new ethers.Contract(
+				token?.token_address,
+				tokenAbi,
+				signer
+			);
 
 			try {
 				await tokenContract.estimateGas.transfer(crowdsaleAddress, tokensBN);
-				console.log("✅ Gas estimation succeeded, proceeding to transfer");
+				console.log("Gas estimation succeeded, proceeding to transfer");
 			} catch (err) {
-				console.error("❌ Gas estimation failed:", err);
+				console.error("Gas estimation failed:", err);
 				throw new Error(
 					"Cannot transfer tokens: gas estimation failed. Make sure the contract is ready."
 				);
 			}
 
 			toast.update(toastId, {
-				render: "🚀 Transferring tokens to crowdsale...",
+				render: t("Transferring tokens to crowdsale..."),
 				isLoading: true,
 			});
 
 			const tx = await tokenContract.transfer(crowdsaleAddress, tokensBN);
 			await tx.wait();
 
-			console.log("✅ Tokens transferred!");
+			console.log("Tokens transferred!");
 			toast.update(toastId, {
-				render: "✅ Tokens successfully transferred to crowdsale!",
+				render: t("tokens_transferred"),
 				isLoading: false,
 				type: "success",
 				autoClose: 4000,
@@ -346,10 +305,11 @@ const Launch = () => {
 			});
 			setTransferDisabled(true);
 			setTransferDone(true);
+			router.push("/provisioning");
 		} catch (error) {
-			console.error("🚨 Transfer failed:", error);
+			console.error("Transfer failed:", error);
 			toast.update(toastId, {
-				render: `❌ ${error.message || "Transfer failed"}`,
+				render: `${error.message || "Transfer failed"}`,
 				isLoading: false,
 				type: "error",
 				autoClose: 5000,
@@ -380,7 +340,7 @@ const Launch = () => {
 
 			// Confirm token deployment
 			toast.update(toastId, {
-				render: "Waiting for token propagation...",
+				render: t("Wait please..."),
 				isLoading: true,
 			});
 			while (true) {
@@ -395,7 +355,7 @@ const Launch = () => {
 
 			// Confirm crowdsale deployment
 			toast.update(toastId, {
-				render: "Waiting for crowdsale propagation...",
+				render: t("Wait please..."),
 				isLoading: true,
 			});
 			while (true) {
@@ -405,7 +365,7 @@ const Launch = () => {
 			}
 
 			toast.update(toastId, {
-				render: "✅ Deployment completed! You can now transfer tokens.",
+				render: t("deploy_complete"),
 				isLoading: false,
 				type: "success",
 				autoClose: 4000,
@@ -415,9 +375,9 @@ const Launch = () => {
 			setTransferDisabled(false);
 			setDeploymentComplete(true);
 		} catch (error) {
-			console.error("🚨 DEPLOY ERROR", error);
+			console.error("DEPLOY ERROR", error);
 			toast.update(toastId, {
-				render: `❌ ${error.message || "Deployment failed"}`,
+				render: `${error.message || "Deployment failed"}`,
 				isLoading: false,
 				type: "error",
 				autoClose: 5000,
@@ -503,20 +463,21 @@ const Launch = () => {
 			setLoading(false);
 		}
 	};
+
 	const finalizeAndRenewCrowdsale = async () => {
 		const signer = await ethers5Adapter.signer.toEthers({
 			client: client,
 			chain: chain,
 			account: account,
 		});
-		const toastId = toast.loading("🔄 Finalizing crowdsale...", {
+		const toastId = toast.loading(t("finalizing_crowdsale"), {
 			theme: "dark",
 		});
 		setLoading(true);
 
 		try {
 			const crowdsaleContract = new ethers.Contract(
-				crowdsaleAddress,
+				token?.crowdsale_address,
 				crowdAbi,
 				signer
 			);
@@ -527,7 +488,7 @@ const Launch = () => {
 				await finalizeTx.wait();
 
 				toast.update(toastId, {
-					render: "Crowdsale finalized! Retrieving tokens...",
+					render: t("crowdsale_finalized"),
 					isLoading: true,
 				});
 			} else {
@@ -538,16 +499,18 @@ const Launch = () => {
 				});
 			}
 
-			// Obtener balance actual de la wallet
-			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+			const tokenContract = new ethers.Contract(
+				token.token_address,
+				tokenAbi,
+				signer
+			);
 
 			const walletAddress = await signer.getAddress();
 			const walletBalance = await tokenContract.balanceOf(walletAddress);
 			const totalTokens = ethers.utils.formatEther(walletBalance);
 
-			console.log(`🎉 Wallet balance: ${totalTokens} tokens`);
+			console.log(`Wallet balance: ${totalTokens} tokens`);
 
-			// Actualizar DB con tokens y habilitar transferencia
 			await updateTokenInfo(getValues().symbol, {
 				cap: totalTokens,
 				tokensToCrowdsale: totalTokens,
@@ -560,17 +523,11 @@ const Launch = () => {
 				transfered_to_crowdsale: false,
 			}));
 
-			// 🛠 Fix: convertir fechas a timestamp correctamente
-			const toTimestamp = (dateString) => {
-				if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(dateString)) {
-					dateString = dateString.replace(" ", "T") + ":00"; // Forzar ISO format
-				}
-				return Math.floor(new Date(dateString).getTime() / 1000);
-			};
-
 			const v = getValues();
-			const openingTs = toTimestamp(v.openingTime);
-			const closingTs = toTimestamp(v.closingTime);
+			console.log(v);
+
+			const openingTs = Math.floor(toTimestamp(v.openingTime));
+			const closingTs = Math.floor(toTimestamp(v.closingTime));
 
 			const crowdFactory = new ethers.ContractFactory(
 				crowdAbi,
@@ -579,13 +536,13 @@ const Launch = () => {
 			);
 
 			toast.update(toastId, {
-				render: "🚀 Deploying new crowdsale...",
+				render: "Deploying new crowdsale...",
 				isLoading: true,
 			});
 
 			const newCrowdsale = await crowdFactory.deploy(
 				v.walletAddress,
-				tokenAddress,
+				token?.token_address,
 				ethers.utils.parseEther(totalTokens).div(v.rate),
 				openingTs,
 				closingTs,
@@ -593,14 +550,13 @@ const Launch = () => {
 			);
 			await newCrowdsale.deployed();
 
-			// ✅ Actualizar DB con nueva dirección del crowdsale
 			await updateTokenInfo(getValues().symbol, {
 				crowdsale_address: newCrowdsale.address,
 			});
 			setCrowdsaleAddress(newCrowdsale.address);
 
 			toast.update(toastId, {
-				render: "✅ Crowdsale renewed successfully!",
+				render: t("crowdsale_renewed"),
 				isLoading: false,
 				type: "success",
 				autoClose: 4000,
@@ -609,9 +565,9 @@ const Launch = () => {
 			setTransferDisabled(false);
 			setTransferDone(false);
 		} catch (error) {
-			console.error("🚨 Finalize & Renew failed:", error);
+			console.error("Finalize & Renew failed:", error);
 			toast.update(toastId, {
-				render: `❌ ${error.message || "Finalize & Renew failed"}`,
+				render: ` ${error.message || t("fin_and_renew_fail")}`,
 				isLoading: false,
 				type: "error",
 				autoClose: 5000,
@@ -621,146 +577,20 @@ const Launch = () => {
 		}
 	};
 
-	// const finalizeAndRenewCrowdsale = async () => {
-	// 	const signer = await ethers5Adapter.signer.toEthers({
-	// 		client: client,
-	// 		chain: chain,
-	// 		account: account,
-	// 	});
-	// 	const toastId = toast.loading("🔄 Finalizing crowdsale...", {
-	// 		theme: "dark",
-	// 	});
-	// 	setLoading(true);
-
-	// 	try {
-	// 		const crowdsaleContract = new ethers.Contract(
-	// 			crowdsaleAddress,
-	// 			crowdAbi,
-	// 			signer
-	// 		);
-
-	// 		const alreadyFinalized = await crowdsaleContract.isFinalized();
-	// 		if (!alreadyFinalized) {
-	// 			const finalizeTx = await crowdsaleContract.finalize();
-	// 			await finalizeTx.wait();
-
-	// 			toast.update(toastId, {
-	// 				render: "Crowdsale finalized! Retrieving tokens...",
-	// 				isLoading: true,
-	// 			});
-	// 		} else {
-	// 			console.log("Crowdsale already finalized. Skipping finalize...");
-	// 			toast.update(toastId, {
-	// 				render: "Crowdsale already finalized. Renewing...",
-	// 				isLoading: true,
-	// 			});
-	// 		}
-
-	// 		// Obtener balance actual de la wallet
-	// 		const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
-
-	// 		const walletAddress = await signer.getAddress();
-	// 		const walletBalance = await tokenContract.balanceOf(walletAddress);
-	// 		const totalTokens = ethers.utils.formatEther(walletBalance);
-
-	// 		console.log(`🎉 Wallet balance: ${totalTokens} tokens`);
-
-	// 		// Actualizar DB con tokens y habilitar transferencia
-	// 		await updateTokenInfo(getValues().symbol, {
-	// 			cap: totalTokens,
-	// 			tokensToCrowdsale: totalTokens,
-	// 			transfered_to_crowdsale: false,
-	// 		});
-	// 		setToken((prev) => ({
-	// 			...prev,
-	// 			cap: totalTokens,
-	// 			tokensToCrowdsale: totalTokens,
-	// 			transfered_to_crowdsale: false,
-	// 		}));
-
-	// 		// ✅ Crear nuevo crowdsale
-	// 		const v = getValues();
-	// 		// const openingTs = Math.floor(new Date(v.openingTime).getTime() / 1000);
-	// 		// const closingTs = Math.floor(new Date(v.closingTime).getTime() / 1000);
-	// 		const toTimestamp = (dateString) => {
-	// 			// Si viene como "YYYY-MM-DD HH:MM", agregar ":00" y forzar formato ISO
-	// 			if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(dateString)) {
-	// 				dateString = dateString.replace(" ", "T") + ":00";
-	// 			}
-	// 			return Math.floor(new Date(dateString).getTime() / 1000);
-	// 		};
-
-	// 		const openingTs = toTimestamp(v.openingTime);
-	// 		const closingTs = toTimestamp(v.closingTime);
-
-	// 		const crowdFactory = new ethers.ContractFactory(
-	// 			crowdAbi,
-	// 			crowdBytecode,
-	// 			signer
-	// 		);
-
-	// 		toast.update(toastId, {
-	// 			render: "🚀 Deploying new crowdsale...",
-	// 			isLoading: true,
-	// 		});
-
-	// 		const newCrowdsale = await crowdFactory.deploy(
-	// 			v.walletAddress,
-	// 			tokenAddress,
-	// 			ethers.utils.parseEther(totalTokens).div(v.rate),
-	// 			openingTs,
-	// 			closingTs,
-	// 			v.rate
-	// 		);
-	// 		await newCrowdsale.deployed();
-
-	// 		// ✅ Actualizar DB con nueva dirección del crowdsale
-	// 		await updateTokenInfo(getValues().symbol, {
-	// 			crowdsale_address: newCrowdsale.address,
-	// 		});
-	// 		setCrowdsaleAddress(newCrowdsale.address);
-
-	// 		toast.update(toastId, {
-	// 			render: "✅ Crowdsale renewed successfully!",
-	// 			isLoading: false,
-	// 			type: "success",
-	// 			autoClose: 4000,
-	// 		});
-
-	// 		setTransferDisabled(false);
-	// 		setTransferDone(false);
-	// 	} catch (error) {
-	// 		console.error("🚨 Finalize & Renew failed:", error);
-	// 		toast.update(toastId, {
-	// 			render: `❌ ${error.message || "Finalize & Renew failed"}`,
-	// 			isLoading: false,
-	// 			type: "error",
-	// 			autoClose: 5000,
-	// 		});
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// };
-
 	const finalizeCrowdsale = async () => {
 		const signer = await ethers5Adapter.signer.toEthers({
 			client: client,
 			chain: chain,
 			account: account,
 		});
-		const toastId = toast.loading("🔒 Finalizing crowdsale...", {
+		const toastId = toast.loading(t("finalizing_crowdsale"), {
 			theme: "dark",
 		});
 		setLoading(true);
 
 		try {
-			const signer = ethers5Adapter.toEthers({
-				client,
-				chain: getChain(),
-			});
-
 			const crowdsaleContract = new ethers.Contract(
-				crowdsaleAddress,
+				token?.crowdsale_address,
 				crowdAbi,
 				signer
 			);
@@ -768,7 +598,7 @@ const Launch = () => {
 			const alreadyFinalized = await crowdsaleContract.isFinalized();
 			if (alreadyFinalized) {
 				toast.update(toastId, {
-					render: "⚠️ Crowdsale already finalized.",
+					render: t("crowdsale_already_finalized"),
 					isLoading: false,
 					type: "info",
 					autoClose: 3000,
@@ -781,22 +611,33 @@ const Launch = () => {
 			await finalizeTx.wait();
 
 			toast.update(toastId, {
-				render: "✅ Crowdsale finalized!",
+				render: t("crowdsale_finalized"),
 				isLoading: false,
 				type: "success",
 				autoClose: 4000,
 			});
 
-			const tokenContract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+			const tokenContract = new ethers.Contract(
+				token?.token_address,
+				tokenAbi,
+				signer
+			);
 
 			const walletAddress = await signer.getAddress();
 			const walletBalance = await tokenContract.balanceOf(walletAddress);
 			const totalTokens = ethers.utils.formatEther(walletBalance);
-
-			await updateTokenInfo(getValues().symbol, {
+			console.log({
 				cap: totalTokens,
 				transfered_to_crowdsale: false,
 				crowdsale_address: "",
+				crowdsale_finalized: true,
+			});
+
+			await updateTokenInfo(token?.symbol, {
+				cap: totalTokens,
+				transfered_to_crowdsale: false,
+				crowdsale_address: "",
+				crowdsale_finalized: true,
 			});
 
 			setToken((prev) => ({
@@ -807,10 +648,11 @@ const Launch = () => {
 			}));
 			setTransferDisabled(true);
 			setDisableDeploy(false);
+			router.push(`/provisioning`);
 		} catch (error) {
-			console.error("🚨 Finalize failed:", error);
+			console.error("Finalize failed:", error);
 			toast.update(toastId, {
-				render: `❌ ${error.message || "Finalize failed"}`,
+				render: `${error.message || t("finalize_failed")}`,
 				isLoading: false,
 				type: "error",
 				autoClose: 5000,
@@ -1053,6 +895,7 @@ const Launch = () => {
 						</div>
 					)}
 					{/* Buttons */}
+
 					<div className="flex justify-between space-x-4 mt-4">
 						{/* Volver */}
 						<button
@@ -1062,78 +905,81 @@ const Launch = () => {
 						>
 							{t("volver")}
 						</button>
-
-						{/* Guardar token en DB en modos crear o editar */}
-						{(isCreateMode || isEditMode) && (
-							<button
-								type="button"
-								onClick={createTokenInDatabase}
-								disabled={loading}
-								className={`px-6 py-2 rounded text-white ${
-									loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
-								}`}
-							>
-								{t("save_token")}
-							</button>
-						)}
-
-						{/* Deploy y Transfer solo en modo vista */}
-						{isViewMode && (
-							<>
+						<div className="flex space-x-4">
+							{/* Guardar token en DB en modos crear o editar */}
+							{(isCreateMode || isEditMode) && (
 								<button
 									type="button"
-									onClick={handleDeployAll}
-									disabled={loading || disableDeploy}
+									onClick={createTokenInDatabase}
+									disabled={loading}
 									className={`px-6 py-2 rounded text-white ${
-										loading || disableDeploy
-											? "bg-gray-400 cursor-not-allowed"
-											: "bg-green-700"
+										loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
 									}`}
 								>
-									Deploy Contracts
+									{t("save_token")}
 								</button>
+							)}
 
+							{/* Deploy y Transfer solo en modo vista */}
+							{isViewMode &&
+								!token?.crowdsale_finalized &&
+								!token?.tokens_transfered && (
+									<>
+										<button
+											type="button"
+											onClick={handleDeployAll}
+											disabled={loading || disableDeploy}
+											className={`px-6 py-2 rounded text-white ${
+												loading || disableDeploy
+													? "bg-gray-400 cursor-not-allowed"
+													: "bg-green-700"
+											}`}
+										>
+											{t("deploy_contracts")}
+										</button>
+
+										<button
+											type="button"
+											onClick={transferTokensToCrowdsale}
+											disabled={loading || transferDisabled}
+											className={`px-6 py-2 rounded text-white ${
+												loading || transferDisabled
+													? "bg-gray-400 cursor-not-allowed"
+													: "bg-blue-600"
+											}`}
+										>
+											{t("transfer_tokens_to_crowdsale")}
+										</button>
+									</>
+								)}
+							{isViewMode && transferDone && !token?.crowdsale_finalized && (
 								<button
 									type="button"
-									onClick={transferTokensToCrowdsale}
-									disabled={loading || transferDisabled}
+									onClick={finalizeAndRenewCrowdsale}
+									disabled={loading}
 									className={`px-6 py-2 rounded text-white ${
-										loading || transferDisabled
-											? "bg-gray-400 cursor-not-allowed"
-											: "bg-blue-600"
+										loading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700"
 									}`}
 								>
-									Transfer Tokens to Crowdsale
+									{t("finalize_and_renew")}
 								</button>
-							</>
-						)}
-						{isViewMode && transferDone && (
-							<button
-								type="button"
-								onClick={finalizeAndRenewCrowdsale}
-								disabled={loading}
-								className={`px-6 py-2 rounded text-white ${
-									loading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700"
-								}`}
-							>
-								Finalize & Renew
-							</button>
-						)}
-						{isViewMode && transferDone && (
-							<button
-								type="button"
-								onClick={finalizeCrowdsale}
-								disabled={loading}
-								className={`px-6 py-2 rounded text-white ${
-									loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600"
-								}`}
-							>
-								Finalize Crowdsale
-							</button>
-						)}
+							)}
+							{isViewMode && transferDone && !token?.crowdsale_finalized && (
+								<button
+									type="button"
+									onClick={finalizeCrowdsale}
+									disabled={loading}
+									className={`px-6 py-2 rounded text-white ${
+										loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600"
+									}`}
+								>
+									{t("finalize_crowdsale")}
+								</button>
+							)}
+						</div>
 					</div>
 				</form>
-				{(tokenAddress || crowdsaleAddress) && (
+				{(tokenAddress || crowdsaleAddress) && !token?.crowdsale_finalized && (
 					<div className="mt-8 space-y-2 text-center">
 						{tokenAddress && (
 							<>

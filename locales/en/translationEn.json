@@ -99,6 +99,19 @@
 	"token_config": "Token params",
 	"rate": "Tokens / ETH",
 	"cap": "Cap",
-	"ups_no_hay_nada_aqui": "Ups, there's nothing here...",
-	"save_token": "Save token"
+	"ups_no_hay_nada_aqui": "Ups! there's nothing here...",
+	"save_token": "Save token",
+	"transfer_tokens_to_crowdsale": "Transferir tokens",
+	"deploy_complete": "Deployment complete",
+	"Wait please...": "Wait please...",
+	"Transferring tokens to crowdsale...": "Transferring tokens to crowdsale...",
+	"tokens_transferred": "Tokens transferred",
+	"finalizing_crowdsale": "Finalizing Crowdsale…",
+	"crowdsale_finalized": "Crowdsale finalized!",
+	"crowdsale_already_finalized": "Crowdsale already finalized. Renewing...",
+	"crowdsale_renewed": "Crowdsale renewed!",
+	"finalize_crowdsale": "Finalize Crowdsale",
+	"finalize_and_renew": "Finalize & Renew",
+	"fin_and_renew_fail": "Finalize & Renew failed",
+	"finalize_failed": "Finalize failed"
 }
