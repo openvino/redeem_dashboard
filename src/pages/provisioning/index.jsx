@@ -12,6 +12,7 @@ import {
 import useProvisioning from "@/hooks/useProvisioning";
 import { ROUTE_CONSTANTS } from "@/utils";
 import { isAdminUser } from "@/utils/authUtils";
+import LoadingSpinner from "@/components/Spinner";
 
 const Provisioning = () => {
 	const { rows, tokens, setTokens, session } = useProvisioning();
@@ -44,16 +45,20 @@ const Provisioning = () => {
 			<Head>
 				<title>Wine Token Provisioning</title>
 			</Head>
-			<div className="border rounded-lg overflow-x-scroll custom-scroll">
-				{tokens?.length && (
+			{tokens?.length > 0 ? (
+				<div className="border rounded-lg overflow-x-scroll custom-scroll">
 					<Table
 						columnas={columnas}
 						data={tokens}
 						n={10}
 						route={ROUTE_CONSTANTS.PROVISIONING_ROUTE}
 					/>
-				)}
-			</div>
+				</div>
+			) : (
+				<div className="flex items-center justify-center align-middle mt-20">
+					<LoadingSpinner />
+				</div>
+			)}
 		</HomeLayout>
 	);
 };
