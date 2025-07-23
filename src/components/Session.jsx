@@ -20,7 +20,9 @@ const SessionSync = () => {
 
 		if (previousAddress.current && currentAddress !== previousAddress.current) {
 			signOut({ redirect: false }).finally(async () => {
-				await disconnect(wallet);
+				if (account?.address) {
+					await disconnect(wallet);
+				}
 				router.replace("/");
 				previousAddress.current = null;
 			});

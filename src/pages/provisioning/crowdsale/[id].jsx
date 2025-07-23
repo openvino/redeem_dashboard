@@ -126,7 +126,6 @@ const Launch = () => {
 			chain: chain,
 			account: account,
 		});
-		console.log(signer);
 
 		const v = getValues();
 		const name = v.name?.trim();
@@ -662,121 +661,84 @@ const Launch = () => {
 		}
 	};
 
+	const OnUpdateCrowdsale = async () => {
+		await updateCrowdsale();
+	};
+
+	const updateCrowdsale = async () => {
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
+		const toastId = toast.loading(t("updating_crowdsale"), {
+			theme: "dark",
+		});
+		setLoading(true);
+
+		try {
+			const v = getValues();
+			const newRate = Number(String(v.rate || "").trim());
+
+			if (isNaN(newRate) || newRate <= 0) {
+				throw new Error("Invalid rate value");
+			}
+
+			const crowdsaleContract = new ethers.Contract(
+				token?.crowdsale_address,
+				crowdAbi,
+				signer
+			);
+
+			const currentRate = await crowdsaleContract.getRate();
+			console.log(`Current rate: ${currentRate}, New rate: ${newRate}`);
+
+			if (currentRate.toString() === newRate.toString()) {
+				throw new Error("New rate is the same as the current rate");
+			}
+
+			const tx = await crowdsaleContract.updateRate(newRate);
+			console.log("UpdateRate transaction sent:", tx.hash);
+
+			await tx.wait();
+
+			toast.update(toastId, {
+				render: t("crowdsale_updated"),
+				isLoading: false,
+				type: "success",
+				autoClose: 4000,
+			});
+
+			await updateTokenInfo(token?.symbol, { rate: newRate });
+
+			setToken((prev) => ({
+				...prev,
+				rate: newRate,
+			}));
+		} catch (error) {
+			console.error("Update crowdsale failed:", error);
+			toast.update(toastId, {
+				render: error.message || t("crowdsale_update_failed"),
+				isLoading: false,
+				type: "error",
+				autoClose: 5000,
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return (
 		<HomeLayout>
 			<ToastContainer />
 			<div className="p-4 w-full overflow-x-auto lg:overflow-x-hidden">
-				<h1 className="text-2xl font-bold text-center mb-6">{t("launch")}</h1>
+				<h1 className="text-2xl font-bold text-center mb-6">
+					{t("update_crowdsale")}
+				</h1>
 				<form
 					className="space-y-6 bg-[#F1EDE2] p-6 rounded-xl border-2 border-gray-200"
 					onSubmit={handleSubmit((e) => e.preventDefault())}
 				>
-					{/* Token Config */}
-					<h2 className="text-xl font-semibold">{t("token_config")}</h2>
-					<div className="grid lg:grid-cols-3 gap-4">
-						{/* Nombre */}
-						<div>
-							<label className="font-bold">{t("token_name")}</label>
-							<input
-								{...register("name")}
-								className="w-full mt-1 p-2 border rounded"
-								required
-								disabled={isFieldDisabled()}
-							/>
-						</div>
-
-						{/* Símbolo */}
-						<div>
-							<label className="font-bold">{t("token_symbol")}</label>
-							<input
-								{...register("symbol")}
-								className="w-full mt-1 p-2 border rounded"
-								required
-								disabled={isFieldDisabled()}
-							/>
-						</div>
-
-						{/* Cap */}
-						<div>
-							<label className="font-bold">{t("token_cap")}</label>
-							<input
-								type="number"
-								step="any"
-								{...register("cap")}
-								className="w-full mt-1 p-2 border rounded"
-								required
-								disabled={isFieldDisabled()}
-							/>
-						</div>
-
-						{/* Redeem Wallet */}
-						<div>
-							<label className="font-bold">{t("REDEEM_wallet_address")}</label>
-							<input
-								type="text"
-								{...register("redeemWalletAddress")}
-								className="w-full mt-1 p-2 border rounded"
-								required
-								disabled={isFieldDisabled()}
-							/>
-						</div>
-
-						{/* Logo */}
-						<div>
-							<label className="font-bold">{t("token_logo")}</label>
-							<input
-								type="file"
-								accept="image/*"
-								onChange={async (e) => {
-									const file = e.target.files[0];
-									if (!file) return;
-									try {
-										const url = await uploadImage(file);
-										setValue("tokenImage", url);
-										toast.success("Logo uploaded to IPFS");
-									} catch {
-										toast.error("Error uploading logo to IPFS");
-									}
-								}}
-								className="w-full mt-1 p-2 border rounded bg-white"
-								disabled={isFieldDisabled() || uploading}
-							/>
-							{uploading && (
-								<p className="text-sm text-gray-500 mt-2">Uploading...</p>
-							)}
-							{ipfsUrl && (
-								<div className="mt-2">
-									<img
-										src={ipfsUrl}
-										alt="Token Logo Preview"
-										className="rounded-lg shadow w-32 h-32 object-contain border"
-									/>
-									<p className="text-xs break-all mt-1">{ipfsUrl}</p>
-								</div>
-							)}
-						</div>
-
-						{/* Winery */}
-						<div>
-							<label className="font-bold">{t("select_winery")}</label>
-							<select
-								value={selectedWinery}
-								onChange={(e) => {
-									setSelectedWinery(e.target.value);
-									setValue("winery_id", e.target.value);
-								}}
-								className="w-full mt-1 p-2 border rounded bg-white"
-								disabled={isFieldDisabled()}
-							>
-								{wineries.map((wineryId) => (
-									<option key={wineryId} value={wineryId}>
-										{wineryId}
-									</option>
-								))}
-							</select>
-						</div>
-					</div>
-
 					{/* Crowdsale Config */}
 					<h2 className="text-xl font-semibold">{t("crowdsale_config")}</h2>
 					<div className="grid lg:grid-cols-2 gap-4">
@@ -810,7 +772,6 @@ const Launch = () => {
 								}}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled={isFieldDisabled()}
 							/>
 						</div>
 
@@ -831,7 +792,6 @@ const Launch = () => {
 								}}
 								className="w-full mt-1 p-2 border rounded"
 								required
-								disabled={isFieldDisabled()}
 							/>
 						</div>
 
@@ -905,15 +865,14 @@ const Launch = () => {
 						>
 							{t("volver")}
 						</button>
-
 						<div className="flex space-x-4">
 							{token?.crowdsale_address && (
 								<button
 									type="button"
-									onClick={() => router.push(`/provisioning/crowdsale/${id}`)}
-									className="px-6 py-2 bg-gray-300 rounded"
+									onClick={OnUpdateCrowdsale}
+									className="px-6 py-2 bg-purple-400 rounded"
 								>
-									{t("update_crowdsale")}
+									{t("update!")}
 								</button>
 							)}
 							{/* Guardar token en DB en modos crear o editar */}
@@ -930,24 +889,11 @@ const Launch = () => {
 								</button>
 							)}
 
-							{/* Deploy y Transfer solo en modo vista */}
+							{/* Acciones */}
 							{isViewMode &&
 								!token?.crowdsale_finalized &&
 								!token?.tokens_transfered && (
 									<>
-										<button
-											type="button"
-											onClick={handleDeployAll}
-											disabled={loading || disableDeploy}
-											className={`px-6 py-2 rounded text-white ${
-												loading || disableDeploy
-													? "bg-gray-400 cursor-not-allowed"
-													: "bg-green-700"
-											}`}
-										>
-											{t("deploy_contracts")}
-										</button>
-
 										<button
 											type="button"
 											onClick={transferTokensToCrowdsale}

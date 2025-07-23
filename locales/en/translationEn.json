@@ -113,5 +113,6 @@
 	"finalize_crowdsale": "Finalize Crowdsale",
 	"finalize_and_renew": "Finalize & Renew",
 	"fin_and_renew_fail": "Finalize & Renew failed",
-	"finalize_failed": "Finalize failed"
+	"finalize_failed": "Finalize failed",
+	"update_crowdsale": "Update Crowdsale"
 }
