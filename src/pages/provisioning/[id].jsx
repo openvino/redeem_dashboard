@@ -416,29 +416,39 @@ const Launch = () => {
             )}
           </div>
 
-          <div className="flex justify-between space-x-4 mt-4">
-            {/* Volver */}
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-2 bg-gray-300 rounded"
-            >
-              {t("volver")}
-            </button>
-            <div className="flex space-x-4">
-              {/* Guardar token en DB en modos crear o editar */}
-              {(isCreateMode || isEditMode) && (
-                <button
-                  type="button"
-                  onClick={createTokenInDatabase}
-                  disabled={loading}
-                  className={`px-6 py-2 rounded text-white ${
-                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
-                  }`}
-                >
-                  {t("save_token")}
-                </button>
-              )}
+					<div className="flex justify-between space-x-4 mt-4">
+						{/* Volver */}
+						<button
+							type="button"
+							onClick={() => router.back()}
+							className="px-6 py-2 bg-gray-300 rounded"
+						>
+							{t("volver")}
+						</button>
+
+						<div className="flex space-x-4">
+							{token?.crowdsale_address && (
+								<button
+									type="button"
+									onClick={() => router.push(`/provisioning/crowdsale/${id}`)}
+									className="px-6 py-2 bg-gray-300 rounded"
+								>
+									{t("update_crowdsale")}
+								</button>
+							)}
+							{/* Guardar token en DB en modos crear o editar */}
+							{(isCreateMode || isEditMode) && (
+								<button
+									type="button"
+									onClick={createTokenInDatabase}
+									disabled={loading}
+									className={`px-6 py-2 rounded text-white ${
+										loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
+									}`}
+								>
+									{t("save_token")}
+								</button>
+							)}
 
               {/* Deploy y Transfer solo en modo vista */}
               {isViewMode &&
