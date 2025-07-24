@@ -11,6 +11,13 @@ import "react-toastify/dist/ReactToastify.css";
 import clientAxios from "@/config/clientAxios";
 import HomeLayout from "@/components/HomeLayout";
 import FormField from "@/components/FormField";
+import {
+  createLoadingToast,
+  updateErrorToast,
+  updateSuccessToast,
+} from "../../../helpers/toastHelpers";
+
+//TODO TRADUCIR
 
 const AdminUser = () => {
   const router = useRouter();
@@ -46,20 +53,7 @@ const AdminUser = () => {
     }
   }, [admins, reset]);
   const onSubmit = async (data) => {
-
-    
-
-    const toastId = toast("Updating winary data...", {
-      position: "top-right",
-      autoClose: false,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      isLoading: true,
-    });
+    const toastId = createLoadingToast("Updating winary data...");
 
     try {
       setLoading(true);
@@ -67,39 +61,16 @@ const AdminUser = () => {
         data,
         previd: admins.id,
       });
-
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.SUCCESS,
-        render: "Admin updated success",
-        autoClose: 5000,
-      });
+      updateSuccessToast(toastId, "Admin updated success");
     } catch (error) {
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.ERROR,
-        render: "Error ",
-        autoClose: 5000,
-      });
+      updateErrorToast(toastId, error.message);
     } finally {
       setLoading(false);
     }
   };
 
-
   const handleDeleteAdmin = async () => {
-    const toastId = toast("Deleting admin...", {
-      position: "top-right",
-      autoClose: false,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      isLoading: true,
-    });
-
+    const toastId = createLoadingToast("Deleting admin...");
     try {
       setLoading(true);
       await clientAxios.delete("/adminRoute", {
@@ -107,15 +78,10 @@ const AdminUser = () => {
           id,
         },
       });
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.SUCCESS,
-        render: "Admin deleted successfully",
-        autoClose: 5000,
-      });
-
+      updateSuccessToast(toastId, "Admin deleted successfully");
       router.back();
     } catch (error) {
+      updateErrorToast(toastId, error.message);
       console.log(error);
     }
   };
@@ -139,26 +105,14 @@ const AdminUser = () => {
           >
             {/* ID */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                label={t("clave")}
-                {...register("id")}
-              />
-              <FormField
-                label={t("nombre")}
-                {...register("name")}
-              />
+              <FormField label={t("clave")} {...register("id")} />
+              <FormField label={t("nombre")} {...register("name")} />
             </div>
 
             {/* Apellido + Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                label={t("apellido")}
-                {...register("last_name")}
-              />
-              <FormField
-                label="Email:"
-                {...register("email")}
-              />
+              <FormField label={t("apellido")} {...register("last_name")} />
+              <FormField label="Email:" {...register("email")} />
             </div>
 
             {/* Imagen de perfil + Bodega (condicional) */}

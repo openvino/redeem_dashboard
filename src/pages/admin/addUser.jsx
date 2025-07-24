@@ -17,10 +17,7 @@ const addUser = () => {
   const { register, handleSubmit, setValue } = useForm();
   const router = useRouter();
   const { t } = useTranslation();
-
   const { wineries } = useWineries();
-
-  const [loading, setLoading] = useState();
 
   const onSubmit = async (data) => {
     const toastId = toast(t("Updating winery data..."), {
@@ -50,8 +47,6 @@ const addUser = () => {
         autoClose: 5000,
       });
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 
