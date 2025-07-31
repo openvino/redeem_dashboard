@@ -1,13 +1,9 @@
 import conn from "../config/db";
 
 export async function checkAuth(public_key) {
-	console.log("pkkkkkkkkkkkkkk", public_key);
-
 	const wineryAdmin = await conn.query(
 		`SELECT * FROM admin_users WHERE id='${public_key.toLowerCase()}';`
 	);
-	console.log(wineryAdmin?.rows);
-
 	if (wineryAdmin.rows.length) {
 		return true;
 	} else {

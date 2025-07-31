@@ -1,7 +1,6 @@
 import { createThirdwebClient, getContract } from "thirdweb";
 import { base, baseSepolia } from "thirdweb/chains";
 import { activeNetwork } from "./envs";
-console.log(activeNetwork);
 
 const activeChain = activeNetwork === "baseSepolia" ? baseSepolia : base;
 

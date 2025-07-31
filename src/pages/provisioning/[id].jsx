@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import HomeLayout from "@/components/HomeLayout";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { activeNetwork} from "@/config";
+import { activeNetwork } from "@/config";
 import {
   createTokenForLaunch,
   updateTokenInfo,
@@ -11,23 +11,25 @@ import {
 import { isAdminUser } from "@/utils/authUtils";
 import { formatDateForInput, toTimestamp } from "@/utils/dateUtils";
 import { useIpfsUpload } from "@/hooks/useIpfsUpload";
-import FormField from "@/components/FormField";
 import useDeployment from "@/hooks/useDeployment";
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "react-i18next";
-import useWineries from "@/hooks/useWineries";
+import { TokenConfigurationForm } from "@/components/TokenConfigurationForm";
+import { CrowdsaleConfogurationForm } from "@/components/CrowdsaleConfigurationForm";
+import DeployedAddresses from "@/components/DeployedAddresses";
+import LaunchActionButton from "@/components/LaunchActionButton";
 
 const Launch = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
   const [isCreateMode, setIsCreateMode] = useState(false);
-
   const [disableDeploy, setDisableDeploy] = useState(false);
   const [transferDisabled, setTransferDisabled] = useState(true);
   const [transferDone, setTransferDone] = useState(false);
+  const [bottleImage, setBottleImage] = useState("");
+  const [tokenImage, setTokenImage] = useState("");
 
-  const { wineries } = useWineries();
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -37,15 +39,18 @@ const Launch = () => {
       name: "",
       symbol: "",
       cap: "",
-      redeemWalletAddress: "",
-      tokenImage: "",
-      walletAddress: "",
-      pricePerToken: "",
-      rate: "",
-      openingTime: "",
-      closingTime: "",
-      tokensToCrowdsale: "",
+      redeem_wallet_address: "",
+      vintage: "esker",
+      bottle_image: "",
+      token_image: "",
       winery_id: "",
+      description: "",
+      wallet_address: "",
+      price_per_token: "",
+      rate: "",
+      opening_time: "",
+      closing_time: "",
+      tokens_to_crowdsale: "",
       token_address: "",
       crowdsale_address: "",
     },
@@ -93,6 +98,12 @@ const Launch = () => {
 
   useEffect(() => {
     if (token) {
+
+      if(token.bottle_image && token.token_image) {
+        setBottleImage(token.bottle_image);
+        setTokenImage(token.token_image);
+      }
+
       if (token.transfered_to_crowdsale) {
         setDisableDeploy(true);
         setTransferDisabled(true);
@@ -105,17 +116,21 @@ const Launch = () => {
         name: token.name,
         symbol: token.symbol,
         cap: token.cap,
-        redeemWalletAddress: token.redeemWalletAddress,
-        tokenImage: token.tokenImage,
-        walletAddress: token.walletAddress,
-        pricePerToken: token.pricePerToken,
+        redeem_wallet_address: token.redeem_wallet_address,
+        vintage: token.vintage,
+        bottle_image: token.bottle_image,
+        token_image: token.token_image,
+        winery_id: token.winery_id,
+        description: token.description,
+        wallet_address: token.wallet_address,
+        price_per_token: token.price_per_token,
         rate: token.rate,
-        openingTime: formatDateForInput(token.openingTime),
-        closingTime: formatDateForInput(token.closingTime),
-        tokensToCrowdsale: token.tokensToCrowdsale,
+        opening_time: formatDateForInput(token.opening_time),
+        closing_time: formatDateForInput(token.closing_time),
+        tokens_to_crowdsale: token.tokens_to_crowdsale,
       });
       const newPrice = 1 / token.rate;
-      setValue("pricePerToken", parseFloat(newPrice.toFixed(8)));
+      setValue("price_per_token", parseFloat(newPrice.toFixed(8)));
     }
   }, [token, reset, setValue]);
 
@@ -130,13 +145,19 @@ const Launch = () => {
     const name = v.name?.trim();
     const symbol = v.symbol?.trim();
     const cap = v.cap;
-    const redeemWalletAddress = v.redeemWalletAddress?.trim();
-    const tokenImage = v.tokenImage?.trim();
-    const walletAddress = v.walletAddress?.trim();
+    const redeemWalletAddress = v.redeem_wallet_address?.trim();
+    const vintage = v.vintage;
+    const bottleImage = v.bottle_image?.trim();
+    const tokenImage = v.token_image?.trim();
+    const winery_id = v.winery_id;
+    const description = v.description;
+    const walletAddress = v.wallet_address?.trim();
+    const pricePerToken = v.price_per_token;
     const rate = v.rate;
-    const openingTime = v.openingTime;
-    const closingTime = v.closingTime;
-    const tokensToCrowdsale = v.tokensToCrowdsale;
+    const openingTime = v.opening_time;
+    const closingTime = v.closing_time;
+    const tokensToCrowdsale = v.tokens_to_crowdsale;
+
     if (!name || !symbol || !cap || !redeemWalletAddress || !selectedWinery) {
       toast.error("Missing required fields");
       return;
@@ -154,13 +175,18 @@ const Launch = () => {
           name,
           symbol,
           cap,
-          redeemWalletAddress,
-          tokenImage,
-          walletAddress,
+          redeem_wallet_address: redeemWalletAddress,
+          vintage,
+          bottle_image: bottleImage || "",
+          token_image: tokenImage || "",
+          winery_id,
+          description,
+          wallet_address: walletAddress,
+          price_per_token: pricePerToken,
           rate,
-          openingTime,
-          closingTime,
-          tokensToCrowdsale,
+          opening_time: openingTime,
+          closing_time: closingTime,
+          tokens_to_crowdsale: tokensToCrowdsale,
           winery_id: selectedWinery,
         });
       } else {
@@ -169,8 +195,12 @@ const Launch = () => {
           symbol,
           cap,
           redeemWalletAddress,
+          vintage,
+          bottleImage,
           tokenImage,
+          winery_id,
           walletAddress,
+          pricePerToken,
           rate,
           openingTime,
           closingTime,
@@ -178,6 +208,7 @@ const Launch = () => {
           winery_id: selectedWinery,
           token_address: "",
           crowdsale_address: "",
+          description,
         });
       }
       toast.update(toastId, {
@@ -213,301 +244,47 @@ const Launch = () => {
         >
           {/* Token Config */}
           <h2 className="text-xl font-semibold">{t("token_config")}</h2>
-
-          {/* Nombre */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("token_name")}
-              required
-              disabled={isFieldDisabled()}
-              {...register("name")}
-            />
-
-            {/* Símbolo */}
-            <FormField
-              disabled={isFieldDisabled()}
-              label={t("token_symbol")}
-              required
-              {...register("symbol")}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("token_cap")}
-              type="number"
-              step="any"
-              {...register("cap")}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
-
-            <FormField
-              label={t("REDEEM_wallet_address")}
-              type="text"
-              {...register("redeemWalletAddress")}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="font-bold">{t("token_logo")}</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  const file = e.target.files[0];
-                  if (!file) return;
-                  try {
-                    const url = await uploadImage(file);
-                    setValue("tokenImage", url);
-                    toast.success("Logo uploaded to IPFS");
-                  } catch {
-                    toast.error("Error uploading logo to IPFS");
-                  }
-                }}
-                className="w-full px-3 py-2 h-[39px] border border-gray-300 rounded-md  disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-[#840C4A]"
-                disabled={isFieldDisabled() || uploading}
-              />
-              {uploading && (
-                <p className="text-sm text-gray-500 mt-2">Uploading...</p>
-              )}
-              {ipfsUrl && (
-                <div className="mt-2">
-                  <img
-                    src={ipfsUrl}
-                    alt="Token Logo Preview"
-                    className="rounded-lg shadow w-32 h-32 object-contain border"
-                  />
-                  <p className="text-xs break-all mt-1">{ipfsUrl}</p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="font-bold">{t("select_winery")}</label>
-              <select
-                value={selectedWinery}
-                onChange={(e) => {
-                  setSelectedWinery(e.target.value);
-                  setValue("winery_id", e.target.value);
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-[#840C4A] "
-                disabled={isFieldDisabled()}
-              >
-                {wineries.map((wineryId) => (
-                  <option key={wineryId.id} value={wineryId.id}>
-                    {wineryId.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <TokenConfigurationForm
+            register={register}
+            isFieldDisabled={isFieldDisabled}
+            uploadImage={uploadImage}
+            tokenPreview={tokenImage}
+            bottlePreview={bottleImage}
+            setValue={setValue}
+            setSelectedWinery={setSelectedWinery}
+            selectedWinery={selectedWinery}
+            setBottleImage={setBottleImage}
+            bottleImage={bottleImage}
+            setTokenImage={setTokenImage}
+            tokenImage={tokenImage}
+        
+          />
 
           <h2 className="text-xl font-semibold">{t("crowdsale_config")}</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("VCO_wallet_address")}
-              type="text"
-              {...register("walletAddress")}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
+          <CrowdsaleConfogurationForm
+            register={register}
+            isFieldDisabled={isFieldDisabled}
+            setValue={setValue}
+          />
 
-            <FormField
-              label={t("price_per_token")}
-              type="number"
-              step="any"
-              {...register("pricePerToken")}
-              onChange={(e) => {
-                const price = parseFloat(e.target.value);
-                if (!isNaN(price) && price > 0) {
-                  const newRate = Math.floor(1 / price);
-                  setValue("rate", newRate);
-                } else {
-                  setValue("rate", 0);
-                }
-              }}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
-          </div>
+          <DeployedAddresses token={token} />
 
-          {/* Rate */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("rate_tokens_per_eth")}
-              type="number"
-              {...register("rate")}
-              onChange={(e) => {
-                const rate = parseFloat(e.target.value);
-                if (!isNaN(rate) && rate > 0) {
-                  const newPrice = 1 / rate;
-                  setValue("pricePerToken", parseFloat(newPrice.toFixed(8)));
-                } else {
-                  setValue("pricePerToken", 0);
-                }
-              }}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
-
-            <FormField
-              label={t("opening_time")}
-              type="datetime-local"
-              {...register("openingTime")}
-              className="w-full mt-1 p-2 border rounded"
-              disabled={isFieldDisabled()}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("closing_time")}
-              type="datetime-local"
-              {...register("closingTime")}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
-            <FormField
-              label={t("tokens_to_crowdsale")}
-              type="number"
-              step="any"
-              {...register("tokensToCrowdsale")}
-              className="w-full mt-1 p-2 border rounded"
-              required
-              disabled={isFieldDisabled()}
-            />
-          </div>
-
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <textarea />
-
-             
-           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {token?.token_address && (
-              <FormField
-                label={t("token_address")}
-                type="text"
-                value={token?.token_address}
-                className="w-full mt-1 p-2 border rounded bg-gray-100"
-                disabled
-              />
-            )}
-            {token?.crowdsale_address && (
-              <FormField
-                label={t("crowdsale_address")}
-                type="text"
-                value={token?.crowdsale_address}
-                className="w-full mt-1 p-2 border rounded bg-gray-100"
-                disabled
-              />
-            )}
-          </div>
-
-					<div className="flex justify-between space-x-4 mt-4">
-						{/* Volver */}
-						<button
-							type="button"
-							onClick={() => router.back()}
-							className="px-6 py-2 bg-gray-300 rounded"
-						>
-							{t("volver")}
-						</button>
-
-						<div className="flex space-x-4">
-							{token?.crowdsale_address && (
-								<button
-									type="button"
-									onClick={() => router.push(`/provisioning/crowdsale/${id}`)}
-									className="px-6 py-2 bg-gray-300 rounded"
-								>
-									{t("update_crowdsale")}
-								</button>
-							)}
-							{/* Guardar token en DB en modos crear o editar */}
-							{(isCreateMode || isEditMode) && (
-								<button
-									type="button"
-									onClick={createTokenInDatabase}
-									disabled={loading}
-									className={`px-6 py-2 rounded text-white ${
-										loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700"
-									}`}
-								>
-									{t("save_token")}
-								</button>
-							)}
-
-              {/* Deploy y Transfer solo en modo vista */}
-              {isViewMode &&
-                !token?.crowdsale_finalized &&
-                !token?.tokens_transfered && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleDeployAll}
-                      disabled={loading || disableDeploy}
-                      className={`px-6 py-2 rounded text-white ${
-                        loading || disableDeploy
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-700"
-                      }`}
-                    >
-                      {t("deploy_contracts")}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={transferTokensToCrowdsale}
-                      disabled={loading || transferDisabled}
-                      className={`px-6 py-2 rounded text-white ${
-                        loading || transferDisabled
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600"
-                      }`}
-                    >
-                      {t("transfer_tokens_to_crowdsale")}
-                    </button>
-                  </>
-                )}
-              {isViewMode && transferDone && !token?.crowdsale_finalized && (
-                <button
-                  type="button"
-                  onClick={finalizeAndRenewCrowdsale}
-                  disabled={loading}
-                  className={`px-6 py-2 rounded text-white ${
-                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-purple-700"
-                  }`}
-                >
-                  {t("finalize_and_renew")}
-                </button>
-              )}
-              {isViewMode && transferDone && !token?.crowdsale_finalized && (
-                <button
-                  type="button"
-                  onClick={finalizeCrowdsale}
-                  disabled={loading}
-                  className={`px-6 py-2 rounded text-white ${
-                    loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600"
-                  }`}
-                >
-                  {t("finalize_crowdsale")}
-                </button>
-              )}
-            </div>
-          </div>
+          <LaunchActionButton
+            token={token}
+            isCreateMode={isCreateMode}
+            isEditMode={isEditMode}
+            isViewMode={isViewMode}
+            handleDeployAll={handleDeployAll}
+            loading={loading}
+            disableDeploy={disableDeploy}
+            transferTokensToCrowdsale={transferTokensToCrowdsale}
+            transferDisabled={transferDisabled}
+            transferDone={transferDone}
+            createTokenInDatabase={createTokenInDatabase}
+            finalizeAndRenewCrowdsale={finalizeAndRenewCrowdsale}
+            finalizeCrowdsale={finalizeCrowdsale}
+          />
         </form>
         {(tokenAddress || crowdsaleAddress) && !token?.crowdsale_finalized && (
           <div className="mt-8 space-y-2 text-center">

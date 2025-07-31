@@ -40,7 +40,6 @@ export const updateAdmin = async (req) => {
   const { id, name, last_name, email, winery_id, profile_img, is_admin } =
     req.body.data;
 
-  console.log(req.body.data);
 
   const { previd } = req.body;
   let adminQuery = `UPDATE admin_users SET `;

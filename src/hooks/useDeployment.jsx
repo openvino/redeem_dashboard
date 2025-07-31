@@ -48,7 +48,6 @@ const useDeployment = (
         const token = await tokenLaunching(id);
         setSelectedWinery(token.winery_id);
         setToken(token);
-        console.log(token);
       }
     };
     fetchTokens();
@@ -140,15 +139,15 @@ const useDeployment = (
     });
 
     const symbol = v.symbol?.trim();
-    const walletAddress = v.walletAddress?.trim();
+    const walletAddress = v.wallet_address?.trim();
     if (!walletAddress) throw new Error("Wallet address missing");
 
     const rate = Number(String(v.rate || "").trim());
-    const openingTs = Math.floor(toTimestamp(v.openingTime));
-    const closingTs = Math.floor(toTimestamp(v.closingTime));
+    const openingTs = Math.floor(toTimestamp(v.opening_time));
+    const closingTs = Math.floor(toTimestamp(v.closing_time));
 
     const tokensBN = ethers.utils.parseEther(
-      String(v.tokensToCrowdsale || "").trim()
+      String(v.tokens_to_crowdsale || "").trim()
     );
 
     const weiCapBN = tokensBN.div(rate);
@@ -241,18 +240,18 @@ const useDeployment = (
 
       await updateTokenInfo(getValues().symbol, {
         cap: totalTokens,
-        tokensToCrowdsale: totalTokens,
+        tokens_to_crowdsale: totalTokens,
         transfered_to_crowdsale: false,
       });
       setToken((prev) => ({
         ...prev,
         cap: totalTokens,
-        tokensToCrowdsale: totalTokens,
+        tokens_to_crowdsale: totalTokens,
         transfered_to_crowdsale: false,
       }));
 
       const tokensBN = ethers.utils.parseEther(
-        String(v.tokensToCrowdsale || "").trim()
+        String(v.tokens_to_crowdsale || "").trim()
       );
 
       const rate = Number(String(v.rate || "").trim());
@@ -261,8 +260,8 @@ const useDeployment = (
       if (weiCapBN.isZero())
         throw new Error("Rate demasiado alto para los tokens");
 
-      const openingTs = Math.floor(toTimestamp(v.openingTime));
-      const closingTs = Math.floor(toTimestamp(v.closingTime));
+      const openingTs = Math.floor(toTimestamp(v.opening_time));
+      const closingTs = Math.floor(toTimestamp(v.closing_time));
 
       showLoadingToast(toastId, t("Deploying new crowdsale..."));
 
@@ -271,7 +270,7 @@ const useDeployment = (
         crowdBytecode,
         signer,
         [
-          v.walletAddress,
+          v.wallet_address,
           token?.token_address,
           ethers.utils.parseEther(totalTokens).div(v.rate),
           openingTs,
@@ -291,7 +290,7 @@ const useDeployment = (
         .encode(
           ["address", "address", "uint256", "uint256", "uint256", "uint256"],
           [
-            v.walletAddress,
+            v.wallet_address,
             token?.token_address,
             ethers.utils.parseEther(totalTokens).div(v.rate),
             openingTs,
@@ -336,7 +335,7 @@ const useDeployment = (
       }
 
       const tokensBN = ethers.utils.parseEther(
-        String(getValues().tokensToCrowdsale).trim()
+        String(getValues().tokens_to_crowdsale).trim()
       );
 
       const tokenContract = new ethers.Contract(
@@ -430,7 +429,7 @@ const useDeployment = (
       setToken((prev) => ({
         ...prev,
         cap: totalTokens,
-        crowdsaleAddress: "",
+        crowdsale_address: "",
         transfered_to_crowdsale: false,
       }));
       setTransferDisabled(true);
@@ -451,7 +450,7 @@ const useDeployment = (
     });
 
     try {
-      if (!v.tokensToCrowdsale || isNaN(v.tokensToCrowdsale)) {
+      if (!v.tokens_to_crowdsale || isNaN(v.tokens_to_crowdsale)) {
         throw new Error("Invalid number of tokens to transfer");
       }
 
@@ -499,6 +498,70 @@ const useDeployment = (
       setLoading(false);
     }
   };
+
+  	const updateCrowdsale = async () => {
+		const signer = await ethers5Adapter.signer.toEthers({
+			client: client,
+			chain: chain,
+			account: account,
+		});
+		const toastId = toast.loading(t("updating_crowdsale"), {
+			theme: "dark",
+		});
+		setLoading(true);
+
+		try {
+			const v = getValues();
+			const newRate = Number(String(v.rate || "").trim());
+
+			if (isNaN(newRate) || newRate <= 0) {
+				throw new Error("Invalid rate value");
+			}
+
+			const crowdsaleContract = new ethers.Contract(
+				token?.crowdsale_address,
+				crowdAbi,
+				signer
+			);
+
+			const currentRate = await crowdsaleContract.getRate();
+			console.log(`Current rate: ${currentRate}, New rate: ${newRate}`);
+
+			if (currentRate.toString() === newRate.toString()) {
+				throw new Error("New rate is the same as the current rate");
+			}
+
+			const tx = await crowdsaleContract.updateRate(newRate);
+			console.log("UpdateRate transaction sent:", tx.hash);
+
+			await tx.wait();
+
+			toast.update(toastId, {
+				render: t("crowdsale_updated"),
+				isLoading: false,
+				type: "success",
+				autoClose: 4000,
+			});
+
+			await updateTokenInfo(token?.symbol, { rate: newRate });
+
+			setToken((prev) => ({
+				...prev,
+				rate: newRate,
+			}));
+		} catch (error) {
+			console.error("Update crowdsale failed:", error);
+			toast.update(toastId, {
+				render: error.message || t("crowdsale_update_failed"),
+				isLoading: false,
+				type: "error",
+				autoClose: 5000,
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
   return {
     deployToken,
     deployCrowdsale,
@@ -515,6 +578,7 @@ const useDeployment = (
     deploymentComplete,
     setSelectedWinery,
     selectedWinery,
+    updateCrowdsale
   };
 };
 
