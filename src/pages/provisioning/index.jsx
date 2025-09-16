@@ -36,7 +36,6 @@ const Provisioning = () => {
 			: tokensLaunching(winery_id);
 		tokensPromise.then((tokensAll) => {
 			setTokens(tokensAll);
-			console.log(tokensAll);
 		});
 	}, []);
 

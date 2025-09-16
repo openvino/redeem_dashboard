@@ -2,7 +2,7 @@ import clientAxios from "@/config/clientAxios";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 const useWineries = () => {
-  const [wineries, setWineries] = useState();
+  const [wineries, setWineries] = useState([]);
   const { data: session, status } = useSession();
   const fetchWineries = async () => {
     try {

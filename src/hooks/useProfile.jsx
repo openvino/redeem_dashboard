@@ -8,7 +8,6 @@ const useProfile = () => {
 
 	const fetchProfile = async () => {
 		try {
-			console.log("session", session, "status", status);
 
 			if (status === "authenticated" && session) {
 				const response = await clientAxios.post("/loginRoute", {

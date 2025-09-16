@@ -7,12 +7,13 @@ export const getAllProposals = async (token) => {
 	let query = `SELECT * from proposals`;
 
 	const proposals = await conn.query(query);
+	return proposals.rows;
 
-	if (proposals.rows.length > 0) {
-		return proposals.rows;
-	} else {
-		throw new Error("No proposals");
-	}
+	// if (proposals.rows.length > 0) {
+	// 	return proposals.rows;
+	// } else {
+	// 	throw new Error("No proposals");
+	// }
 };
 
 export const createProposal = async (req) => {

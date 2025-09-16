@@ -38,11 +38,9 @@ export function useIpfsUpload() {
 					"X-Api-Key": apiKey,
 				},
 			});
-			console.log(response.data);
 
 			const url = `https://ipfst.costaflores.openvino.org/ipfs/${response.data.cid}`;
 			setIpfsUrl(url);
-			console.log(url);
 
 			return { cid: response.data.cid, url };
 		} catch (error) {

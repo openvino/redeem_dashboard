@@ -40,9 +40,6 @@ export const createWineBiodigitalData = async ({
 			organic,
 			privates,
 		];
-
-		console.log("Inserting values:", values);
-
 		const result = await conn.query(query, values);
 
 		if (result.rows.length) {
@@ -118,15 +115,6 @@ export const updateWineBiodigitalData = async ({ wine, field, value }) => {
     `;
 
 		const values = [value, wine];
-
-		console.log(
-			"Updating field:",
-			field,
-			"with value:",
-			value,
-			"for wine:",
-			wine
-		);
 
 		const result = await conn.query(query, values);
 
