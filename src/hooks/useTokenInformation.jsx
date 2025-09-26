@@ -39,6 +39,13 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
 			try {
 				const fetchTokenDataPromise = (async () => {
 					const data = await tokenDataInspector(contract, contractAddress);
+					console.log(
+						"//////////////////////////////////",
+						contract,
+						contractAddress
+					);
+
+					console.log(data);
 
 					const {
 						address,
