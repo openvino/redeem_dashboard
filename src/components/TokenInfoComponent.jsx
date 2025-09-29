@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import LoadingSpinner from './Spinner';
 import axios from 'axios';
 import Image from 'next/image';
 import { VCOPrices, contracts } from '../../contracts';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
-const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
+const TokenInfoComponent = ({ tokenInfo, onSelectChange, style }) => {
   const { t } = useTranslation();
   const {
     name,
@@ -61,7 +60,10 @@ const TokenInfoComponent = ({ tokenInfo, onSelectChange }) => {
   }, [name]);
 
   return (
-    <div className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center min-w-full min-h-full">
+    <div
+      style={style}
+      className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center min-w-full min-h-full"
+    >
       <div className="flex flex-row justify-between ">
         {/* Imagen y texto */}
         <div className="text-center flex">

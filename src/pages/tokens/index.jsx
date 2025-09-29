@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import TokenInfoComponent from '@/components/TokenInfoComponent';
-import { MTB18Address, MTB18_ETH_PAIR } from '../../../contracts';
+import { contracts } from '../../../contracts';
 import useTokenInformation from '@/hooks/useTokenInformation';
 import LoadingSpinner from '@/components/Spinner';
 
 import HomeLayout from '@/components/HomeLayout';
 
 const Tokens = () => {
-  const [address, setAddress] = useState(MTB18Address);
-  const [pairAddress, setPairAddress] = useState(MTB18_ETH_PAIR);
+  const defaultContract = contracts[0] ?? {};
+  const [address, setAddress] = useState(defaultContract.contractAddress ?? '');
+  const [pairAddress, setPairAddress] = useState(
+    defaultContract.contractPairAddress ?? ''
+  );
   const { tokenInfo, loading } = useTokenInformation(address, pairAddress);
 
   const onSelectChange = (e) => {
@@ -17,12 +20,11 @@ const Tokens = () => {
       e.target.options[e.target.selectedIndex].getAttribute('name');
 
     setAddress(selectedContractAddress);
-    setPairAddress(selectedContractName);
+    setPairAddress(selectedContractName ?? '');
   };
 
   return (
-   <HomeLayout>
- 
+    <HomeLayout>
       <div className="z-1 rounded-xl">
         {tokenInfo && !loading ? (
           <div className="w-full flex justify-start ml-5 overflow-x-hidden">
@@ -38,7 +40,7 @@ const Tokens = () => {
           </div>
         )}
       </div>
-   </HomeLayout>
+    </HomeLayout>
   );
 };
 

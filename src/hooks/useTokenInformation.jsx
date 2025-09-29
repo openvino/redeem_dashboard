@@ -5,7 +5,7 @@ import {
 	tokenDataInspector,
 	calculateHoldersCount,
 } from "@/utils/getTokenInformation";
-import { ETH_DAI_PAIR, MTB19_ETH_PAIR } from "../../contracts";
+import { ETH_DAI_PAIR } from "../../contracts";
 import { ethers } from "ethers";
 
 const useTokenInformation = (contractAddress, contractPairAddress) => {
@@ -31,6 +31,7 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
 	});
 
 	useEffect(() => {
+		if (!contractAddress) return;
 		const providerUri = process.env.NEXT_PUBLIC_ETHEREUM_PROVIDER_URL;
 
 		const provider = new ethers.providers.JsonRpcProvider(providerUri);
@@ -72,18 +73,14 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
 						crowdsaleAddress,
 						uniswapUri,
 						lpContractAddress,
-						// lpContract: '',
-						// vcoStartDate: '',
-						// vcoEndDate: '',
-						// vcoPrice: 0,
-						// vcoPriceFiat: '',
-						// adminAddress: '',
-						// initialLpTokenDeposit: 0,
 					}));
 				})();
 
 				const fetchPricePromise = (async () => {
-					const price = await getPrice(MTB19_ETH_PAIR, ETH_DAI_PAIR);
+					if (!contractPairAddress) {
+						return;
+					}
+					const price = await getPrice(contractPairAddress, ETH_DAI_PAIR);
 
 					setTokenInfo((prev) => ({
 						...prev,
@@ -122,7 +119,7 @@ const useTokenInformation = (contractAddress, contractPairAddress) => {
 		};
 
 		fetchData();
-	}, [contractAddress]);
+	}, [contractAddress, contractPairAddress]);
 
 	return { tokenInfo, loading };
 };
