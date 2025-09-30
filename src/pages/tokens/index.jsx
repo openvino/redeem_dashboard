@@ -12,7 +12,15 @@ const Tokens = () => {
   const [pairAddress, setPairAddress] = useState(
     defaultContract.contractPairAddress ?? ''
   );
-  const { tokenInfo, loading } = useTokenInformation(address, pairAddress);
+  const {
+    tokenInfo,
+    loading,
+    holdersDetail,
+    getTokensSoldBetweenDates,
+    getTokensSoldForYear,
+    tokensSoldDuringVco,
+    knownAddresses,
+  } = useTokenInformation(address, pairAddress);
 
   const onSelectChange = (e) => {
     const selectedContractAddress = e.target.value;
@@ -31,6 +39,11 @@ const Tokens = () => {
             <TokenInfoComponent
               tokenInfo={tokenInfo}
               onSelectChange={onSelectChange}
+              holdersDetail={holdersDetail}
+              onQueryTokensByRange={getTokensSoldBetweenDates}
+              onQueryTokensByYear={getTokensSoldForYear}
+              onQueryTokensDuringVco={tokensSoldDuringVco}
+              knownAddresses={knownAddresses}
               style={{ boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)' }}
             />
           </div>

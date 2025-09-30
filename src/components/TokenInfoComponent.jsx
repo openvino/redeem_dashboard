@@ -1,226 +1,643 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Image from 'next/image';
-import { VCOPrices, contracts } from '../../contracts';
-import Link from 'next/link';
-import { useTranslation } from 'react-i18next';
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import Image from "next/image";
+import Link from "next/link";
+import { useTranslation } from "react-i18next";
+import { VCOPrices, contracts } from "../../contracts";
 
-const TokenInfoComponent = ({ tokenInfo, onSelectChange, style }) => {
-  const { t } = useTranslation();
-  const {
-    name,
-    symbol,
-    vcoIssuance,
-    totalSupply,
-    burnedTokens,
-    holdersCount,
-    totalTransfers,
-    tokenContract,
-    uniswapUri,
-    crowdsaleAddress,
-    lpContractAddress,
-  } = tokenInfo;
+const TokenInfoComponent = ({
+	tokenInfo,
+	onSelectChange,
+	style,
+}) => {
+	const { t } = useTranslation();
 
-  const [priceFiat, setPriceFiat] = useState({ ars: 0, usd: 0 });
-  const [currency, setCurrency] = useState('ars');
+	const {
+		name,
+		symbol,
+		vcoIssuance,
+		totalSupply,
+		burnedTokens,
+		holdersCount,
+		totalTransfers,
+		tokenContract,
+		uniswapUri,
+		crowdsaleAddress,
+		lpContractAddress,
+		address,
+		price,
+		holdersUrl,
+	} = tokenInfo;
 
-  const getPrice = async (ethAmount, currency) => {
-    try {
-      const responseUsd = await axios.get(
-        'https://criptoya.com/api/bitsoalpha/eth/usd'
-      );
-      const responseArs = await axios.get(
-        'https://criptoya.com/api/argenbtc/usdt/ars'
-      );
+	const [sales, setSales] = useState([]);
+	const [loadingSales, setLoadingSales] = useState(false);
+	const [fiatPrice, setFiatPrice] = useState({ ars: null, usd: null });
+	const [rangeStart, setRangeStart] = useState("");
+	const [rangeEnd, setRangeEnd] = useState("");
+	const [rangeResult, setRangeResult] = useState(null);
+	const [year, setYear] = useState("");
+	const [yearResult, setYearResult] = useState(null);
 
-      if (responseUsd.data && responseUsd.data.ask) {
-        const ethPriceInUSD = responseUsd.data.totalAsk;
-        const priceInUSD = ethAmount * ethPriceInUSD;
-        const priceInARS = priceInUSD * responseArs.data.ask;
-        setPriceFiat({ ars: priceInARS, usd: priceInUSD });
+	const [salesPage, setSalesPage] = useState(1);
+	const [salesPageSize, setSalesPageSize] = useState(25);
+	const [wineryFilter, setWineryFilter] = useState("");
 
-        return;
-      } else {
-        console.log('No se pudo obtener el precio de Ethereum en dólares');
-        return null;
-      }
-    } catch (error) {
-      console.error(
-        'Error al obtener el precio de Ethereum en dólares:',
-        error
-      );
-      return null;
-    }
-  };
+	const sumAmounts = (rows = []) =>
+		rows.reduce((acc, r) => acc + Number(r.amount || 0), 0);
 
-  useEffect(() => {
-    const price = VCOPrices.find((element) => element.name === name)?.priceEth;
+	const fetchSalesByRange = async ({ from, to, winery }) => {
+		const params = {};
+		if (from) params.from = from;
+		if (to) params.to = to;
+		if (winery) params.winery = winery;
+		if (tokenInfo?.address) params.token = tokenInfo.address;
+		const res = await axios.get("/api/routes/salesRoute", { params });
+		return res.data?.sales || res.data?.rows || [];
+	};
 
-    getPrice(price);
-  }, [name]);
+	const fetchSalesByYear = async ({ year, winery }) => {
+		const from = `${year}-01-01`;
+		const to = `${year}-12-31`;
+		return fetchSalesByRange({ from, to, winery });
+	};
 
-  return (
-    <div
-      style={style}
-      className="p-4 border rounded-xl bg-[#F1EDE2] flex flex-col justify-center min-w-full min-h-full"
-    >
-      <div className="flex flex-row justify-between ">
-        {/* Imagen y texto */}
-        <div className="text-center flex">
-          <Image
-            src={`/assets/${symbol}.png`}
-            width={100}
-            height={80}
-            className="w-[8rem] sm:w-[8rem] h-auto"
-            alt="mtb23"
-          />
-          {/* <h1 className="text-md md:text-xl font-bold m-2">
-            {t('token_info')}
-          </h1> */}
-        </div>
+	const totalSalesRows = sales.length;
+	const totalSalesPages = Math.max(
+		1,
+		Math.ceil(totalSalesRows / salesPageSize)
+	);
 
-        {/* Select */}
-        <div className="flex my-1 mr-10 items-center sm:w-[16rem] w-full justify-end">
-          <select
-            name=""
-            id=""
-            onChange={onSelectChange}
-            className="text-gray-800 border rounded-lg text-md "
-            style={{ outline: 'none', height: '2.5rem', width: '7rem' }}
-          >
-            <option value="">{t('select_token')}</option>
-            {contracts?.map((e, index) => (
-              <option
-                key={index}
-                value={e.contractAddress}
-                name={e.contractPairAddress}
-              >
-                {e.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+	const pagedSales = useMemo(() => {
+		const start = (salesPage - 1) * salesPageSize;
+		const end = start + salesPageSize;
+		return sales.slice(start, end);
+	}, [sales, salesPage, salesPageSize]);
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 mt-3 min-w-[500px] overflow-x-auto md:overflow-hidden">
-        {/* First Column */}
-        <div className="grid grid-cols-1  gap-2 text-sm lg:text-lg">
-          <div className="mb-2">
-            {t('name')}
-            {':   '} <span className="font-semibold">{name}</span>
-          </div>
+	useEffect(() => {
+		if (salesPage > totalSalesPages) setSalesPage(totalSalesPages);
+	}, [totalSalesPages, salesPage]);
 
-          <div className="mb-2">
-            {t('symbol')}: <span className="font-semibold">{symbol}</span>
-          </div>
-          <div className="mb-2">
-            {t('token_issuance')}:{' '}
-            <span className="font-semibold">{vcoIssuance}</span>
-          </div>
-          <div className="mb-2">
-            {t('burned_tokens')}:{'   '}
-            <span className="font-semibold">{burnedTokens}</span>
-          </div>
-          {/* <div className="mb-2">
-          Price: <span className="font-semibold">{price}</span>
-        </div> */}
-          <div>
-            {t('bottles_remaining')}:
-            <span className="font-semibold">{totalSupply}</span>
-          </div>
-          <div>
-            {t('total_transfers')}:
-            <span className="font-semibold">{totalTransfers}</span>
-          </div>
-          <div>
-            {t('holders')}:<span className="font-semibold">{holdersCount}</span>
-          </div>
-        </div>
+	const vcoData = useMemo(
+		() => VCOPrices.find((entry) => entry.name === name),
+		[name]
+	);
 
-        {/* Second Column */}
-        <div className="grid grid-cols-1 gap-2 text-xs lg:text-lg w-[600px]">
-          <div className="mb-2">
-            {t('contract_address')}:{'   '}
-            <span className="font-semibold ">{tokenContract}</span>
-          </div>
-          <div className="mb-2">
-            {t('crowdsale_address')}:{'   '}
-            <span className="font-semibold">{crowdsaleAddress}</span>
-          </div>
-          <div className="mb-2">
-            {t('lp')} {':    '}
-            <span className="font-semibold">{lpContractAddress}</span>
-          </div>
-          <div>
-            {t('vco_start')}:{'   '}
-            <span className="font-semibold">
-              {VCOPrices.map((element, index) => {
-                if (name == element.name) return `${element.dateStart}`;
-              })}
-            </span>
-          </div>
-          <div>
-            {t('vco_end')}:{'   '}
-            <span className="font-semibold">
-              {VCOPrices.map((element, index) => {
-                if (name == element.name) return `${element.dateEnd}`;
-              })}
-            </span>
-          </div>
-          <div>
-            {t('vco_price')}:{'   '}
-            <span className="font-semibold">
-              {VCOPrices.map((element, index) => {
-                if (name == element.name) return `${element.priceEth} ETH`;
-              })}
-            </span>
-          </div>
-          <div>
-            <span className="flex flex-row">
-              <div>
-                <div>
-                  {t('vco_price_fiat')}:{' '}
-                  {VCOPrices.map((element, index) => {
-                    if (name === element.name) {
-                      return (
-                        <span className="font-semibold" key={index}>
-                          {`${element.priceArs} ARS`}
-                        </span>
-                      );
-                    }
+	useEffect(() => {
+		if (!vcoData?.priceEth) {
+			setFiatPrice({ ars: null, usd: null });
+			return;
+		}
+		const fetchFiatReference = async () => {
+			try {
+				const [ethUsd, usdArs] = await Promise.all([
+					axios.get("https://criptoya.com/api/bitsoalpha/eth/usd"),
+					axios.get("https://criptoya.com/api/argenbtc/usdt/ars"),
+				]);
+				if (ethUsd.data?.totalAsk && usdArs.data?.ask) {
+					const priceUsd = Number(ethUsd.data.totalAsk) * vcoData.priceEth;
+					const priceArs = priceUsd * Number(usdArs.data.ask);
+					setFiatPrice({ usd: priceUsd, ars: priceArs });
+				}
+			} catch (error) {
+				console.error("No se pudo actualizar la referencia fiat", error);
+				setFiatPrice({ ars: null, usd: null });
+			}
+		};
+		fetchFiatReference();
+	}, [vcoData]);
 
-                    return null;
-                  })}
-                </div>
-              </div>
+	const formatNumber = (value) => {
+		if (value === undefined || value === null) return "—";
+		const numericValue = Number(value);
+		if (Number.isFinite(numericValue)) {
+			return numericValue.toLocaleString(undefined, {
+				maximumFractionDigits: 2,
+			});
+		}
+		return value;
+	};
 
-              {/* <div className="">
-                <select
-                  name="currencySelect"
-                  id="currencySelect"
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className=" "
-                  style={{ outline: 'none' }}
-                  value={currency}
-                >
-                  <option value="ars">ARS</option>
-                  <option value="usd">USD</option>
-                </select>
-              </div> */}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="flex justify-start md:justify-end mt-4 mr-8">
-        <Link href={uniswapUri || ''} target="blank">
-          <button className="px-2 py-1 rounded bg-[#840C4A] text-white  w-30">
-            {/* {t('add_admin')} */}
-            More Info...
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
+	const handleRangeSubmit = async (event) => {
+		event.preventDefault();
+		if (!rangeStart || !rangeEnd) {
+			setRangeResult(null);
+			return;
+		}
+		try {
+			setLoadingSales(true);
+			const rows = await fetchSalesByRange({
+				from: rangeStart,
+				to: rangeEnd,
+				winery: wineryFilter || undefined,
+			});
+			const total = sumAmounts(rows);
+			setSales(rows);
+			setSalesPage(1);
+			setRangeResult(total);
+		} catch (error) {
+			console.error("Error al consultar ventas por rango", error);
+			setRangeResult(null);
+		} finally {
+			setLoadingSales(false);
+		}
+	};
+
+	const handleYearChange = async (event) => {
+		const selectedYear = event.target.value;
+		setYear(selectedYear);
+
+		if (!selectedYear) {
+			setYearResult(null);
+			return;
+		}
+
+		const from = `${selectedYear}-01-01`;
+		const to = `${selectedYear}-12-31`;
+		setRangeStart(from);
+		setRangeEnd(to);
+
+		try {
+			setLoadingSales(true);
+			const rows = await fetchSalesByRange({
+				from,
+				to,
+				winery: wineryFilter || undefined,
+			});
+			const total = sumAmounts(rows);
+			setSales(rows);
+			setSalesPage(1);
+			setYearResult(total);
+			setRangeResult(total);
+		} catch (error) {
+			console.error("Error al consultar ventas por año", error);
+			setYearResult(null);
+		} finally {
+			setLoadingSales(false);
+		}
+	};
+
+	const logoSrc = symbol ? `/assets/${symbol}.png` : "/assets/default.png";
+	const network = (process.env.NEXT_PUBLIC_NETWORK || "").toLowerCase();
+	const explorerBaseUrl =
+		network === "basesepolia" || network === "base-sepolia"
+			? "https://sepolia.basescan.org"
+			: "https://basescan.org";
+	const getExplorerUrl = (addr) =>
+		addr ? `${explorerBaseUrl}/address/${addr}` : null;
+
+	return (
+		<div
+			style={style}
+			className="w-full bg-[#F1EDE2] rounded-xl p-6 flex flex-col gap-6"
+		>
+			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+				<div className="flex items-center gap-4">
+					<Image
+						src={logoSrc}
+						width={96}
+						height={96}
+						alt={`${symbol} logo`}
+						className="w-20 h-20 object-contain"
+					/>
+					<div>
+						<h1 className="text-2xl font-semibold text-gray-900">{name}</h1>
+						<p className="text-gray-600 uppercase tracking-wide">{symbol}</p>
+					</div>
+				</div>
+
+				<div className="flex items-center gap-2">
+					<label htmlFor="token-select" className="text-sm text-gray-600">
+						{t("select_token")}
+					</label>
+					<select
+						id="token-select"
+						value={tokenContract ?? ""}
+						onChange={onSelectChange}
+						className="border rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none"
+					>
+						<option value="">{t("select_token")}</option>
+						{contracts.map((entry) => (
+							<option
+								key={entry.contractAddress}
+								value={entry.contractAddress}
+								name={entry.contractPairAddress}
+							>
+								{entry.name}
+							</option>
+						))}
+					</select>
+				</div>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+			{[
+				{ label: t("token_issuance"), value: vcoIssuance },
+				{ label: t("bottles_remaining"), value: totalSupply },
+				{ label: t("burned_tokens"), value: burnedTokens },
+				{
+					label: t("holders"),
+					value: holdersCount,
+					link: holdersUrl
+						? {
+							text:
+								t("holders_wallets") || "Wallets de holders",
+							href: holdersUrl,
+						}
+						: null,
+				},
+			].map((card) => (
+				<div
+					key={card.label}
+					className="bg-white/70 rounded-lg p-4 shadow-sm flex flex-col gap-1"
+				>
+					<span className="text-xs uppercase text-gray-500">
+						{card.label}
+					</span>
+					<span className="text-xl font-semibold text-gray-900">
+						{formatNumber(card.value)}
+					</span>
+					{card.link && (
+						<Link
+							href={card.link.href}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-sm text-[#840C4A] underline"
+						>
+							{card.link.text}
+						</Link>
+					)}
+				</div>
+			))}
+			</div>
+
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+				<div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-3">
+					<h2 className="text-lg font-semibold text-gray-900">{t("price")}</h2>
+					<p className="text-sm text-gray-600">
+						{t("price_eth") || "Precio actual (ETH)"}:{" "}
+						<span className="font-semibold text-gray-900">
+							{price && price > 0 ? price.toFixed(6) : "—"}
+						</span>
+					</p>
+					<p className="text-sm text-gray-600">
+						{t("vco_price")}:{" "}
+						<span className="font-semibold text-gray-900">
+							{vcoData?.priceEth ? `${vcoData.priceEth} ETH` : "—"}
+						</span>
+					</p>
+					<p className="text-sm text-gray-600">
+						{t("vco_price_fiat")}:{" "}
+						<span className="font-semibold text-gray-900">
+							{fiatPrice.usd && fiatPrice.ars
+								? `${fiatPrice.usd.toFixed(2)} USD / ${fiatPrice.ars.toFixed(
+										2
+								  )} ARS`
+								: vcoData
+								? `${vcoData.priceUsd} USD / ${vcoData.priceArs} ARS`
+								: "—"}
+						</span>
+					</p>
+					<p className="text-sm text-gray-600">
+						{t("total_transfers")}:{" "}
+						<span className="font-semibold text-gray-900">
+							{formatNumber(totalTransfers)}
+						</span>
+					</p>
+				</div>
+
+				<div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-3">
+					<h2 className="text-lg font-semibold text-gray-900">
+						{t("vco_info") || "Información VCO"}
+					</h2>
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
+						<div>
+							<span className="uppercase text-xs text-gray-500 block">
+								{t("vco_start")}
+							</span>
+							<span className="font-semibold text-gray-900">
+								{vcoData?.dateStart ?? "—"}
+							</span>
+						</div>
+						<div>
+							<span className="uppercase text-xs text-gray-500 block">
+								{t("vco_end")}
+							</span>
+							<span className="font-semibold text-gray-900">
+								{vcoData?.dateEnd ?? "—"}
+							</span>
+						</div>
+						<div>
+							<span className="uppercase text-xs text-gray-500 block">
+								{t("token_issuance")}
+							</span>
+							<span className="font-semibold text-gray-900">
+								{formatNumber(vcoIssuance)}
+							</span>
+						</div>
+						<div>
+							<span className="uppercase text-xs text-gray-500 block">
+								{t("burned_tokens")}
+							</span>
+							<span className="font-semibold text-gray-900">
+								{formatNumber(burnedTokens)}
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="bg-white/70 rounded-lg p-4 shadow-sm">
+				<h2 className="text-lg font-semibold text-gray-900 mb-3">
+					{t("addresses") || "Direcciones"}
+				</h2>
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
+					{[
+						{ label: t("contract_address"), value: address },
+						{ label: t("crowdsale_address"), value: crowdsaleAddress },
+						{ label: t("lp"), value: lpContractAddress },
+					].map((card) => {
+						const href = getExplorerUrl(card.value);
+						return (
+							<div key={card.label} className="flex flex-col gap-1">
+								<span className="text-xs uppercase text-gray-500">
+									{card.label}
+								</span>
+								<span className="font-mono break-all text-gray-900">
+									{href ? (
+										<Link
+											href={href}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-[#840C4A] underline"
+										>
+											{card.value}
+										</Link>
+									) : (
+										card.value ?? "—"
+									)}
+								</span>
+							</div>
+						);
+					})}
+				</div>
+				{uniswapUri && (
+					<div className="mt-4">
+						<Link href={uniswapUri} target="_blank" rel="noopener noreferrer">
+							<button className="px-4 py-2 bg-[#840C4A] text-white rounded-lg text-sm">
+								Uniswap
+							</button>
+						</Link>
+					</div>
+				)}
+			</div>
+
+			<div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-4">
+				<h2 className="text-lg font-semibold text-gray-900">
+					{t("sales_sumary")}
+				</h2>
+
+				<form
+					onSubmit={handleRangeSubmit}
+					className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700"
+				>
+					<label className="flex flex-col gap-1">
+						<span className="text-xs uppercase text-gray-500">
+							{t("from") || "Desde"}
+						</span>
+						<input
+							type="date"
+							value={rangeStart}
+							onChange={(e) => {
+								setRangeStart(e.target.value);
+								setYear("---");
+								setYearResult(null);
+							}}
+							className="border rounded px-2 py-2 focus:outline-none"
+						/>
+					</label>
+					<label className="flex flex-col gap-1">
+						<span className="text-xs uppercase text-gray-500">
+							{t("to") || "Hasta"}
+						</span>
+						<input
+							type="date"
+							value={rangeEnd}
+							onChange={(e) => {
+								setRangeEnd(e.target.value);
+								setYear("---");
+								setYearResult(null);
+							}}
+							className="border rounded px-2 py-2 focus:outline-none"
+						/>
+					</label>
+					<label className="flex flex-col gap-1 sm:col-span-2">
+						<span className="text-xs uppercase text-gray-500">
+							{t("winery") || "Bodega (opcional)"}
+						</span>
+						<input
+							type="text"
+							value={wineryFilter}
+							onChange={(e) => setWineryFilter(e.target.value)}
+							className="border rounded px-2 py-2 focus:outline-none"
+							placeholder={t("winery") || "Bodega"}
+						/>
+					</label>
+					<div className="sm:col-span-2 flex flex-wrap gap-2">
+						<button
+							type="submit"
+							className="px-3 py-2 bg-[#840C4A] text-white rounded text-sm"
+						>
+							{t("calculate") || "Calcular"}
+						</button>
+						<button
+							type="button"
+							onClick={() => {
+								setRangeStart("");
+								setRangeEnd("");
+								setRangeResult(null);
+								setSales([]);
+							}}
+							className="px-3 py-2 border border-[#840C4A] text-[#840C4A] rounded text-sm"
+						>
+							{t("clear") || "Limpiar"}
+						</button>
+					</div>
+					<div className="sm:col-span-2 text-sm text-gray-600">
+						{loadingSales && <span className="mr-2">Cargando…</span>}
+						{rangeResult !== null
+							? `${
+									t("tokens_sold_between") || "Tokens vendidos"
+							  }: ${formatNumber(rangeResult)}`
+							: t("select_date_range") || "Seleccioná un rango para consultar"}
+						{sales?.length ? (
+							<span className="ml-2 text-gray-500">({sales.length} filas)</span>
+						) : null}
+					</div>
+				</form>
+
+				<div className="flex flex-wrap items-center gap-3 text-sm text-gray-700">
+					<label
+						htmlFor="year-query"
+						className="text-xs uppercase text-gray-500"
+					>
+						{t("year") || "Año"}
+					</label>
+					<input
+						id="year-query"
+						type="number"
+						min="2000"
+						max="2100"
+						value={year}
+						onChange={async (event) => {
+							const nextYear = event.target.value;
+							setYear(nextYear);
+							if (!nextYear) {
+								setYearResult(null);
+								return;
+							}
+							try {
+								setLoadingSales(true);
+								const rows = await fetchSalesByYear({
+									year: nextYear,
+									winery: wineryFilter || undefined,
+								});
+								const total = sumAmounts(rows);
+								setSales(rows);
+								setSalesPage(1);
+								setYearResult(total);
+							} catch (error) {
+								console.error("Error al consultar ventas por año", error);
+								setYearResult(null);
+							} finally {
+								setLoadingSales(false);
+							}
+						}}
+						className="border rounded px-2 py-2 focus:outline-none w-28"
+						placeholder="YYYY"
+					/>
+					<span>
+						{year === "---"
+							? "---"
+							: yearResult !== null
+							? `${formatNumber(yearResult)} ${t("tokens") || "tokens"}`
+							: t("select_year") || "Elegí un año"}
+						{sales?.length ? (
+							<span className="text-gray-500"> · {sales.length} filas</span>
+						) : null}
+					</span>
+				</div>
+
+				<div className="bg-white/60 rounded-lg p-3 border border-gray-200">
+					<div className="flex items-center justify-between mb-2 text-sm">
+						<div>
+							{totalSalesRows
+								? `Mostrando ${Math.min(
+										(salesPage - 1) * salesPageSize + 1,
+										totalSalesRows
+								  )}–${Math.min(
+										salesPage * salesPageSize,
+										totalSalesRows
+								  )} de ${totalSalesRows} ventas`
+								: "Sin resultados"}
+						</div>
+						<div className="flex items-center gap-2">
+							<span className="text-gray-500">Filas por página</span>
+							<select
+								value={salesPageSize}
+								onChange={(e) => {
+									setSalesPageSize(Number(e.target.value));
+									setSalesPage(1);
+								}}
+								className="border rounded px-2 py-1"
+							>
+								{[10, 25, 50, 100].map((n) => (
+									<option key={n} value={n}>
+										{n}
+									</option>
+								))}
+							</select>
+						</div>
+					</div>
+
+					<div className="overflow-x-auto">
+						<table className="min-w-full text-sm text-left">
+							<thead className="uppercase text-xs text-gray-500">
+								<tr>
+									<th className="py-2 pr-4">Fecha</th>
+									<th className="py-2 pr-4">Wallet</th>
+									<th className="py-2 pr-4">Cantidad</th>
+									<th className="py-2 pr-4">Bodega</th>
+									<th className="py-2">Token</th>
+								</tr>
+							</thead>
+							<tbody>
+								{pagedSales.length ? (
+									pagedSales.map((r) => (
+										<tr
+											key={
+												r.id ?? `${r.customer_id || r.wallet}-${r.created_at}`
+											}
+											className="border-t border-gray-200"
+										>
+											<td className="py-2 pr-4">
+												{new Date(r.created_at).toLocaleString()}
+											</td>
+											<td className="py-2 pr-4 font-mono break-all">
+												{r.customer_id || r.wallet}
+											</td>
+											<td className="py-2 pr-4">{formatNumber(r.amount)}</td>
+											<td className="py-2 pr-4">
+												{r.winerie_id || r.winery_id || r.winery || "—"}
+											</td>
+											<td className="py-2">
+												{r.token_symbol || r.token || symbol || "—"}
+											</td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan={5} className="py-4 text-center text-gray-500">
+											{loadingSales
+												? "Cargando ventas…"
+												: "No hay ventas para mostrar"}
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
+					</div>
+
+					<div className="mt-3 flex items-center justify-between text-sm">
+						<div className="text-gray-600">
+							{t("page") || "Página"} {salesPage} {t("of") || "de"}{" "}
+							{totalSalesPages}
+						</div>
+						<div className="flex items-center gap-2">
+							<button
+								type="button"
+								onClick={() => setSalesPage((p) => Math.max(1, p - 1))}
+								disabled={salesPage === 1}
+								className="px-3 py-1 rounded border disabled:opacity-50"
+							>
+								{t("previous") || "Anterior"}
+							</button>
+							<button
+								type="button"
+								onClick={() =>
+									setSalesPage((p) => Math.min(totalSalesPages, p + 1))
+								}
+								disabled={salesPage === totalSalesPages}
+								className="px-3 py-1 rounded border disabled:opacity-50"
+							>
+								{t("next") || "Siguiente"}
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	);
 };
 
 export default TokenInfoComponent;
