@@ -111,14 +111,17 @@ const useTokenInformation = (contractMeta) => {
 			try {
 				setLoading(true);
 				const baseData = await tokenDataInspector(contract, contractAddress);
-				const effectiveNetwork = normalizeNetwork(baseData.network || networkKey);
-				const priceReferencePair =
-					contractPairAddress
-						? baseData.priceReferencePair ||
-						  contractMeta?.priceReferencePair ||
-						  NETWORK_CONFIG[effectiveNetwork]?.referencePair ||
-						  null
-						: null;
+				console.log("baseData", baseData);
+
+				const effectiveNetwork = normalizeNetwork(
+					baseData.network || networkKey
+				);
+				const priceReferencePair = contractPairAddress
+					? baseData.priceReferencePair ||
+					  contractMeta?.priceReferencePair ||
+					  NETWORK_CONFIG[effectiveNetwork]?.referencePair ||
+					  null
+					: null;
 
 				const knownAddresses = {
 					crowdsaleAddress: baseData.crowdsaleAddress,
@@ -127,164 +130,225 @@ const useTokenInformation = (contractMeta) => {
 					tokenContract: contractAddress,
 				};
 
-		const startBlock =
-			baseData.startBlock ?? contractMeta?.startBlock ?? 0;
-		const shouldFetchOnchain = ENABLE_ONCHAIN_STATS;
+				const startBlock = baseData.startBlock ?? contractMeta?.startBlock ?? 0;
+				const shouldFetchOnchain = ENABLE_ONCHAIN_STATS;
 
-		const eventsPromise = shouldFetchOnchain
-			? fetchTransferEventsWithMetadata(contract, provider, {
-				startBlock,
-				chunkSize: 7500,
-			}).catch((err) => {
-				console.error("No se pudieron obtener los eventos", err);
-				return [];
-			})
-			: Promise.resolve([]);
+				const eventsPromise = shouldFetchOnchain
+					? fetchTransferEventsWithMetadata(contract, provider, {
+							startBlock,
+							chunkSize: 7500,
+					  }).catch((err) => {
+							console.error("No se pudieron obtener los eventos", err);
+							return [];
+					  })
+					: Promise.resolve([]);
 
-		const pricePromise =
-			shouldFetchOnchain && contractPairAddress && priceReferencePair
-				? getPrice(contractPairAddress, priceReferencePair, provider).catch(
-					(err) => {
-						console.error("No se pudo obtener el precio del par", err);
-						return -1;
-					}
-				  )
-				: Promise.resolve(-1);
+				const pricePromise =
+					shouldFetchOnchain && contractPairAddress && priceReferencePair
+						? getPrice(contractPairAddress, priceReferencePair, provider).catch(
+								(err) => {
+									console.error("No se pudo obtener el precio del par", err);
+									return -1;
+								}
+						  )
+						: Promise.resolve(-1);
 
-		const historyPromise =
-			shouldFetchOnchain && contractPairAddress
-				? fetchPairPriceHistory(provider, contractPairAddress, contractAddress).catch(
-					(err) => {
-						console.error("No se pudo obtener el histórico de precios", err);
-						return [];
-					}
-				  )
-				: Promise.resolve([]);
+				const historyPromise =
+					shouldFetchOnchain && contractPairAddress
+						? fetchPairPriceHistory(
+								provider,
+								contractPairAddress,
+								contractAddress
+						  ).catch((err) => {
+								console.error(
+									"No se pudo obtener el histórico de precios",
+									err
+								);
+								return [];
+						  })
+						: Promise.resolve([]);
 
-		const burnedCurrentPromise = contract
-			.balanceOf(ZERO_ADDRESS)
-			.then((balanceWei) =>
-				parseFloat(ethers.utils.formatEther(balanceWei))
-			)
-			.catch((err) => {
-				console.error("No se pudo obtener el balance del address cero", err);
-				return null;
-			});
-
-		let legacyBurnPromise = Promise.resolve(null);
-		if (contractMeta?.legacyAddress) {
-			const legacyMeta = contracts.find(
-				(entry) =>
-					entry.contractAddress.toLowerCase() ===
-					contractMeta.legacyAddress.toLowerCase()
-			);
-			const legacyNetworkKey = normalizeNetwork(
-				legacyMeta?.network || NETWORK_CONFIG.ethereum.key
-			);
-			const legacyProviderUri = resolveProviderUri(legacyNetworkKey);
-			if (legacyProviderUri) {
-				const legacyProvider = new ethers.providers.JsonRpcProvider(
-					legacyProviderUri
-				);
-				const legacyContract = new ethers.Contract(
-					contractMeta.legacyAddress,
-					OVT_ABI,
-					legacyProvider
-				);
-				legacyBurnPromise = legacyContract
+				const burnedCurrentPromise = contract
 					.balanceOf(ZERO_ADDRESS)
 					.then((balanceWei) =>
 						parseFloat(ethers.utils.formatEther(balanceWei))
 					)
 					.catch((err) => {
 						console.error(
-							"No se pudo obtener el balance del address cero (legacy)",
+							"No se pudo obtener el balance del address cero",
 							err
 						);
 						return null;
 					});
-			}
-		}
 
-		const [events, price, history, burnedCurrent, legacyBurned] =
-			await Promise.all([
-				eventsPromise,
-				pricePromise,
-				historyPromise,
-				burnedCurrentPromise,
-				legacyBurnPromise,
-			]);
-
-		const detailedHolders = shouldFetchOnchain
-			? await calculateHoldersDetail(contract, knownAddresses, events).catch(
-				(err) => {
-					console.error("No se pudo calcular el detalle de holders", err);
-					return [];
+				let legacyBurnPromise = Promise.resolve(null);
+				if (contractMeta?.legacyAddress) {
+					const legacyMeta = contracts.find(
+						(entry) =>
+							entry.contractAddress.toLowerCase() ===
+							contractMeta.legacyAddress.toLowerCase()
+					);
+					const legacyNetworkKey = normalizeNetwork(
+						legacyMeta?.network || NETWORK_CONFIG.ethereum.key
+					);
+					const legacyProviderUri = resolveProviderUri(legacyNetworkKey);
+					if (legacyProviderUri) {
+						const legacyProvider = new ethers.providers.JsonRpcProvider(
+							legacyProviderUri
+						);
+						const legacyContract = new ethers.Contract(
+							contractMeta.legacyAddress,
+							OVT_ABI,
+							legacyProvider
+						);
+						legacyBurnPromise = legacyContract
+							.balanceOf(ZERO_ADDRESS)
+							.then((balanceWei) =>
+								parseFloat(ethers.utils.formatEther(balanceWei))
+							)
+							.catch((err) => {
+								console.error(
+									"No se pudo obtener el balance del address cero (legacy)",
+									err
+								);
+								return null;
+							});
+					}
 				}
-			)
-			: [];
 
-		if (!isActive) return;
+				const [events, price, history, burnedCurrent, legacyBurned] =
+					await Promise.all([
+						eventsPromise,
+						pricePromise,
+						historyPromise,
+						burnedCurrentPromise,
+						legacyBurnPromise,
+					]);
 
-		setTokenInfo((prev) => {
-			const burnedTokensValue =
-				burnedCurrent !== null && burnedCurrent !== undefined
-					? burnedCurrent
-					: baseData.burnedTokens ?? prev.burnedTokens;
+				const detailedHolders = shouldFetchOnchain
+					? await calculateHoldersDetail(
+							contract,
+							knownAddresses,
+							events
+					  ).catch((err) => {
+							console.error("No se pudo calcular el detalle de holders", err);
+							return [];
+					  })
+					: [];
 
-			const metadataLegacyBurned =
-				baseData.legacyBurned ?? prev.legacyBurned ?? null;
-			let effectiveLegacyBurned =
-				legacyBurned !== null && legacyBurned !== undefined
-					? legacyBurned
-					: metadataLegacyBurned;
+				if (!isActive) return;
 
-			if (
-				effectiveLegacyBurned === 0 &&
-				metadataLegacyBurned !== null &&
-				metadataLegacyBurned !== undefined &&
-				metadataLegacyBurned > 0
-			) {
-				effectiveLegacyBurned = metadataLegacyBurned;
-			}
+				setTokenInfo((prev) => {
+					const burnedFromSupply = (() => {
+						const issuance = baseData.vcoIssuance ?? prev.vcoIssuance;
+						const supply = baseData.totalSupply ?? prev.totalSupply;
+						if (issuance == null || supply == null) return null;
+						const diff = Number(issuance) - Number(supply);
+						return Number.isFinite(diff) ? Math.max(diff, 0) : null;
+					})();
 
-			const tokensToBurnValue =
-				effectiveLegacyBurned !== null &&
-				effectiveLegacyBurned !== undefined
-					? Math.max(effectiveLegacyBurned - (burnedTokensValue || 0), 0)
-					: baseData.tokensToBurn ?? prev.tokensToBurn;
+					const burnedOnChainValue =
+						burnedCurrent !== null && burnedCurrent !== undefined
+							? burnedCurrent
+							: baseData.burnedTokens ?? prev.burnedTokens ?? null;
+					const burnedOnChainNumeric =
+						burnedOnChainValue !== null && burnedOnChainValue !== undefined
+							? Number(burnedOnChainValue)
+							: null;
 
-			return {
-				...prev,
-				...baseData,
-				price,
-				holdersCount: detailedHolders.length,
-				totalTransfers: events.length,
-				network: effectiveNetwork,
-				networkLabel:
-					NETWORK_CONFIG[effectiveNetwork]?.label ?? effectiveNetwork,
-				archived: baseData.archived ?? archivedFlag,
-				displayName:
-					baseData.displayName ||
-					contractMeta?.displayName ||
-					baseData.name ||
-					prev.displayName,
-				priceReferencePair,
-				burnedTokens: burnedTokensValue,
-				tokensToBurn: tokensToBurnValue,
-				legacyBurned:
-					effectiveLegacyBurned !== null &&
-					effectiveLegacyBurned !== undefined
-						? effectiveLegacyBurned
-						: baseData.legacyBurned ?? prev.legacyBurned,
-				vcoSourceNetwork:
-					baseData.vcoSourceNetwork ?? prev.vcoSourceNetwork ?? effectiveNetwork,
-				vcoSourceNetworkLabel:
-					baseData.vcoSourceNetworkLabel ??
-					prev.vcoSourceNetworkLabel ??
-					NETWORK_CONFIG[effectiveNetwork]?.label ?? effectiveNetwork,
-			};
-		});
+					const burnedBaseline = (() => {
+						if (burnedFromSupply !== null && burnedFromSupply !== undefined) {
+							return Number(burnedFromSupply);
+						}
+						if (
+							burnedOnChainNumeric !== null &&
+							burnedOnChainNumeric !== undefined
+						) {
+							return burnedOnChainNumeric;
+						}
+						const fallback = baseData.burnedTokens ?? prev.burnedTokens;
+						return fallback != null ? Number(fallback) : 0;
+					})();
+
+					const metadataLegacyBurned =
+						baseData.legacyBurned ?? prev.legacyBurned ?? null;
+					let effectiveLegacyBurned =
+						legacyBurned !== null && legacyBurned !== undefined
+							? legacyBurned
+							: metadataLegacyBurned;
+
+					if (
+						effectiveLegacyBurned === 0 &&
+						metadataLegacyBurned !== null &&
+						metadataLegacyBurned !== undefined &&
+						metadataLegacyBurned > 0
+					) {
+						effectiveLegacyBurned = metadataLegacyBurned;
+					}
+
+					const tokensToBurnValue =
+						effectiveLegacyBurned !== null &&
+						effectiveLegacyBurned !== undefined
+							? Math.max(effectiveLegacyBurned - (burnedOnChainNumeric || 0), 0)
+							: baseData.tokensToBurn ?? prev.tokensToBurn;
+
+			const normalizedTokensToBurn =
+				tokensToBurnValue !== null && tokensToBurnValue !== undefined
+					? Number(tokensToBurnValue)
+					: tokensToBurnValue;
+
+			const burnedTokensValue = (() => {
+				const baseline =
+					burnedBaseline === null || burnedBaseline === undefined
+						? burnedOnChainNumeric ?? 0
+						: Number(burnedBaseline);
+				if (!archivedFlag) {
+					const pending = Number(normalizedTokensToBurn ?? 0);
+					if (pending > 0 && Number.isFinite(baseline)) {
+						const floor = burnedOnChainNumeric ?? 0;
+						const adjusted = baseline - pending;
+						if (Number.isFinite(adjusted)) {
+							return Math.max(adjusted, floor, 0);
+						}
+					}
+				}
+				return baseline;
+			})();
+
+					return {
+						...prev,
+						...baseData,
+						price,
+						holdersCount: detailedHolders.length,
+						totalTransfers: events.length,
+						network: effectiveNetwork,
+						networkLabel:
+							NETWORK_CONFIG[effectiveNetwork]?.label ?? effectiveNetwork,
+						archived: baseData.archived ?? archivedFlag,
+						displayName:
+							baseData.displayName ||
+							contractMeta?.displayName ||
+							baseData.name ||
+							prev.displayName,
+						priceReferencePair,
+						burnedTokens: burnedTokensValue,
+						tokensToBurn: normalizedTokensToBurn,
+						legacyBurned:
+							effectiveLegacyBurned !== null &&
+							effectiveLegacyBurned !== undefined
+								? effectiveLegacyBurned
+								: baseData.legacyBurned ?? prev.legacyBurned,
+						vcoSourceNetwork:
+							baseData.vcoSourceNetwork ??
+							prev.vcoSourceNetwork ??
+							effectiveNetwork,
+						vcoSourceNetworkLabel:
+							baseData.vcoSourceNetworkLabel ??
+							prev.vcoSourceNetworkLabel ??
+							NETWORK_CONFIG[effectiveNetwork]?.label ??
+							effectiveNetwork,
+					};
+				});
 
 				setTransferEvents(events);
 				setHoldersDetail(detailedHolders);
@@ -351,7 +415,12 @@ const useTokenInformation = (contractMeta) => {
 			new Date(tokenInfo.vcoStartDate),
 			new Date(tokenInfo.vcoEndDate)
 		);
-	}, [transferEvents, tokenInfo.crowdsaleAddress, tokenInfo.vcoStartDate, tokenInfo.vcoEndDate]);
+	}, [
+		transferEvents,
+		tokenInfo.crowdsaleAddress,
+		tokenInfo.vcoStartDate,
+		tokenInfo.vcoEndDate,
+	]);
 
 	return {
 		tokenInfo,

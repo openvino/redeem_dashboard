@@ -228,7 +228,6 @@ const legacyEthereumContracts = [
 		archived: true,
 		migratedTo: "0x2b1A955b2C8B49579d197eAaa7DcE7DBC7b4dA23",
 		startBlock: 5600000,
-		burned: 2497,
 	},
 	{
 		name: "MTB19",
@@ -246,7 +245,6 @@ const legacyEthereumContracts = [
 		archived: true,
 		migratedTo: "0xd9fc98e7ed79FB67aB5f36013D958aBd85Ff28fF",
 		startBlock: 8000000,
-		burned: 121,
 	},
 	{
 		name: "MTB20",
@@ -264,7 +262,6 @@ const legacyEthereumContracts = [
 		archived: true,
 		migratedTo: "0x3d98E5829A1bAE7423cf3874662c2f3a0c72123F",
 		startBlock: 10000000,
-		burned: 48,
 	},
 	{
 		name: "MTB21",
@@ -282,7 +279,6 @@ const legacyEthereumContracts = [
 		archived: true,
 		migratedTo: "0x9a7DF7eD3c536c1940DD98786f3eEfb7810E2f8f",
 		startBlock: 12500000,
-		burned: 419,
 	},
 	{
 		name: "MTB22",
@@ -300,7 +296,6 @@ const legacyEthereumContracts = [
 		archived: true,
 		migratedTo: "0xeF89072a1f25c2aDA952c2e04644289906e0e6F9",
 		startBlock: 14800000,
-		burned: 0,
 	},
 	{
 		name: "MTB23",
@@ -318,7 +313,6 @@ const legacyEthereumContracts = [
 		archived: true,
 		migratedTo: "0x80B19e1BD4f5c96bc5cC7f1fc0A3731eBb0F8820",
 		startBlock: 17000000,
-		burned: 0,
 	},
 ];
 

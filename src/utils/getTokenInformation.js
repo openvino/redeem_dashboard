@@ -166,7 +166,6 @@ export const getPrice = async (pair1address, pair2address, provider) => {
 	}
 };
 
-
 export const fetchTransferEventsWithMetadata = async (
 	contract,
 	provider,
@@ -186,7 +185,9 @@ export const fetchTransferEventsWithMetadata = async (
 		provider,
 		{
 			address: contract.address,
-			topics: transferFilter.topics ?? [contract.interface.getEventTopic("Transfer")],
+			topics: transferFilter.topics ?? [
+				contract.interface.getEventTopic("Transfer"),
+			],
 		},
 		startBlock,
 		latestBlock,
@@ -256,7 +257,7 @@ export const calculateHoldersDetail = async (
 		if (event.from) addresses.add(event.from);
 	});
 
-const details = await Promise.all(
+	const details = await Promise.all(
 		[...addresses]
 			.filter(
 				(address) =>
@@ -414,6 +415,7 @@ export const tokenDataInspector = async (contract, address) => {
 	const totalSupply = ensureFiniteNumber(
 		ethers.utils.formatEther(totalSupplyWei)
 	);
+	console.log("TOKEN DATA", { name, symbol, totalSupply, totalSupplyWei });
 
 	let vcoIssuanceWei;
 	let vcoIssuance;
@@ -428,8 +430,11 @@ export const tokenDataInspector = async (contract, address) => {
 
 	const totalSupplyNumeric = ensureFiniteNumber(totalSupply ?? 0) ?? 0;
 	const vcoIssuanceNumeric = ensureFiniteNumber(vcoIssuance) ?? 0;
-	const burnedTokensDrunk = Math.max(vcoIssuanceNumeric - totalSupplyNumeric, 0);
-
+	const burnedTokensDrunk = Math.max(
+		vcoIssuanceNumeric - totalSupplyNumeric,
+		0
+	);
+	console.log(`burnedTokensDrunk: ${burnedTokensDrunk}`);
 	const staticContractData = contracts.find(
 		(entry) => entry.contractAddress === address
 	);
@@ -453,7 +458,7 @@ export const tokenDataInspector = async (contract, address) => {
 				(entry) =>
 					entry.contractAddress &&
 					entry.contractAddress.toLowerCase() === legacyAddress.toLowerCase()
-			  )
+		  )
 		: null;
 
 	let { tokensToBurn, legacyBurned } = staticContractData || {};
@@ -475,13 +480,13 @@ export const tokenDataInspector = async (contract, address) => {
 	if (legacyContractMeta?.network) {
 		vcoSourceNetwork = legacyContractMeta.network;
 		vcoSourceNetworkLabel =
-			NETWORK_CONFIG[legacyContractMeta.network]?.label ?? legacyContractMeta.network;
+			NETWORK_CONFIG[legacyContractMeta.network]?.label ??
+			legacyContractMeta.network;
 	}
 
 	if (!vcoSourceNetwork && archived && network) {
 		vcoSourceNetwork = network;
-		vcoSourceNetworkLabel =
-			NETWORK_CONFIG[network]?.label ?? network;
+		vcoSourceNetworkLabel = NETWORK_CONFIG[network]?.label ?? network;
 	}
 
 	const vcoData = VCOPrices.find((entry) => entry.symbol === symbol);
