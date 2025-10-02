@@ -3,12 +3,13 @@ import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
-import { VCOPrices, contracts } from "../../contracts";
+import { VCOPrices, contracts, NETWORK_CONFIG } from "../../contracts";
 
 const TokenInfoComponent = ({
 	tokenInfo,
 	onSelectChange,
 	style,
+	selectedContractAddress,
 }) => {
 	const { t } = useTranslation();
 
@@ -27,7 +28,19 @@ const TokenInfoComponent = ({
 		address,
 		price,
 		holdersUrl,
+		displayName,
+		network,
+		networkLabel,
+		archived,
+		tokensToBurn,
 	} = tokenInfo;
+
+	const availableSupply = useMemo(() => {
+		const supply = Number(totalSupply) || 0;
+		const pendingBurn = Number(tokensToBurn) || 0;
+		if (pendingBurn <= 0) return supply;
+		return Math.max(supply - pendingBurn, 0);
+	}, [totalSupply, tokensToBurn]);
 
 	const [sales, setSales] = useState([]);
 	const [loadingSales, setLoadingSales] = useState(false);
@@ -177,13 +190,17 @@ const TokenInfoComponent = ({
 	};
 
 	const logoSrc = symbol ? `/assets/${symbol}.png` : "/assets/default.png";
-	const network = (process.env.NEXT_PUBLIC_NETWORK || "").toLowerCase();
 	const explorerBaseUrl =
-		network === "basesepolia" || network === "base-sepolia"
-			? "https://sepolia.basescan.org"
-			: "https://basescan.org";
+		network && NETWORK_CONFIG[network]?.explorer
+			? NETWORK_CONFIG[network].explorer
+			: NETWORK_CONFIG.base.explorer;
 	const getExplorerUrl = (addr) =>
 		addr ? `${explorerBaseUrl}/address/${addr}` : null;
+	const title = displayName || name;
+	const networkDisplay = networkLabel || network;
+	const archivedLabel = archived ? t("archived_token") || "Archive" : null;
+	const isEthereumNetwork = network === NETWORK_CONFIG.ethereum.key;
+	const showUniswapButton = Boolean(uniswapUri && !isEthereumNetwork);
 
 	return (
 		<div
@@ -200,8 +217,14 @@ const TokenInfoComponent = ({
 						className="w-20 h-20 object-contain"
 					/>
 					<div>
-						<h1 className="text-2xl font-semibold text-gray-900">{name}</h1>
+						<h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
 						<p className="text-gray-600 uppercase tracking-wide">{symbol}</p>
+					{networkDisplay && (
+						<span className="inline-flex items-center gap-2 text-xs font-medium text-gray-600 uppercase">
+							{networkDisplay}
+							{archivedLabel ? `• ${archivedLabel}` : ""}
+						</span>
+					)}
 					</div>
 				</div>
 
@@ -211,7 +234,9 @@ const TokenInfoComponent = ({
 					</label>
 					<select
 						id="token-select"
-						value={tokenContract ?? ""}
+						value={
+							selectedContractAddress ?? tokenContract ?? ""
+						}
 						onChange={onSelectChange}
 						className="border rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none"
 					>
@@ -222,7 +247,7 @@ const TokenInfoComponent = ({
 								value={entry.contractAddress}
 								name={entry.contractPairAddress}
 							>
-								{entry.name}
+								{entry.displayName || entry.name}
 							</option>
 						))}
 					</select>
@@ -230,44 +255,46 @@ const TokenInfoComponent = ({
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-			{[
-				{ label: t("token_issuance"), value: vcoIssuance },
-				{ label: t("bottles_remaining"), value: totalSupply },
-				{ label: t("burned_tokens"), value: burnedTokens },
-				{
-					label: t("holders"),
-					value: holdersCount,
-					link: holdersUrl
-						? {
-							text:
-								t("holders_wallets") || "Wallets de holders",
-							href: holdersUrl,
-						}
+				{[
+					{ label: t("token_issuance"), value: vcoIssuance },
+					{
+						label: t("bottles_remaining"),
+						value: archived ? totalSupply : availableSupply,
+					},
+					{ label: t("burned_tokens"), value: burnedTokens },
+					!archived && tokensToBurn !== null && tokensToBurn !== undefined
+						? { label: t("tokens_to_burn"), value: tokensToBurn }
 						: null,
-				},
-			].map((card) => (
-				<div
-					key={card.label}
-					className="bg-white/70 rounded-lg p-4 shadow-sm flex flex-col gap-1"
-				>
-					<span className="text-xs uppercase text-gray-500">
-						{card.label}
-					</span>
-					<span className="text-xl font-semibold text-gray-900">
-						{formatNumber(card.value)}
-					</span>
-					{card.link && (
+				]
+					.filter(Boolean)
+					.map((card) => (
+						<div
+							key={card.label}
+							className="bg-white/70 rounded-lg p-4 shadow-sm flex flex-col gap-1"
+						>
+							<span className="text-xs uppercase text-gray-500">
+								{card.label}
+							</span>
+							<span className="text-xl font-semibold text-gray-900">
+								{formatNumber(card.value)}
+							</span>
+						</div>
+					))}
+				{holdersUrl && (
+					<div className="bg-white/70 rounded-lg p-4 shadow-sm flex flex-col gap-1">
+						<span className="text-xs uppercase text-gray-500">
+							{t("holders")}
+						</span>
 						<Link
-							href={card.link.href}
+							href={holdersUrl}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-sm text-[#840C4A] underline"
 						>
-							{card.link.text}
+							{t("holders_wallets") || "Wallets de holders"}
 						</Link>
-					)}
-				</div>
-			))}
+					</div>
+				)}
 			</div>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -346,43 +373,62 @@ const TokenInfoComponent = ({
 				</div>
 			</div>
 
-			<div className="bg-white/70 rounded-lg p-4 shadow-sm">
-				<h2 className="text-lg font-semibold text-gray-900 mb-3">
-					{t("addresses") || "Direcciones"}
-				</h2>
-				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
-					{[
-						{ label: t("contract_address"), value: address },
-						{ label: t("crowdsale_address"), value: crowdsaleAddress },
-						{ label: t("lp"), value: lpContractAddress },
-					].map((card) => {
-						const href = getExplorerUrl(card.value);
-						return (
-							<div key={card.label} className="flex flex-col gap-1">
-								<span className="text-xs uppercase text-gray-500">
-									{card.label}
-								</span>
-								<span className="font-mono break-all text-gray-900">
-									{href ? (
-										<Link
-											href={href}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-[#840C4A] underline"
-										>
-											{card.value}
-										</Link>
-									) : (
-										card.value ?? "—"
-									)}
-								</span>
-							</div>
-						);
-					})}
-				</div>
-				{uniswapUri && (
-					<div className="mt-4">
-						<Link href={uniswapUri} target="_blank" rel="noopener noreferrer">
+				<div className="bg-white/70 rounded-lg p-4 shadow-sm">
+					<h2 className="text-lg font-semibold text-gray-900 mb-3">
+						{t("addresses") || "Direcciones"}
+					</h2>
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
+						{[
+							{
+								label: t("network") || "Network",
+								value: networkDisplay,
+								href: null,
+							},
+							{
+								label: t("contract_address"),
+								value: address,
+								href: getExplorerUrl(address),
+							},
+							{
+								label: t("crowdsale_address"),
+								value: crowdsaleAddress,
+								href: getExplorerUrl(crowdsaleAddress),
+							},
+							{
+								label: t("lp"),
+								value: lpContractAddress,
+								href: getExplorerUrl(lpContractAddress),
+							},
+						]
+							.filter((card) => card.value)
+							.map((card) => (
+								<div
+									key={`${card.label}-${card.value}`}
+									className="flex flex-col gap-1"
+								>
+									<span className="text-xs uppercase text-gray-500">
+										{card.label}
+									</span>
+									<span className="font-mono break-all text-gray-900">
+										{card.href ? (
+											<Link
+												href={card.href}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="text-[#840C4A] underline"
+											>
+												{card.value}
+											</Link>
+										) : (
+											card.value ?? "—"
+										)}
+									</span>
+								</div>
+							))}
+					</div>
+					{showUniswapButton && (
+						<div className="mt-4">
+							<Link href={uniswapUri} target="_blank" rel="noopener noreferrer">
 							<button className="px-4 py-2 bg-[#840C4A] text-white rounded-lg text-sm">
 								Uniswap
 							</button>

@@ -16,9 +16,113 @@ const erc20Abi = ["function decimals() view returns (uint8)"];
 const SAFE_SYNC_LIMIT = 150;
 
 const ensureFiniteNumber = (value) => {
-	if (!Number.isFinite(value)) return null;
-	if (Number.isNaN(value)) return null;
-	return value;
+	const numericValue = Number(value);
+	if (!Number.isFinite(numericValue)) return null;
+	if (Number.isNaN(numericValue)) return null;
+	return numericValue;
+};
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const BLOCK_BATCH_SIZE = 40;
+const BLOCK_BATCH_DELAY_MS = 150;
+
+const extractTransferAmount = (event) => {
+	const raw =
+		event?.args?.value ??
+		event?.args?.amount ??
+		event?.args?.[2] ??
+		event?.args?.["2"];
+	if (!raw) {
+		return null;
+	}
+	try {
+		return ethers.utils.formatEther(raw);
+	} catch (error) {
+		console.error("No se pudo formatear el monto del evento", error, {
+			event,
+			raw,
+		});
+		return null;
+	}
+};
+
+const eventsCache = new Map();
+const blockCache = new Map();
+
+const getCacheKey = (address) => address?.toLowerCase() ?? "";
+
+const fetchLogsInChunks = async (
+	provider,
+	filter,
+	fromBlock,
+	toBlock,
+	chunkSize = 20000,
+	retries = 3,
+	delayMs = 100
+) => {
+	const logs = [];
+	for (let start = fromBlock; start <= toBlock; start += chunkSize) {
+		const end = Math.min(start + chunkSize - 1, toBlock);
+
+		let attempt = 0;
+		while (attempt <= retries) {
+			try {
+				const result = await provider.getLogs({
+					...filter,
+					fromBlock: start,
+					toBlock: end,
+				});
+				logs.push(...result);
+				break;
+			} catch (error) {
+				if (attempt >= retries) {
+					console.error(
+						"Fallo al obtener logs",
+						{ fromBlock: start, toBlock: end },
+						error
+					);
+					throw error;
+				}
+				const delay = 500 * Math.pow(2, attempt);
+				await sleep(delay);
+				attempt += 1;
+			}
+		}
+		if (delayMs > 0 && start + chunkSize - 1 < toBlock) {
+			await sleep(delayMs);
+		}
+	}
+	return logs;
+};
+
+const fetchBlocksBatched = async (
+	provider,
+	blockNumbers,
+	batchSize = BLOCK_BATCH_SIZE,
+	delayMs = BLOCK_BATCH_DELAY_MS
+) => {
+	const blocks = [];
+	for (let i = 0; i < blockNumbers.length; i += batchSize) {
+		const chunk = blockNumbers.slice(i, i + batchSize);
+		const chunkPromises = chunk.map((blockNumber) => {
+			const cacheKey = `${provider.connection?.url || ""}:${blockNumber}`;
+			if (blockCache.has(cacheKey)) {
+				return Promise.resolve(blockCache.get(cacheKey));
+			}
+			return provider.getBlock(blockNumber).then((block) => {
+				blockCache.set(cacheKey, block);
+				return block;
+			});
+		});
+
+		const resolved = await Promise.all(chunkPromises);
+		blocks.push(...resolved);
+		if (delayMs > 0 && i + batchSize < blockNumbers.length) {
+			await sleep(delayMs);
+		}
+	}
+	return blocks;
 };
 
 const deriveKnownTags = (address, knownAddresses = {}) => {
@@ -62,45 +166,83 @@ export const getPrice = async (pair1address, pair2address, provider) => {
 	}
 };
 
-export const fetchTransferEventsWithMetadata = async (contract, provider) => {
-	const transferFilter = contract.filters?.Transfer?.() ?? "Transfer";
-	const transferEvents = await contract.queryFilter(transferFilter);
 
-	if (transferEvents.length === 0) {
+export const fetchTransferEventsWithMetadata = async (
+	contract,
+	provider,
+	options = {}
+) => {
+	const cacheKey = getCacheKey(contract.address);
+	if (eventsCache.has(cacheKey)) {
+		return eventsCache.get(cacheKey);
+	}
+
+	const transferFilter = contract.filters?.Transfer?.() ?? "Transfer";
+	const latestBlock = options.endBlock ?? (await provider.getBlockNumber());
+	const startBlock = options.startBlock ?? 0;
+	const chunkSize = options.chunkSize ?? 20000;
+
+	const rawLogs = await fetchLogsInChunks(
+		provider,
+		{
+			address: contract.address,
+			topics: transferFilter.topics ?? [contract.interface.getEventTopic("Transfer")],
+		},
+		startBlock,
+		latestBlock,
+		chunkSize
+	);
+
+	if (rawLogs.length === 0) {
+		eventsCache.set(cacheKey, []);
 		return [];
 	}
 
-	const uniqueBlocks = [
-		...new Set(transferEvents.map((event) => event.blockNumber)),
-	];
 	let blocks;
 	try {
-		blocks = await Promise.all(
-			uniqueBlocks.map((blockNumber) => provider.getBlock(blockNumber))
-		);
+		const uniqueBlocks = [...new Set(rawLogs.map((log) => log.blockNumber))];
+		blocks = await fetchBlocksBatched(provider, uniqueBlocks);
 	} catch (error) {
 		console.error("No se pudieron obtener los bloques de referencia", error);
-		return transferEvents.map((event) => ({
-			hash: event.transactionHash,
-			from: event.args.from,
-			to: event.args.to,
-			value: parseFloat(ethers.utils.formatEther(event.args.value)),
-			blockNumber: event.blockNumber,
-			timestamp: null,
-		}));
+		const fallback = rawLogs.map((log) => {
+			const parsed = contract.interface.parseLog(log);
+			return {
+				hash: log.transactionHash,
+				from: parsed.args.from,
+				to: parsed.args.to,
+				value: (() => {
+					const amount = extractTransferAmount({ args: parsed.args });
+					return amount !== null ? parseFloat(amount) : 0;
+				})(),
+				blockNumber: log.blockNumber,
+				timestamp: null,
+			};
+		});
+		eventsCache.set(cacheKey, fallback);
+		return fallback;
 	}
+
 	const timestampMap = new Map(
 		blocks.map((block) => [block.number, block.timestamp * 1000])
 	);
 
-	return transferEvents.map((event) => ({
-		hash: event.transactionHash,
-		from: event.args.from,
-		to: event.args.to,
-		value: parseFloat(ethers.utils.formatEther(event.args.value)),
-		blockNumber: event.blockNumber,
-		timestamp: timestampMap.get(event.blockNumber) ?? null,
-	}));
+	const parsedEvents = rawLogs.map((log) => {
+		const parsed = contract.interface.parseLog(log);
+		return {
+			hash: log.transactionHash,
+			from: parsed.args.from,
+			to: parsed.args.to,
+			value: (() => {
+				const amount = extractTransferAmount({ args: parsed.args });
+				return amount !== null ? parseFloat(amount) : 0;
+			})(),
+			blockNumber: log.blockNumber,
+			timestamp: timestampMap.get(log.blockNumber) ?? null,
+		};
+	});
+
+	eventsCache.set(cacheKey, parsedEvents);
+	return parsedEvents;
 };
 
 export const calculateHoldersDetail = async (
@@ -114,7 +256,7 @@ export const calculateHoldersDetail = async (
 		if (event.from) addresses.add(event.from);
 	});
 
-	const details = await Promise.all(
+const details = await Promise.all(
 		[...addresses]
 			.filter(
 				(address) =>
@@ -150,6 +292,7 @@ export const calculateHoldersCount = async (contract, knownAddresses = {}) => {
 		transferEvents.map((event) => ({
 			to: event.args.to,
 			from: event.args.from,
+			value: extractTransferAmount(event),
 		}))
 	);
 
@@ -177,7 +320,11 @@ export const computeTokensSoldBetween = (
 		if (!event.timestamp) return acc;
 		if (event.from?.toLowerCase() !== lowerCrowdsale) return acc;
 		if (event.timestamp < startMs || event.timestamp > endMs) return acc;
-		return acc + (event.value ?? 0);
+		const amount =
+			event.value !== undefined
+				? Number(event.value)
+				: Number(extractTransferAmount(event)) || 0;
+		return acc + amount;
 	}, 0);
 };
 
@@ -264,7 +411,9 @@ export const tokenDataInspector = async (contract, address) => {
 	const name = await contract.name();
 	const symbol = await contract.symbol();
 	const totalSupplyWei = await contract.totalSupply();
-	const totalSupply = ethers.utils.formatEther(totalSupplyWei);
+	const totalSupply = ensureFiniteNumber(
+		ethers.utils.formatEther(totalSupplyWei)
+	);
 
 	let vcoIssuanceWei;
 	let vcoIssuance;
@@ -277,15 +426,46 @@ export const tokenDataInspector = async (contract, address) => {
 		vcoIssuance = fallback?.tokenInssuance ?? 0;
 	}
 
-	const burnedTokensDrunk = vcoIssuance - totalSupply;
+	const totalSupplyNumeric = ensureFiniteNumber(totalSupply ?? 0) ?? 0;
+	const vcoIssuanceNumeric = ensureFiniteNumber(vcoIssuance) ?? 0;
+	const burnedTokensDrunk = Math.max(vcoIssuanceNumeric - totalSupplyNumeric, 0);
 
 	const staticContractData = contracts.find(
 		(entry) => entry.contractAddress === address
 	);
 
-	const { crowdsaleAddress, uniswapUri, lpContractAddress, holdersUrl } =
-		staticContractData || {};
-	console.log("staticContractData", staticContractData);
+	const {
+		crowdsaleAddress,
+		uniswapUri,
+		lpContractAddress,
+		holdersUrl,
+		network,
+		priceReferencePair,
+		archived,
+		displayName,
+		legacyAddress,
+		migratedTo,
+		startBlock,
+	} = staticContractData || {};
+
+	let { tokensToBurn, legacyBurned } = staticContractData || {};
+
+	if ((tokensToBurn == null || legacyBurned == null) && legacyAddress) {
+		const legacyContractMeta = contracts.find(
+			(entry) =>
+				entry.contractAddress &&
+				entry.contractAddress.toLowerCase() === legacyAddress.toLowerCase()
+		);
+		const burnedFromLegacy = legacyContractMeta?.burned;
+		if (burnedFromLegacy != null) {
+			if (legacyBurned == null) {
+				legacyBurned = burnedFromLegacy;
+			}
+			if (tokensToBurn == null) {
+				tokensToBurn = burnedFromLegacy;
+			}
+		}
+	}
 
 	const vcoData = VCOPrices.find((entry) => entry.symbol === symbol);
 
@@ -293,13 +473,23 @@ export const tokenDataInspector = async (contract, address) => {
 		address,
 		name,
 		symbol,
-		totalSupply: Math.trunc(totalSupply),
-		vcoIssuance: Math.trunc(vcoIssuance),
-		burnedTokensDrunk: Math.trunc(burnedTokensDrunk),
+		totalSupply: totalSupplyNumeric,
+		vcoIssuance: vcoIssuanceNumeric,
+		burnedTokensDrunk,
+		burnedTokens: burnedTokensDrunk,
 		crowdsaleAddress,
 		uniswapUri,
 		lpContractAddress,
 		holdersUrl,
+		network,
+		priceReferencePair,
+		archived,
+		displayName,
+		legacyAddress,
+		migratedTo,
+		startBlock,
+		tokensToBurn,
+		legacyBurned,
 		vcoStartDate: vcoData?.dateStart ?? null,
 		vcoEndDate: vcoData?.dateEnd ?? null,
 		vcoPriceEth: vcoData?.priceEth ?? null,

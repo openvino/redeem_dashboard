@@ -1,11 +1,7 @@
 import { getSales } from "../controllers/salesController";
 
 export default async function handler(req, res) {
-	console.log("salesRouteeeeeeeeeeeeee");
-
 	if (req.method === "GET") {
-		console.log("GEEEET");
-
 		try {
 			const sales = await getSales(req.query);
 			console.log("sales", sales);
