@@ -195,6 +195,7 @@ const baseContracts = [
 		startBlock: 2171714,
 		network: NETWORK_CONFIG.base.key,
 		priceReferencePair: NETWORK_CONFIG.base.referencePair,
+		legacyBurned: 0,
 	},
 	{
 		name: "MTB25",
@@ -208,6 +209,7 @@ const baseContracts = [
 		startBlock: 2171714,
 		network: NETWORK_CONFIG.base.key,
 		priceReferencePair: NETWORK_CONFIG.base.referencePair,
+		legacyBurned: 0,
 	},
 ];
 
