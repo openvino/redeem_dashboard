@@ -33,6 +33,7 @@ const TokenInfoComponent = ({
 		networkLabel,
 		archived,
 		tokensToBurn,
+		vcoSourceNetworkLabel,
 	} = tokenInfo;
 
 	const availableSupply = useMemo(() => {
@@ -91,8 +92,11 @@ const TokenInfoComponent = ({
 	}, [totalSalesPages, salesPage]);
 
 	const vcoData = useMemo(
-		() => VCOPrices.find((entry) => entry.name === name),
-		[name]
+		() =>
+			VCOPrices.find(
+				(entry) => entry.name === name || entry.symbol === symbol
+			),
+		[name, symbol]
 	);
 
 	useEffect(() => {
@@ -201,6 +205,9 @@ const TokenInfoComponent = ({
 	const archivedLabel = archived ? t("archived_token") || "Archive" : null;
 	const isEthereumNetwork = network === NETWORK_CONFIG.ethereum.key;
 	const showUniswapButton = Boolean(uniswapUri && !isEthereumNetwork);
+	const vcoPriceLabel = vcoSourceNetworkLabel
+		? `${t("vco_price")} (${vcoSourceNetworkLabel})`
+		: t("vco_price");
 
 	return (
 		<div
@@ -307,7 +314,7 @@ const TokenInfoComponent = ({
 						</span>
 					</p>
 					<p className="text-sm text-gray-600">
-						{t("vco_price")}:{" "}
+						{vcoPriceLabel}:{" "}
 						<span className="font-semibold text-gray-900">
 							{vcoData?.priceEth ? `${vcoData.priceEth} ETH` : "—"}
 						</span>
@@ -361,14 +368,16 @@ const TokenInfoComponent = ({
 								{formatNumber(vcoIssuance)}
 							</span>
 						</div>
-						<div>
-							<span className="uppercase text-xs text-gray-500 block">
-								{t("burned_tokens")}
-							</span>
-							<span className="font-semibold text-gray-900">
-								{formatNumber(burnedTokens)}
-							</span>
-						</div>
+						{vcoSourceNetworkLabel && (
+							<div>
+								<span className="uppercase text-xs text-gray-500 block">
+									{t("network") || "Network"}
+								</span>
+								<span className="font-semibold text-gray-900">
+									{vcoSourceNetworkLabel}
+								</span>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

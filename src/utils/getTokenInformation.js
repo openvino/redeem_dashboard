@@ -1,4 +1,4 @@
-import { contracts, VCOPrices } from "../../contracts";
+import { contracts, VCOPrices, NETWORK_CONFIG } from "../../contracts";
 
 import { ethers } from "ethers";
 
@@ -448,23 +448,40 @@ export const tokenDataInspector = async (contract, address) => {
 		startBlock,
 	} = staticContractData || {};
 
-	let { tokensToBurn, legacyBurned } = staticContractData || {};
+	const legacyContractMeta = legacyAddress
+		? contracts.find(
+				(entry) =>
+					entry.contractAddress &&
+					entry.contractAddress.toLowerCase() === legacyAddress.toLowerCase()
+			  )
+		: null;
 
-	if ((tokensToBurn == null || legacyBurned == null) && legacyAddress) {
-		const legacyContractMeta = contracts.find(
-			(entry) =>
-				entry.contractAddress &&
-				entry.contractAddress.toLowerCase() === legacyAddress.toLowerCase()
-		);
-		const burnedFromLegacy = legacyContractMeta?.burned;
-		if (burnedFromLegacy != null) {
-			if (legacyBurned == null) {
-				legacyBurned = burnedFromLegacy;
-			}
-			if (tokensToBurn == null) {
-				tokensToBurn = burnedFromLegacy;
-			}
+	let { tokensToBurn, legacyBurned } = staticContractData || {};
+	const burnedFromLegacy = legacyContractMeta?.burned;
+	if (burnedFromLegacy != null) {
+		if (legacyBurned == null) {
+			legacyBurned = burnedFromLegacy;
 		}
+		if (tokensToBurn == null) {
+			tokensToBurn = burnedFromLegacy;
+		}
+	}
+
+	let vcoSourceNetwork = network ?? null;
+	let vcoSourceNetworkLabel = vcoSourceNetwork
+		? NETWORK_CONFIG[vcoSourceNetwork]?.label ?? vcoSourceNetwork
+		: null;
+
+	if (legacyContractMeta?.network) {
+		vcoSourceNetwork = legacyContractMeta.network;
+		vcoSourceNetworkLabel =
+			NETWORK_CONFIG[legacyContractMeta.network]?.label ?? legacyContractMeta.network;
+	}
+
+	if (!vcoSourceNetwork && archived && network) {
+		vcoSourceNetwork = network;
+		vcoSourceNetworkLabel =
+			NETWORK_CONFIG[network]?.label ?? network;
 	}
 
 	const vcoData = VCOPrices.find((entry) => entry.symbol === symbol);
@@ -490,6 +507,8 @@ export const tokenDataInspector = async (contract, address) => {
 		startBlock,
 		tokensToBurn,
 		legacyBurned,
+		vcoSourceNetwork,
+		vcoSourceNetworkLabel,
 		vcoStartDate: vcoData?.dateStart ?? null,
 		vcoEndDate: vcoData?.dateEnd ?? null,
 		vcoPriceEth: vcoData?.priceEth ?? null,

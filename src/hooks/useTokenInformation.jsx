@@ -73,6 +73,8 @@ const useTokenInformation = (contractMeta) => {
 		legacyAddress: contractMeta?.legacyAddress ?? null,
 		tokensToBurn: null,
 		legacyBurned: null,
+		vcoSourceNetwork: null,
+		vcoSourceNetworkLabel: null,
 	});
 
 	const [holdersDetail, setHoldersDetail] = useState([]);
@@ -275,6 +277,12 @@ const useTokenInformation = (contractMeta) => {
 					effectiveLegacyBurned !== undefined
 						? effectiveLegacyBurned
 						: baseData.legacyBurned ?? prev.legacyBurned,
+				vcoSourceNetwork:
+					baseData.vcoSourceNetwork ?? prev.vcoSourceNetwork ?? effectiveNetwork,
+				vcoSourceNetworkLabel:
+					baseData.vcoSourceNetworkLabel ??
+					prev.vcoSourceNetworkLabel ??
+					NETWORK_CONFIG[effectiveNetwork]?.label ?? effectiveNetwork,
 			};
 		});
 
