@@ -1,12 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ethers } from "ethers";
+import axios from "axios";
 import { OVT_ABI, NETWORK_CONFIG, contracts } from "../../contracts";
 import {
-	getPrice,
 	tokenDataInspector,
-	calculateHoldersDetail,
-	fetchTransferEventsWithMetadata,
-	fetchPairPriceHistory,
 	computeTokensSoldBetween,
 	computeTokensSoldForYear,
 } from "@/utils/getTokenInformation";
@@ -35,10 +32,221 @@ const resolveProviderUri = (networkKey) => {
 	return null;
 };
 
-const ENABLE_ONCHAIN_STATS =
-	process.env.NEXT_PUBLIC_ENABLE_ONCHAIN_STATS === "true";
-
 const ZERO_ADDRESS = ethers.constants.AddressZero;
+const OPENVINO_API_URL =
+	process.env.NEXT_PUBLIC_OPENVINO_API_URL ||
+	"https://dondetopa.openvino.org";
+const OPENVINO_API_KEY =
+	process.env.NEXT_PUBLIC_OPENVINO_API_KEY ||
+	"59da429f8f8d813a87c035f163ac1c31a436aa0c3f2ca90f47f46e83f3f20693";
+
+const mapNetworkToApiNetwork = (networkKey) => {
+	if (!networkKey) return "base";
+	const normalized = networkKey.toLowerCase();
+	if (normalized === "ethereum") return "mainnet";
+	if (normalized === "optimism") return "optimism";
+	return normalized;
+};
+
+const toNumberOrNull = (input) => {
+	if (input === null || input === undefined) return null;
+	if (typeof input === "number") {
+		return Number.isFinite(input) ? input : null;
+	}
+	if (typeof input === "string") {
+		const normalized = Number(input.replace(/,/g, ""));
+		return Number.isFinite(normalized) ? normalized : null;
+	}
+	return null;
+};
+
+const toTimestampMs = (input) => {
+	if (input === null || input === undefined) return null;
+	if (typeof input === "number") {
+		if (!Number.isFinite(input)) return null;
+		return input > 1e12 ? input : input * 1000;
+	}
+	if (typeof input === "string") {
+		const parsed = Date.parse(input);
+		return Number.isNaN(parsed) ? null : parsed;
+	}
+	return null;
+};
+
+const deriveTags = (address, knownAddresses = {}) => {
+	if (!address) return [];
+	const lower = address.toLowerCase();
+	return Object.entries(knownAddresses)
+		.filter(([, candidate]) => candidate && candidate.toLowerCase() === lower)
+		.map(([label]) => label);
+};
+
+const deriveApiData = ({
+	tokenHistory,
+	pairHistory,
+	knownAddresses,
+	targetTokenAddress,
+}) => {
+	const normalizedToken = targetTokenAddress?.toLowerCase() ?? null;
+
+	const holders =
+		Array.isArray(tokenHistory?.holders) && tokenHistory.holders.length > 0
+			? tokenHistory.holders
+					.map((holder) => {
+						const address =
+							holder.address || holder.wallet || holder.holderAddress;
+						const balance =
+							toNumberOrNull(
+								holder.balanceFormatted ??
+									holder.balance ??
+									holder.balanceRaw ??
+									holder.amount
+							) ?? 0;
+						if (!address || balance <= 0) return null;
+						return {
+							address,
+							balance,
+							tags: deriveTags(address, knownAddresses),
+						};
+					})
+					.filter(Boolean)
+			: [];
+
+	const events =
+		Array.isArray(tokenHistory?.events) && tokenHistory.events.length > 0
+			? tokenHistory.events
+					.map((event) => {
+						const value =
+							toNumberOrNull(
+								event.valueFormatted ??
+									event.value ??
+									event.amountFormatted ??
+									event.amount
+							) ?? 0;
+						const timestamp =
+							toTimestampMs(
+								event.timestamp ??
+									event.blockTimestamp ??
+									event.isoDate ??
+									event.date ??
+									event.blockTimestampLast
+							) ?? null;
+						return {
+							hash:
+								event.transactionHash ??
+								event.hash ??
+								event.txHash ??
+								null,
+							from: event.from ?? event.sender ?? null,
+							to: event.to ?? event.recipient ?? event.receiver ?? null,
+							value,
+							blockNumber: event.blockNumber ?? event.block ?? null,
+							timestamp,
+						};
+					})
+					.filter(
+						(event) =>
+							(event.from || event.to) &&
+							event.timestamp !== null &&
+							Number.isFinite(event.value)
+					)
+			: [];
+
+	const tokenSummary = tokenHistory?.summary ?? {};
+	const tokenMeta = tokenHistory?.token ?? {};
+
+	const holdersCount =
+		toNumberOrNull(tokenMeta.holdersCount) ??
+		toNumberOrNull(tokenSummary.holderCount) ??
+		(holders.length > 0 ? holders.length : null);
+	const totalTransfers =
+		toNumberOrNull(tokenMeta.totalTransfers) ??
+		toNumberOrNull(tokenSummary.transferCount) ??
+		(events.length > 0 ? events.length : null);
+	const totalSupply =
+		toNumberOrNull(tokenMeta.totalSupplyFormatted ?? tokenMeta.totalSupply) ??
+		null;
+
+	const syncEvents = pairHistory?.events?.syncs ?? [];
+	const reserveMapping = pairHistory?.pair?.reserveMapping ?? {};
+	const token0Meta = pairHistory?.pair?.token0 ?? reserveMapping?.reserve0 ?? {};
+
+	const computeReserve = (entry, key) =>
+		toNumberOrNull(
+			entry?.[`${key}Formatted`] ??
+				entry?.[`${key}`] ??
+				entry?.[`${key}Raw`] ??
+				entry?.[`${key}Wei`]
+		);
+
+	const priceHistory =
+		Array.isArray(syncEvents) && syncEvents.length > 0
+			? syncEvents
+					.map((sync) => {
+						const reserve0 = computeReserve(sync, "reserve0");
+						const reserve1 = computeReserve(sync, "reserve1");
+						if (!reserve0 || !reserve1) return null;
+						const timestamp =
+							toTimestampMs(
+								sync.timestamp ??
+									sync.blockTimestamp ??
+									sync.isoDate ??
+									sync.date
+							) ?? null;
+						if (!timestamp) return null;
+						let price = reserve1 / reserve0;
+						const syncToken0 = sync.token0 ?? sync.reserve0Token;
+						if (
+							normalizedToken &&
+							syncToken0?.address &&
+							syncToken0.address?.toLowerCase() !== normalizedToken
+						) {
+							price = reserve0 / reserve1;
+						}
+						return Number.isFinite(price)
+							? {
+									timestamp,
+									price,
+							  }
+							: null;
+					})
+					.filter(Boolean)
+			: [];
+
+	const currentReserves =
+		pairHistory?.summary?.currentReserves ??
+		pairHistory?.pair?.currentReserves ??
+		null;
+
+	let price = null;
+	if (currentReserves) {
+		const reserve0 = computeReserve(currentReserves, "reserve0");
+		const reserve1 = computeReserve(currentReserves, "reserve1");
+		if (reserve0 && reserve1) {
+			const pairToken0 = token0Meta?.address?.toLowerCase();
+			if (normalizedToken && pairToken0 && pairToken0 !== normalizedToken) {
+				price = reserve0 / reserve1;
+			} else {
+				price = reserve1 / reserve0;
+			}
+			if (!Number.isFinite(price)) {
+				price = null;
+			}
+		}
+	}
+
+	return {
+		holders,
+		events,
+		priceHistory,
+		price,
+		holdersCount,
+		totalTransfers,
+		totalSupply,
+		tokenSummary,
+		tokenMeta,
+	};
+};
 
 const useTokenInformation = (contractMeta) => {
 	const contractAddress = contractMeta?.contractAddress ?? "";
@@ -80,6 +288,8 @@ const useTokenInformation = (contractMeta) => {
 	const [holdersDetail, setHoldersDetail] = useState([]);
 	const [transferEvents, setTransferEvents] = useState([]);
 	const [priceHistory, setPriceHistory] = useState([]);
+	const [tokenHistoryApiData, setTokenHistoryApiData] = useState(null);
+	const [pairHistoryApiData, setPairHistoryApiData] = useState(null);
 
 	useEffect(() => {
 		if (!contractAddress) return;
@@ -110,63 +320,69 @@ const useTokenInformation = (contractMeta) => {
 		const fetchData = async () => {
 			try {
 				setLoading(true);
-				const baseData = await tokenDataInspector(contract, contractAddress);
-				console.log("baseData", baseData);
 
-				const effectiveNetwork = normalizeNetwork(
-					baseData.network || networkKey
-				);
-				const priceReferencePair = contractPairAddress
-					? baseData.priceReferencePair ||
-					  contractMeta?.priceReferencePair ||
-					  NETWORK_CONFIG[effectiveNetwork]?.referencePair ||
-					  null
-					: null;
+				const apiNetwork = mapNetworkToApiNetwork(networkKey);
+				const sanitizedApiUrl = OPENVINO_API_URL.replace(/\/$/, "");
+				const axiosHeaders = {
+					"Content-Type": "application/json",
+				};
+				if (OPENVINO_API_KEY) {
+					axiosHeaders["x-api-key"] = OPENVINO_API_KEY;
+				}
 
-				const knownAddresses = {
-					crowdsaleAddress: baseData.crowdsaleAddress,
-					lpContractAddress: baseData.lpContractAddress,
-					contractPairAddress,
-					tokenContract: contractAddress,
+				const axiosConfig = {
+					headers: axiosHeaders,
 				};
 
-				const startBlock = baseData.startBlock ?? contractMeta?.startBlock ?? 0;
-				const shouldFetchOnchain = ENABLE_ONCHAIN_STATS;
+				const requestPayload = {
+					network: apiNetwork,
+					startBlock: contractMeta?.startBlock ?? 0,
+					batchDelayMs: 1500,
+					maxRetries: 8,
+					blockscoutPageSize: 100,
+					blockscoutDelayMs: 1200,
+					verbose: true,
+				};
 
-				const eventsPromise = shouldFetchOnchain
-					? fetchTransferEventsWithMetadata(contract, provider, {
-							startBlock,
-							chunkSize: 7500,
-					  }).catch((err) => {
-							console.error("No se pudieron obtener los eventos", err);
-							return [];
-					  })
-					: Promise.resolve([]);
+				const normalizedTokenAddress = contractAddress?.toLowerCase();
+				const normalizedPairAddress = contractPairAddress?.toLowerCase();
 
-				const pricePromise =
-					shouldFetchOnchain && contractPairAddress && priceReferencePair
-						? getPrice(contractPairAddress, priceReferencePair, provider).catch(
-								(err) => {
-									console.error("No se pudo obtener el precio del par", err);
-									return -1;
-								}
-						  )
-						: Promise.resolve(-1);
+				const baseDataPromise = tokenDataInspector(contract, contractAddress);
+				const tokenHistoryPromise =
+					normalizedTokenAddress && OPENVINO_API_URL
+						? axios
+								.post(
+									`${sanitizedApiUrl}/viniswap/tokens/${normalizedTokenAddress}/history`,
+									requestPayload,
+									axiosConfig
+								)
+								.then((response) => response.data)
+								.catch((err) => {
+									console.error(
+										"No se pudo obtener el historial del token desde la API",
+										err?.response?.data || err
+									);
+									return null;
+								})
+						: Promise.resolve(null);
 
-				const historyPromise =
-					shouldFetchOnchain && contractPairAddress
-						? fetchPairPriceHistory(
-								provider,
-								contractPairAddress,
-								contractAddress
-						  ).catch((err) => {
-								console.error(
-									"No se pudo obtener el histórico de precios",
-									err
-								);
-								return [];
-						  })
-						: Promise.resolve([]);
+				const pairHistoryPromise =
+					normalizedPairAddress && OPENVINO_API_URL
+						? axios
+								.post(
+									`${sanitizedApiUrl}/viniswap/pairs/${normalizedPairAddress}/history`,
+									requestPayload,
+									axiosConfig
+								)
+								.then((response) => response.data)
+								.catch((err) => {
+									console.error(
+										"No se pudo obtener el historial del par desde la API",
+										err?.response?.data || err
+									);
+									return null;
+								})
+						: Promise.resolve(null);
 
 				const burnedCurrentPromise = contract
 					.balanceOf(ZERO_ADDRESS)
@@ -216,143 +432,166 @@ const useTokenInformation = (contractMeta) => {
 					}
 				}
 
-				const [events, price, history, burnedCurrent, legacyBurned] =
+				const [baseData, burnedCurrent, legacyBurned, tokenHistory, pairHistory] =
 					await Promise.all([
-						eventsPromise,
-						pricePromise,
-						historyPromise,
+						baseDataPromise,
 						burnedCurrentPromise,
 						legacyBurnPromise,
+						tokenHistoryPromise,
+						pairHistoryPromise,
 					]);
-
-				const detailedHolders = shouldFetchOnchain
-					? await calculateHoldersDetail(
-							contract,
-							knownAddresses,
-							events
-					  ).catch((err) => {
-							console.error("No se pudo calcular el detalle de holders", err);
-							return [];
-					  })
-					: [];
 
 				if (!isActive) return;
 
-				setTokenInfo((prev) => {
-					const burnedFromSupply = (() => {
-						const issuance = baseData.vcoIssuance ?? prev.vcoIssuance;
-						const supply = baseData.totalSupply ?? prev.totalSupply;
-						if (issuance == null || supply == null) return null;
-						const diff = Number(issuance) - Number(supply);
-						return Number.isFinite(diff) ? Math.max(diff, 0) : null;
-					})();
+				const effectiveNetwork = normalizeNetwork(
+					baseData.network || networkKey
+				);
+				const priceReferencePair = contractPairAddress
+					? baseData.priceReferencePair ||
+					  contractMeta?.priceReferencePair ||
+					  NETWORK_CONFIG[effectiveNetwork]?.referencePair ||
+					  null
+					: null;
 
-					const burnedOnChainValue =
-						burnedCurrent !== null && burnedCurrent !== undefined
-							? burnedCurrent
-							: baseData.burnedTokens ?? prev.burnedTokens ?? null;
-					const burnedOnChainNumeric =
-						burnedOnChainValue !== null && burnedOnChainValue !== undefined
-							? Number(burnedOnChainValue)
-							: null;
+				const knownAddresses = {
+					crowdsaleAddress: baseData.crowdsaleAddress,
+					lpContractAddress: baseData.lpContractAddress,
+					contractPairAddress,
+					tokenContract: contractAddress,
+				};
 
-					const burnedBaseline = (() => {
-						if (burnedFromSupply !== null && burnedFromSupply !== undefined) {
-							return Number(burnedFromSupply);
-						}
-						if (
-							burnedOnChainNumeric !== null &&
-							burnedOnChainNumeric !== undefined
-						) {
-							return burnedOnChainNumeric;
-						}
-						const fallback = baseData.burnedTokens ?? prev.burnedTokens;
-						return fallback != null ? Number(fallback) : 0;
-					})();
-
-					const metadataLegacyBurned =
-						baseData.legacyBurned ?? prev.legacyBurned ?? null;
-					let effectiveLegacyBurned =
-						legacyBurned !== null && legacyBurned !== undefined
-							? legacyBurned
-							: metadataLegacyBurned;
-
-					if (
-						effectiveLegacyBurned === 0 &&
-						metadataLegacyBurned !== null &&
-						metadataLegacyBurned !== undefined &&
-						metadataLegacyBurned > 0
-					) {
-						effectiveLegacyBurned = metadataLegacyBurned;
-					}
-
-					const tokensToBurnValue =
-						effectiveLegacyBurned !== null &&
-						effectiveLegacyBurned !== undefined
-							? Math.max(effectiveLegacyBurned - (burnedOnChainNumeric || 0), 0)
-							: baseData.tokensToBurn ?? prev.tokensToBurn;
-
-			const normalizedTokensToBurn =
-				tokensToBurnValue !== null && tokensToBurnValue !== undefined
-					? Number(tokensToBurnValue)
-					: tokensToBurnValue;
-
-			const burnedTokensValue = (() => {
-				const baseline =
-					burnedBaseline === null || burnedBaseline === undefined
-						? burnedOnChainNumeric ?? 0
-						: Number(burnedBaseline);
-				if (!archivedFlag) {
-					const pending = Number(normalizedTokensToBurn ?? 0);
-					if (pending > 0 && Number.isFinite(baseline)) {
-						const floor = burnedOnChainNumeric ?? 0;
-						const adjusted = baseline - pending;
-						if (Number.isFinite(adjusted)) {
-							return Math.max(adjusted, floor, 0);
-						}
-					}
-				}
-				return baseline;
-			})();
-
-					return {
-						...prev,
-						...baseData,
-						price,
-						holdersCount: detailedHolders.length,
-						totalTransfers: events.length,
-						network: effectiveNetwork,
-						networkLabel:
-							NETWORK_CONFIG[effectiveNetwork]?.label ?? effectiveNetwork,
-						archived: baseData.archived ?? archivedFlag,
-						displayName:
-							baseData.displayName ||
-							contractMeta?.displayName ||
-							baseData.name ||
-							prev.displayName,
-						priceReferencePair,
-						burnedTokens: burnedTokensValue,
-						tokensToBurn: normalizedTokensToBurn,
-						legacyBurned:
-							effectiveLegacyBurned !== null &&
-							effectiveLegacyBurned !== undefined
-								? effectiveLegacyBurned
-								: baseData.legacyBurned ?? prev.legacyBurned,
-						vcoSourceNetwork:
-							baseData.vcoSourceNetwork ??
-							prev.vcoSourceNetwork ??
-							effectiveNetwork,
-						vcoSourceNetworkLabel:
-							baseData.vcoSourceNetworkLabel ??
-							prev.vcoSourceNetworkLabel ??
-							NETWORK_CONFIG[effectiveNetwork]?.label ??
-							effectiveNetwork,
-					};
+				const apiDerived = deriveApiData({
+					tokenHistory,
+					pairHistory,
+					knownAddresses,
+					targetTokenAddress: contractAddress,
 				});
 
-				setTransferEvents(events);
-				setHoldersDetail(detailedHolders);
-				setPriceHistory(history);
+				const apiStartBlock =
+					toNumberOrNull(tokenHistory?.range?.fromBlock) ??
+					baseData.startBlock ??
+					contractMeta?.startBlock ??
+					0;
+
+				const burnedFromSupply = (() => {
+					const issuance = toNumberOrNull(baseData.vcoIssuance);
+					const supplyOverride =
+						apiDerived.totalSupply ?? baseData.totalSupply ?? null;
+					if (issuance == null || supplyOverride == null) return null;
+					const diff = Number(issuance) - Number(supplyOverride);
+					return Number.isFinite(diff) ? Math.max(diff, 0) : null;
+				})();
+
+				const burnedOnChainValue =
+					burnedCurrent !== null && burnedCurrent !== undefined
+						? burnedCurrent
+						: baseData.burnedTokens ?? tokenInfo.burnedTokens ?? null;
+
+				const burnedOnChainNumeric =
+					burnedOnChainValue !== null && burnedOnChainValue !== undefined
+						? Number(burnedOnChainValue)
+						: null;
+
+				const metadataLegacyBurned =
+					baseData.legacyBurned ?? tokenInfo.legacyBurned ?? null;
+
+				let effectiveLegacyBurned =
+					legacyBurned !== null && legacyBurned !== undefined
+						? legacyBurned
+						: metadataLegacyBurned;
+
+				if (
+					effectiveLegacyBurned === 0 &&
+					metadataLegacyBurned !== null &&
+					metadataLegacyBurned !== undefined &&
+					metadataLegacyBurned > 0
+				) {
+					effectiveLegacyBurned = metadataLegacyBurned;
+				}
+
+				const tokensToBurnValue =
+					effectiveLegacyBurned !== null &&
+					effectiveLegacyBurned !== undefined
+						? Math.max(effectiveLegacyBurned - (burnedOnChainNumeric || 0), 0)
+						: baseData.tokensToBurn ?? tokenInfo.tokensToBurn ?? null;
+
+				const normalizedTokensToBurn =
+					tokensToBurnValue !== null && tokensToBurnValue !== undefined
+						? Number(tokensToBurnValue)
+						: tokensToBurnValue;
+
+				const burnedTokensValue = (() => {
+					const baseline =
+						burnedFromSupply === null || burnedFromSupply === undefined
+							? burnedOnChainNumeric ?? 0
+							: Number(burnedFromSupply);
+					if (!archivedFlag) {
+						const pending = Number(normalizedTokensToBurn ?? 0);
+						if (pending > 0 && Number.isFinite(baseline)) {
+							const floor = burnedOnChainNumeric ?? 0;
+							const adjusted = baseline - pending;
+							if (Number.isFinite(adjusted)) {
+								return Math.max(adjusted, floor, 0);
+							}
+						}
+					}
+					return baseline;
+				})();
+
+				setTokenInfo((prev) => ({
+					...prev,
+					...baseData,
+					totalSupply:
+						apiDerived.totalSupply ?? baseData.totalSupply ?? prev.totalSupply,
+					startBlock: apiStartBlock,
+					price:
+						apiDerived.price !== null && apiDerived.price !== undefined
+							? apiDerived.price
+							: prev.price ?? -1,
+					holdersCount:
+						apiDerived.holdersCount ??
+						apiDerived.holders.length ??
+						prev.holdersCount,
+					totalTransfers:
+						apiDerived.totalTransfers ??
+						apiDerived.events.length ??
+						prev.totalTransfers,
+					network: effectiveNetwork,
+					networkLabel:
+						NETWORK_CONFIG[effectiveNetwork]?.label ?? effectiveNetwork,
+					archived: baseData.archived ?? archivedFlag,
+					displayName:
+						baseData.displayName ||
+						contractMeta?.displayName ||
+						baseData.name ||
+						prev.displayName,
+					priceReferencePair,
+					burnedTokens: burnedTokensValue,
+					tokensToBurn: normalizedTokensToBurn,
+					legacyBurned:
+						effectiveLegacyBurned !== null &&
+						effectiveLegacyBurned !== undefined
+							? effectiveLegacyBurned
+							: baseData.legacyBurned ?? prev.legacyBurned,
+					vcoSourceNetwork:
+						baseData.vcoSourceNetwork ??
+						prev.vcoSourceNetwork ??
+						effectiveNetwork,
+					vcoSourceNetworkLabel:
+						baseData.vcoSourceNetworkLabel ??
+						prev.vcoSourceNetworkLabel ??
+						NETWORK_CONFIG[effectiveNetwork]?.label ??
+						effectiveNetwork,
+				}));
+
+				setTransferEvents(apiDerived.events);
+				setHoldersDetail(apiDerived.holders);
+				setPriceHistory(apiDerived.priceHistory);
+				setTokenHistoryApiData(tokenHistory);
+				setPairHistoryApiData(pairHistory);
+
+				console.log("Historial de token (API)", tokenHistory);
+				console.log("Historial de par (API)", pairHistory);
 			} catch (error) {
 				console.error("Error al cargar información del token", error);
 			} finally {
@@ -428,6 +667,8 @@ const useTokenInformation = (contractMeta) => {
 		holdersDetail,
 		transferEvents,
 		priceHistory,
+		tokenHistoryApiData,
+		pairHistoryApiData,
 		getTokensSoldBetweenDates,
 		getTokensSoldForYear,
 		tokensSoldDuringVco,

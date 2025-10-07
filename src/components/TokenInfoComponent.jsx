@@ -4,12 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { VCOPrices, contracts, NETWORK_CONFIG } from "../../contracts";
+import PoolHistoryChart from "./PoolHistoryChart";
 
 const TokenInfoComponent = ({
 	tokenInfo,
 	onSelectChange,
 	style,
 	selectedContractAddress,
+	pairHistory,
 }) => {
 	const { t } = useTranslation();
 
@@ -93,9 +95,7 @@ const TokenInfoComponent = ({
 
 	const vcoData = useMemo(
 		() =>
-			VCOPrices.find(
-				(entry) => entry.name === name || entry.symbol === symbol
-			),
+			VCOPrices.find((entry) => entry.name === name || entry.symbol === symbol),
 		[name, symbol]
 	);
 
@@ -226,12 +226,12 @@ const TokenInfoComponent = ({
 					<div>
 						<h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
 						<p className="text-gray-600 uppercase tracking-wide">{symbol}</p>
-					{networkDisplay && (
-						<span className="inline-flex items-center gap-2 text-xs font-medium text-gray-600 uppercase">
-							{networkDisplay}
-							{archivedLabel ? `• ${archivedLabel}` : ""}
-						</span>
-					)}
+						{networkDisplay && (
+							<span className="inline-flex items-center gap-2 text-xs font-medium text-gray-600 uppercase">
+								{networkDisplay}
+								{archivedLabel ? `• ${archivedLabel}` : ""}
+							</span>
+						)}
 					</div>
 				</div>
 
@@ -241,9 +241,7 @@ const TokenInfoComponent = ({
 					</label>
 					<select
 						id="token-select"
-						value={
-							selectedContractAddress ?? tokenContract ?? ""
-						}
+						value={selectedContractAddress ?? tokenContract ?? ""}
 						onChange={onSelectChange}
 						className="border rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none"
 					>
@@ -263,7 +261,7 @@ const TokenInfoComponent = ({
 
 			<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
 				{[
-					{ label: t("token_issuance"), value: vcoIssuance },
+					{ label: t("token_issuance"), value: availableSupply },
 					{
 						label: t("bottles_remaining"),
 						value: archived ? totalSupply : availableSupply,
@@ -382,60 +380,68 @@ const TokenInfoComponent = ({
 				</div>
 			</div>
 
-				<div className="bg-white/70 rounded-lg p-4 shadow-sm">
-					<h2 className="text-lg font-semibold text-gray-900 mb-3">
-						{t("addresses") || "Direcciones"}
-					</h2>
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
-						{[
-							{
-								label: t("network") || "Network",
-								value: networkDisplay,
-								href: null,
-							},
-							{
-								label: t("contract_address"),
-								value: address,
-								href: getExplorerUrl(address),
-							},
-							{
-								label: t("crowdsale_address"),
-								value: crowdsaleAddress,
-								href: getExplorerUrl(crowdsaleAddress),
-							},
-							{
-								label: t("lp"),
-								value: lpContractAddress,
-								href: getExplorerUrl(lpContractAddress),
-							},
-						]
-							.filter((card) => card.value)
-							.map((card) => (
-								<div
-									key={`${card.label}-${card.value}`}
-									className="flex flex-col gap-1"
-								>
-									<span className="text-xs uppercase text-gray-500">
-										{card.label}
-									</span>
-									<span className="font-mono break-all text-gray-900">
-										{card.href ? (
-											<Link
-												href={card.href}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="text-[#840C4A] underline"
-											>
-												{card.value}
-											</Link>
-										) : (
-											card.value ?? "—"
-										)}
-									</span>
-								</div>
-							))}
-					</div>
-					{showUniswapButton && (
+			{pairHistory && (
+		<PoolHistoryChart
+			pairHistory={pairHistory}
+			tokenAddress={tokenContract || address}
+			tokenSymbol={symbol || displayName}
+		/>
+	)}
+
+			<div className="bg-white/70 rounded-lg p-4 shadow-sm">
+				<h2 className="text-lg font-semibold text-gray-900 mb-3">
+					{t("addresses") || "Direcciones"}
+				</h2>
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
+					{[
+						{
+							label: t("network") || "Network",
+							value: networkDisplay,
+							href: null,
+						},
+						{
+							label: t("contract_address"),
+							value: address,
+							href: getExplorerUrl(address),
+						},
+						{
+							label: t("crowdsale_address"),
+							value: crowdsaleAddress,
+							href: getExplorerUrl(crowdsaleAddress),
+						},
+						{
+							label: t("lp"),
+							value: lpContractAddress,
+							href: getExplorerUrl(lpContractAddress),
+						},
+					]
+						.filter((card) => card.value)
+						.map((card) => (
+							<div
+								key={`${card.label}-${card.value}`}
+								className="flex flex-col gap-1"
+							>
+								<span className="text-xs uppercase text-gray-500">
+									{card.label}
+								</span>
+								<span className="font-mono break-all text-gray-900">
+									{card.href ? (
+										<Link
+											href={card.href}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-[#840C4A] underline"
+										>
+											{card.value}
+										</Link>
+									) : (
+										card.value ?? "—"
+									)}
+								</span>
+							</div>
+						))}
+				</div>
+				{/* {showUniswapButton && (
 						<div className="mt-4">
 							<Link href={uniswapUri} target="_blank" rel="noopener noreferrer">
 							<button className="px-4 py-2 bg-[#840C4A] text-white rounded-lg text-sm">
@@ -443,10 +449,10 @@ const TokenInfoComponent = ({
 							</button>
 						</Link>
 					</div>
-				)}
+				)} */}
 			</div>
 
-			<div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-4">
+			{/* <div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-4">
 				<h2 className="text-lg font-semibold text-gray-900">
 					{t("sales_sumary")}
 				</h2>
@@ -689,8 +695,7 @@ const TokenInfoComponent = ({
 						</div>
 					</div>
 				</div>
-			</div>
-
+			</div> */}
 		</div>
 	);
 };

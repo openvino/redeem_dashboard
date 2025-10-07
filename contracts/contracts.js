@@ -135,6 +135,7 @@ const baseContracts = [
 		lpContractAddress: "0x0B583f7790f0237C8dc3CBdD1888FEc4d61B1216",
 		holdersUrl:
 			"https://basescan.org/token/0x3d98e5829a1bae7423cf3874662c2f3a0c72123f#balances",
+		startBlock: 2171714,
 		network: NETWORK_CONFIG.base.key,
 		priceReferencePair: NETWORK_CONFIG.base.referencePair,
 		legacyAddress: "0x6a2f414E1298264ecD446D6Bb9Da012760336A4f",
@@ -164,6 +165,7 @@ const baseContracts = [
 		lpContractAddress: "0x38441FEBE76d2F0e167972aA017dA263EA755306",
 		holdersUrl:
 			"https://basescan.org/token/0xef89072a1f25c2ada952c2e04644289906e0e6f9#balances",
+		startBlock: 2171714,
 		network: NETWORK_CONFIG.base.key,
 		priceReferencePair: NETWORK_CONFIG.base.referencePair,
 		legacyAddress: "0x0DB11855a6bB7410302d0c14c699c6508Ba29FD7",
@@ -206,7 +208,7 @@ const baseContracts = [
 		lpContractAddress: "0xD60b471BD8C62dc4d2f04493413c6CB73b7ce464",
 		holdersUrl:
 			"https://basescan.org/token/0xA4972a46D2a49AbE6E5EE7406cEB7A779A1dA185#balances",
-		startBlock: 2171714,
+		startBlock: 29927023,
 		network: NETWORK_CONFIG.base.key,
 		priceReferencePair: NETWORK_CONFIG.base.referencePair,
 		legacyBurned: 0,
@@ -229,7 +231,7 @@ const legacyEthereumContracts = [
 		priceReferencePair: NETWORK_CONFIG.ethereum.referencePair,
 		archived: true,
 		migratedTo: "0x2b1A955b2C8B49579d197eAaa7DcE7DBC7b4dA23",
-		startBlock: 5600000,
+		startBlock: 5555793,
 	},
 	{
 		name: "MTB19",
@@ -246,7 +248,7 @@ const legacyEthereumContracts = [
 		priceReferencePair: NETWORK_CONFIG.ethereum.referencePair,
 		archived: true,
 		migratedTo: "0xd9fc98e7ed79FB67aB5f36013D958aBd85Ff28fF",
-		startBlock: 8000000,
+		startBlock: 7703801,
 	},
 	{
 		name: "MTB20",
@@ -280,7 +282,7 @@ const legacyEthereumContracts = [
 		priceReferencePair: NETWORK_CONFIG.ethereum.referencePair,
 		archived: true,
 		migratedTo: "0x9a7DF7eD3c536c1940DD98786f3eEfb7810E2f8f",
-		startBlock: 12500000,
+		startBlock: 12367703,
 	},
 	{
 		name: "MTB22",
@@ -297,7 +299,7 @@ const legacyEthereumContracts = [
 		priceReferencePair: NETWORK_CONFIG.ethereum.referencePair,
 		archived: true,
 		migratedTo: "0xeF89072a1f25c2aDA952c2e04644289906e0e6F9",
-		startBlock: 14800000,
+		startBlock: 14723748,
 	},
 	{
 		name: "MTB23",
@@ -314,7 +316,7 @@ const legacyEthereumContracts = [
 		priceReferencePair: NETWORK_CONFIG.ethereum.referencePair,
 		archived: true,
 		migratedTo: "0x80B19e1BD4f5c96bc5cC7f1fc0A3731eBb0F8820",
-		startBlock: 17000000,
+		startBlock: 17344462,
 	},
 ];
 
