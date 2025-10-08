@@ -18,11 +18,10 @@ Chart.register(
 	Tooltip
 );
 
+// ------- helpers -------
 const toNumber = (value) => {
 	if (value === null || value === undefined) return null;
-	if (typeof value === "number") {
-		return Number.isFinite(value) ? value : null;
-	}
+	if (typeof value === "number") return Number.isFinite(value) ? value : null;
 	if (typeof value === "string") {
 		const parsed = Number(value.replace(/,/g, ""));
 		return Number.isFinite(parsed) ? parsed : null;
@@ -34,6 +33,7 @@ const toTimestamp = (value) => {
 	if (value === null || value === undefined) return null;
 	if (typeof value === "number") {
 		if (!Number.isFinite(value)) return null;
+		// si viene en segundos, pasamos a ms
 		return value > 1e12 ? value : value * 1000;
 	}
 	if (typeof value === "string") {
@@ -63,37 +63,36 @@ const formatAxisNumber = (value, decimals = 2) => {
 };
 
 const WETH_ADDRESSES = new Set([
-	"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2".toLowerCase(), // Ethereum mainnet
+	"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2".toLowerCase(), // Ethereum
 	"0x4200000000000000000000000000000000000006".toLowerCase(), // Base
 ]);
 
 const genericSymbolPattern = /^token\d*$/i;
 
-const resolveTokenSymbol = (tokenMeta = {}, fallbackAddress, preferredSymbol) => {
+const resolveTokenSymbol = (
+	tokenMeta = {},
+	fallbackAddress,
+	preferredSymbol
+) => {
 	const rawSymbol = tokenMeta.symbol?.trim();
 	const rawName = tokenMeta.name?.trim();
 	const preferred = preferredSymbol?.trim();
 	const addressLower =
 		tokenMeta.address?.toLowerCase() ?? fallbackAddress?.toLowerCase() ?? "";
 
-	if (addressLower && WETH_ADDRESSES.has(addressLower)) {
-		return "WETH";
-	}
+	if (addressLower && WETH_ADDRESSES.has(addressLower)) return "WETH";
 
 	const candidates = [preferred, rawSymbol, rawName].filter(
-		(value) => value && !genericSymbolPattern.test(value)
+		(v) => v && !genericSymbolPattern.test(v)
 	);
-	if (candidates.length > 0) {
-		return candidates[0];
-	}
+	if (candidates.length > 0) return candidates[0];
 
-	if (addressLower) {
+	if (addressLower)
 		return `${addressLower.slice(0, 4)}…${addressLower.slice(-4)}`;
-	}
-
 	return "Token";
 };
 
+// ------- component -------
 const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 	const canvasRef = useRef(null);
 	const chartRef = useRef(null);
@@ -109,6 +108,7 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 		const syncs = Array.isArray(pairHistory?.events?.syncs)
 			? pairHistory.events.syncs
 			: [];
+
 		if (syncs.length === 0) {
 			return {
 				points: [],
@@ -121,11 +121,11 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 		}
 
 		const token0Address = pairHistory?.pair?.token0?.address?.toLowerCase();
-        const targetToken = tokenAddress?.toLowerCase() ?? null;
-        const tokenIsToken0 = token0Address && targetToken
-            ? token0Address === targetToken
-            : true;
+		const targetToken = tokenAddress?.toLowerCase() ?? null;
+		const tokenIsToken0 =
+			token0Address && targetToken ? token0Address === targetToken : true;
 
+		// Puntos desde los SYNCs
 		const points = syncs
 			.map((entry) => {
 				const reserve0 = toNumber(
@@ -150,52 +150,86 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 
 				if (!reserve0 || !reserve1 || !timestamp) return null;
 
-				const price = tokenIsToken0
-					? reserve1 / reserve0
-					: reserve0 / reserve1;
+				const price = tokenIsToken0 ? reserve1 / reserve0 : reserve0 / reserve1;
 
 				return Number.isFinite(price)
-					? {
-							timestamp,
-							price,
-							reserve0,
-							reserve1,
-					  }
+					? { timestamp, price, reserve0, reserve1 }
 					: null;
 			})
 			.filter(Boolean)
 			.sort((a, b) => a.timestamp - b.timestamp);
 
-	const baseReserveSeriesRaw = points.map((entry) => ({
-		x: entry.timestamp,
-		y: entry.reserve1,
-	}));
-	const pairReserveSeriesRaw = points.map((entry) => ({
-		x: entry.timestamp,
-		y: entry.reserve0,
-	}));
+		// ------ Punto “actual” desde summary ------
+		const summary = pairHistory?.summary ?? {};
+		const current =
+			summary.currentReserves ?? pairHistory?.pair?.currentReserves ?? null;
 
-	const smoothSeries = (series) => {
-		if (series.length <= 1) return series;
-		const values = series.map((item) => item.y).filter((v) => Number.isFinite(v));
-		if (values.length === 0) return series;
-		const maxValue = Math.max(...values.map(Math.abs));
-		if (maxValue === 0) return series;
-		const scaleFactor = 1 / maxValue;
-		return series.map((item) => ({
-			x: item.x,
-			y: item.y * scaleFactor,
-			scaledOriginal: item.y,
+		// preferimos latestIsoDate / latestReadableDate / latestBlockTimestamp
+		const latestTs =
+			toTimestamp(summary.latestIsoDate) ??
+			toTimestamp(summary.latestReadableDate) ??
+			toTimestamp(summary.latestBlockTimestamp);
+
+		if (current && latestTs) {
+			const r0 = toNumber(
+				current.reserve0Formatted ??
+					current.reserve0 ??
+					current.reserve0Raw ??
+					current.reserve0Wei
+			);
+			const r1 = toNumber(
+				current.reserve1Formatted ??
+					current.reserve1 ??
+					current.reserve1Raw ??
+					current.reserve1Wei
+			);
+			if (r0 && r1) {
+				const priceNow = tokenIsToken0 ? r1 / r0 : r0 / r1;
+				const lastT = points.length ? points[points.length - 1].timestamp : 0;
+				// Agregamos solo si es posterior al último sync
+				if (Number.isFinite(priceNow) && latestTs > lastT) {
+					points.push({
+						timestamp: latestTs,
+						price: priceNow,
+						reserve0: r0,
+						reserve1: r1,
+					});
+				}
+			}
+		}
+
+		// Series (reservas) y normalización para compartir eje
+		const baseReserveSeriesRaw = points.map((p) => ({
+			x: p.timestamp,
+			y: p.reserve1,
 		}));
-	};
+		const pairReserveSeriesRaw = points.map((p) => ({
+			x: p.timestamp,
+			y: p.reserve0,
+		}));
 
-	const baseReserveSeries = smoothSeries(baseReserveSeriesRaw);
-	const pairReserveSeries = smoothSeries(pairReserveSeriesRaw);
+		const smoothSeries = (series) => {
+			if (series.length <= 1) return series;
+			const values = series.map((s) => s.y).filter((v) => Number.isFinite(v));
+			if (values.length === 0) return series;
+			const maxValue = Math.max(...values.map(Math.abs));
+			if (maxValue === 0) return series;
+			const scaleFactor = 1 / maxValue;
+			return series.map((s) => ({
+				x: s.x,
+				y: s.y * scaleFactor,
+				scaledOriginal: s.y,
+			}));
+		};
+
+		const baseReserveSeries = smoothSeries(baseReserveSeriesRaw);
+		const pairReserveSeries = smoothSeries(pairReserveSeriesRaw);
 
 		const min = points.length > 0 ? points[0].timestamp : null;
+		// Usamos latestTs si existe, así el eje llega hasta el último bloque conocido
 		const max =
 			points.length > 0
-				? Math.max(points[points.length - 1].timestamp, Date.now())
+				? latestTs ?? points[points.length - 1].timestamp
 				: null;
 
 		return {
@@ -219,14 +253,15 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 		!tokenIsToken0 ? tokenSymbol : undefined
 	);
 
-	const priceLabel = tokenIsToken0
-		? `Precio (${token1Symbol}/${token0Symbol})`
-		: `Precio (${token0Symbol}/${token1Symbol})`;
-	const reserve0Label = `Reserva ${token0Symbol}`;
-	const reserve1Label = `Reserva ${token1Symbol}`;
+	const primarySymbol = tokenIsToken0 ? token0Symbol : token1Symbol;
+	const baseSymbol = tokenIsToken0 ? token1Symbol : token0Symbol;
+	const priceLabel = `Precio (${baseSymbol}/${primarySymbol})`;
+	const reservePrimaryLabel = `Reserva ${primarySymbol}`;
+	const reserveBaseLabel = `Reserva ${baseSymbol}`;
 
 	useEffect(() => {
 		if (!canvasRef.current) return;
+
 		if (!dataset || dataset.length === 0) {
 			if (chartRef.current) {
 				chartRef.current.destroy();
@@ -236,6 +271,8 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 		}
 
 		const ctx = canvasRef.current.getContext("2d");
+		if (!ctx) return;
+
 		if (chartRef.current) {
 			chartRef.current.destroy();
 			chartRef.current = null;
@@ -248,10 +285,7 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 					{
 						label: priceLabel,
 						parsing: false,
-						data: dataset.map((entry) => ({
-							x: entry.timestamp,
-							y: entry.price,
-						})),
+						data: dataset.map((d) => ({ x: d.timestamp, y: d.price })),
 						borderColor: "#3b82f6",
 						backgroundColor: "rgba(59, 130, 246, 0.15)",
 						yAxisID: "y",
@@ -260,7 +294,7 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 						spanGaps: true,
 					},
 					{
-						label: reserve0Label,
+						label: reservePrimaryLabel,
 						parsing: false,
 						data: pairReserveSeries,
 						borderColor: "#10b981",
@@ -271,7 +305,7 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 						spanGaps: true,
 					},
 					{
-						label: reserve1Label,
+						label: reserveBaseLabel,
 						parsing: false,
 						data: baseReserveSeries,
 						borderColor: "#f59e0b",
@@ -287,25 +321,20 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 				responsive: true,
 				maintainAspectRatio: false,
 				normalized: true,
-				interaction: {
-					mode: "index",
-					intersect: false,
-				},
+				interaction: { mode: "index", intersect: false },
 				plugins: {
-					legend: {
-						display: true,
-						position: "bottom",
-					},
+					legend: { display: true, position: "bottom" },
 					tooltip: {
 						callbacks: {
 							title: (items) =>
-								items?.[0]?.parsed?.x
-									? formatDateLabel(items[0].parsed.x)
-									: "",
+								items?.[0]?.parsed?.x ? formatDateLabel(items[0].parsed.x) : "",
 							label: (item) => {
 								const decimals = item.dataset.yAxisID === "y" ? 6 : 2;
-								const rawValue = item.raw?.scaledOriginal ?? item.parsed.y;
-								const formatted = formatAxisNumber(rawValue, decimals);
+								const raw =
+									item.raw && item.raw.scaledOriginal != null
+										? item.raw.scaledOriginal
+										: item.parsed.y;
+								const formatted = formatAxisNumber(raw, decimals);
 								return `${item.dataset.label}: ${formatted}`;
 							},
 						},
@@ -318,45 +347,26 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 						min: minTimestamp ?? undefined,
 						max: maxTimestamp ?? undefined,
 						ticks: {
-							callback: (value) => formatDateLabel(value),
+							callback: (val) => formatDateLabel(val),
 							maxTicksLimit: 8,
 						},
-						title: {
-							display: true,
-							text: "Fecha",
-						},
+						title: { display: true, text: "Fecha" },
 					},
 					y: {
 						type: "linear",
 						display: true,
 						position: "left",
-						title: {
-							display: true,
-							text: priceLabel,
-						},
-						grid: {
-							drawOnChartArea: false,
-							drawTicks: false,
-						},
-						ticks: {
-							display: false,
-						},
+						title: { display: true, text: priceLabel },
+						grid: { drawOnChartArea: false, drawTicks: false },
+						ticks: { display: false },
 					},
 					y1: {
 						type: "linear",
 						display: true,
 						position: "right",
-						title: {
-							display: true,
-							text: "Reservas",
-						},
-						grid: {
-							drawOnChartArea: false,
-							drawTicks: false,
-						},
-						ticks: {
-							display: false,
-						},
+						title: { display: true, text: "Reservas" },
+						grid: { drawOnChartArea: false, drawTicks: false },
+						ticks: { display: false },
 					},
 				},
 			},
@@ -373,8 +383,8 @@ const PoolHistoryChart = ({ pairHistory, tokenAddress, tokenSymbol }) => {
 		pairReserveSeries,
 		baseReserveSeries,
 		priceLabel,
-		reserve0Label,
-		reserve1Label,
+		reservePrimaryLabel,
+		reserveBaseLabel,
 		minTimestamp,
 		maxTimestamp,
 	]);

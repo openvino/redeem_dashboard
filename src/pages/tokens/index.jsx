@@ -9,7 +9,7 @@ import HomeLayout from "@/components/HomeLayout";
 const Tokens = () => {
 	const defaultContract = contracts[0] ?? null;
 	const [selectedContract, setSelectedContract] = useState(defaultContract);
-	const { tokenInfo, loading, pairHistoryApiData } =
+	const { tokenInfo, loading, pairHistoryApiData, holdersDetail } =
 		useTokenInformation(selectedContract);
 
 	const onSelectChange = (event) => {
@@ -35,6 +35,7 @@ const Tokens = () => {
 								selectedContract?.contractAddress || null
 							}
 							style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
+							holdersDetail={holdersDetail}
 						/>
 					</div>
 				) : (
