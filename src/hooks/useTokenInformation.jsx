@@ -33,12 +33,9 @@ const resolveProviderUri = (networkKey) => {
 };
 
 const ZERO_ADDRESS = ethers.constants.AddressZero;
-const OPENVINO_API_URL =
-	process.env.NEXT_PUBLIC_OPENVINO_API_URL ||
-	"https://dondetopa.openvino.org";
-const OPENVINO_API_KEY =
-	process.env.NEXT_PUBLIC_OPENVINO_API_KEY ||
-	"59da429f8f8d813a87c035f163ac1c31a436aa0c3f2ca90f47f46e83f3f20693";
+const OPENVINO_API_URL = process.env.NEXT_PUBLIC_OPENVINO_API_URL;
+
+const OPENVINO_API_KEY = process.env.NEXT_PUBLIC_OPENVINO_API_KEY;
 
 const mapNetworkToApiNetwork = (networkKey) => {
 	if (!networkKey) return "base";
@@ -132,11 +129,7 @@ const deriveApiData = ({
 									event.blockTimestampLast
 							) ?? null;
 						return {
-							hash:
-								event.transactionHash ??
-								event.hash ??
-								event.txHash ??
-								null,
+							hash: event.transactionHash ?? event.hash ?? event.txHash ?? null,
 							from: event.from ?? event.sender ?? null,
 							to: event.to ?? event.recipient ?? event.receiver ?? null,
 							value,
@@ -169,7 +162,8 @@ const deriveApiData = ({
 
 	const syncEvents = pairHistory?.events?.syncs ?? [];
 	const reserveMapping = pairHistory?.pair?.reserveMapping ?? {};
-	const token0Meta = pairHistory?.pair?.token0 ?? reserveMapping?.reserve0 ?? {};
+	const token0Meta =
+		pairHistory?.pair?.token0 ?? reserveMapping?.reserve0 ?? {};
 
 	const computeReserve = (entry, key) =>
 		toNumberOrNull(
@@ -432,14 +426,19 @@ const useTokenInformation = (contractMeta) => {
 					}
 				}
 
-				const [baseData, burnedCurrent, legacyBurned, tokenHistory, pairHistory] =
-					await Promise.all([
-						baseDataPromise,
-						burnedCurrentPromise,
-						legacyBurnPromise,
-						tokenHistoryPromise,
-						pairHistoryPromise,
-					]);
+				const [
+					baseData,
+					burnedCurrent,
+					legacyBurned,
+					tokenHistory,
+					pairHistory,
+				] = await Promise.all([
+					baseDataPromise,
+					burnedCurrentPromise,
+					legacyBurnPromise,
+					tokenHistoryPromise,
+					pairHistoryPromise,
+				]);
 
 				if (!isActive) return;
 
@@ -510,8 +509,7 @@ const useTokenInformation = (contractMeta) => {
 				}
 
 				const tokensToBurnValue =
-					effectiveLegacyBurned !== null &&
-					effectiveLegacyBurned !== undefined
+					effectiveLegacyBurned !== null && effectiveLegacyBurned !== undefined
 						? Math.max(effectiveLegacyBurned - (burnedOnChainNumeric || 0), 0)
 						: baseData.tokensToBurn ?? tokenInfo.tokensToBurn ?? null;
 
