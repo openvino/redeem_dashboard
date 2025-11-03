@@ -49,7 +49,7 @@ const Dashboard = () => {
 			</Head>
 			<div>
 				<h1 className=" text-xl font-bold m-2">Redeems</h1>
-				<div className="border rounded-lg overflow-x-scroll custom-scroll">
+				<div className=" overflow-x-scroll custom-scroll">
 					<Table data={data} columnas={columnas} n={50} />
 				</div>
 			</div>
