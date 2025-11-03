@@ -27,11 +27,11 @@ const HomeLayout = ({ children }) => {
 	}, [account]);
 
 	return (
-		<div className="flex min-h-screen">
+		<div className="flex min-h-screen overflow-x-hidden">
 			<Sidebar />
-			<div className="flex flex-col flex-1">
+			<div className="flex flex-col flex-1 min-w-0">
 				<Topbar />
-				<main className="p-4">{children}</main>
+				<main className="p-4 min-w-0 overflow-x-auto">{children}</main>
 			</div>
 		</div>
 	);

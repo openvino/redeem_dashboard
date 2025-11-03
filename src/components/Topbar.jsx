@@ -173,21 +173,21 @@ const Topbar = () => {
 	return (
 		<>
 			{loading && <Loader />}
-			<div className="bg-[#F1EDE2] md:bg-transparent md:px-4 md:py-3">
+			<div className="bg-[#F1EDE2] px-4 md:bg-transparent  md:py-3">
 				<div className="flex flex-col md:flex-row gap-3 ">
-					<div className="hidden md:flex bg-[#F1EDE2] border-[#840c4a]  bg-opacity-70  shadow-xl border  p-4 md:rounded-lg flex-1 ">
+					<div className="hidden md:flex bg-[#F1EDE2]  bg-opacity-70  shadow-xl border  p-4 md:rounded-lg flex-1 ">
 						<div className="flex flex-col w-full  pb-4 text-lg">
 							<p className=" font-bold">{walletBalance} ETH</p>
 							<p className="text-gray-600  text-[16px]">{t("deuda")}</p>
 						</div>
 					</div>
 
-					<div className="w-calc-full-6rem md:w-full bg-[#F1EDE2] border-[#840c4a] bg-opacity-70 md:shadow-xl flex flex-col md:flex-row justify-evenly gap-2 border p-4 rounded-lg items-center flex-1">
-						<div className="flex justify-evenly items-center w-full gap-3 px-2">
+					<div className="w-calc-full-6rem md:w-full bg-[#F1EDE2]  bg-opacity-70 md:shadow-xl flex flex-col md:flex-row justify-evenly gap-2 border p-4 rounded-lg items-center flex-1">
+						<div className="flex justify-evenly items-center w-full gap-1 ">
 							<div>
 								<SidebarMobile />
 							</div>
-							{router.pathname === "/dashboard" && (
+							{/* {router.pathname === "/dashboard" && (
 								<div className="relative inline-block">
 									<FormField
 										type="text"
@@ -208,7 +208,7 @@ const Topbar = () => {
 										<FaSearch className="hidden md:block" />
 									</span>
 								</div>
-							)}
+							)} */}
 
 							<ConnectButton
 								client={client}
@@ -217,7 +217,7 @@ const Topbar = () => {
 									size: "compact",
 									title: "Viniswap",
 									welcomeScreen: {
-										title: "eskere",
+										title: "Connect Wallet",
 										img: "/mtb.png",
 									},
 								}}
@@ -255,10 +255,10 @@ const Topbar = () => {
 							>
 								{profile?.profile_img && (
 									<Image
-										className="rounded-full w-full h-full min-w-[3rem]"
+										className="rounded-full w-full h-full min-w-[2rem]"
 										src={profile?.profile_img}
-										width={30}
-										height={30}
+										width={20}
+										height={20}
 										alt="wineryLogo"
 									/>
 								)}

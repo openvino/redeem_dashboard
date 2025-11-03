@@ -33,170 +33,105 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 	return (
 		<>
 			<div
-				className="overflow-hidden cursor-grab"
 				onMouseDown={handleMouseDown}
 				onMouseMove={handleMouseMove}
 				onMouseUp={handleMouseUp}
 				onMouseLeave={handleMouseUp}
 				style={{ userSelect: "none" }}
 			>
-				<table className="w-full divide-y divide-gray-200 border border-gray-100">
-					<thead>
-						<tr>
-							{columnas?.map((columna) => (
-								<th
-									key={columna.field}
-									onClick={() => handleOrdenarColumna(columna.field)}
-									className={`px-2 py-2 bg-[#840C4A] text-[0.75rem] text-white font-medium tracking-wider text-center cursor-pointer ${
-										columna.field === "acciones" ? "w-12 sm:w-16" : ""
-									}`}
-									style={{ maxWidth: "5rem" }}
-								>
-									<div className="whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal sm:break-words">
-										{columna.title}
-									</div>
-								</th>
-							))}
-						</tr>
-					</thead>
-					<tbody className="text-sm">
-						{orderPagedData().length === 0 ? (
+				<div className="overflow-x-auto">
+					<table className="w-full md:min-w-[960px] divide-y divide-gray-200 border border-gray-100">
+						<thead>
 							<tr>
-								<td
-									colSpan={columnas.length}
-									className="text-center py-4 text-gray-500 italic"
-								>
-									{t("ups_no_hay_nada_aqui")}
-								</td>
+								{columnas?.map((columna) => (
+									<th
+										key={columna.field}
+										onClick={() => handleOrdenarColumna(columna.field)}
+										className={`px-2 py-2 bg-[#840C4A] text-[0.75rem] text-white font-medium tracking-wider text-center cursor-pointer ${
+											columna.field === "acciones" ? "w-12 sm:w-16" : ""
+										}`}
+									>
+										<div className="whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal sm:break-words">
+											{columna.title}
+										</div>
+									</th>
+								))}
 							</tr>
-						) : (
-							orderPagedData().map((fila, index) => (
-								<tr
-									key={index}
-									className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
-								>
-									{columnas?.map((columna) => {
-										if (columna.field === "acciones") {
-											return (
-												<td
-													key={columna.field}
-													className="px-0 py-1 text-[0.75rem] text-gray-900 text-center"
-												>
-													<Link href={`${route}/${fila.id}`}>
-														<div className="inline-flex items-center px-0">
-															{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
-																<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
-															)}
-															{/* Botón de Launch */}
-															{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
-																<Link href={`${route}/${fila.id}`}>
-																	<FaRocket
-																		className="text-gray-400 cursor-pointer hover:text-gray-700"
-																		title="Launch Token"
-																	/>
-																</Link>
-															)}
-
-															{/* Botón de Edit solo en Provisioning */}
-															{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
-																isAdminUser(session) && (
-																	<Link href={`${route}/${fila.id}?edit=true`}>
-																		<FaPencilAlt
+						</thead>
+						<tbody className="text-sm">
+							{orderPagedData().length === 0 ? (
+								<tr>
+									<td
+										colSpan={columnas.length}
+										className="text-center py-4 text-gray-500 italic"
+									>
+										{t("ups_no_hay_nada_aqui")}
+									</td>
+								</tr>
+							) : (
+								orderPagedData().map((fila, index) => (
+									<tr
+										key={index}
+										className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
+									>
+										{columnas?.map((columna) => {
+											if (columna.field === "acciones") {
+												return (
+													<td
+														key={columna.field}
+														className="px-0 py-1 text-[0.75rem] text-gray-900 text-center"
+													>
+														<Link href={`${route}/${fila.id}`}>
+															<div className="inline-flex items-center px-0">
+																{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																	<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
+																)}
+																{/* Botón de Launch */}
+																{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																	<Link href={`${route}/${fila.id}`}>
+																		<FaRocket
 																			className="text-gray-400 cursor-pointer hover:text-gray-700"
-																			title="Edit Token"
+																			title="Launch Token"
 																		/>
 																	</Link>
 																)}
-														</div>
+
+														{/* Botón de Edit solo en Provisioning */}
+														{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
+															isAdminUser(session) && (
+															<Link href={`${route}/${fila.id}?edit=true`}>
+																<FaPencilAlt
+																	className="text-gray-400 cursor-pointer hover:text-gray-700"
+																	title="Edit Token"
+																/>
+															</Link>
+														)}
+													</div>
 													</Link>
 												</td>
 											);
-										}
-										return (
-											<td
-												key={columna.field}
-												className="px-2 py-1 text-[0.9rem] text-gray-900 text-center"
-												style={{
-													maxWidth: "5rem",
-													overflow: "hidden",
-													textOverflow: "ellipsis",
-													whiteSpace: "nowrap",
-												}}
-												onMouseEnter={(e) =>
-													handleMouseEnter(fila[columna.field], e)
-												}
-												onMouseLeave={handleMouseLeave}
-											>
-												<div>
-													{columna.field === "created_at"
-														? new Date(fila[columna.field]).toLocaleDateString(
-																"es-AR"
-														  )
-														: fila[columna.field]}
-												</div>
-											</td>
-										);
-									})}
-								</tr>
-							))
-						)}
-					</tbody>
-
-					{/* <tbody className="text-sm">
-						{orderPagedData().map((fila, index) => (
-							<tr
-								key={index}
-								className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
-							>
-								{columnas?.map((columna) => {
-									if (columna.field === "acciones") {
-										return (
-											<td
-												key={columna.field}
-												className="px-0 py-1 text-[0.75rem] text-gray-900 text-center"
-											>
-												<Link href={`${route}/${fila.id}`}>
-													<div className="inline-flex items-center px-0">
-														{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
-															<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
-														)}
-														{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
-															<FaRocket className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
-														)}
-													</div>
-												</Link>
-											</td>
-										);
-									}
-									return (
-										<td
-											key={columna.field}
-											className="px-2 py-1 text-[0.9rem] text-gray-900 text-center"
-											style={{
-												maxWidth: "5rem",
-												overflow: "hidden",
-												textOverflow: "ellipsis",
-												whiteSpace: "nowrap",
-											}}
-											onMouseEnter={(e) =>
-												handleMouseEnter(fila[columna.field], e)
 											}
-											onMouseLeave={handleMouseLeave}
-										>
-											<div>
-												{columna.field === "created_at"
-													? new Date(fila[columna.field]).toLocaleDateString(
-															"es-AR"
-													  )
-													: fila[columna.field]}
-											</div>
-										</td>
-									);
-								})}
-							</tr>
-						))}
-					</tbody> */}
-				</table>
+											return (
+												<td
+													key={columna.field}
+													className="px-2 py-1 text-[0.9rem] text-gray-900 text-center"
+													onMouseEnter={(e) => handleMouseEnter(fila[columna.field], e)}
+													onMouseLeave={handleMouseLeave}
+												>
+													<div className="whitespace-nowrap">
+														{columna.field === "created_at"
+															? new Date(fila[columna.field]).toLocaleDateString("es-AR")
+															: fila[columna.field]}
+													</div>
+												</td>
+											);
+										})}
+									</tr>
+								))
+							)}
+						</tbody>
+					</table>
+				</div>
 			</div>
 
 			{tooltip.visible && tooltip.content && (
