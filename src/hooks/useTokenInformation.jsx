@@ -277,6 +277,9 @@ const useTokenInformation = (contractMeta) => {
 		legacyBurned: null,
 		vcoSourceNetwork: null,
 		vcoSourceNetworkLabel: null,
+		bottlesStock: null,
+		pendingRedeems: null,
+		last_data_cid: null,
 	});
 
 	const [holdersDetail, setHoldersDetail] = useState([]);
@@ -310,6 +313,16 @@ const useTokenInformation = (contractMeta) => {
 
 		const provider = new ethers.providers.JsonRpcProvider(providerUri);
 		const contract = new ethers.Contract(contractAddress, OVT_ABI, provider);
+		const fetchTokenStock = async (tokenSymbol, chainName) => {
+			if (!tokenSymbol) return null;
+
+			const res = await axios.get("/api/routes/tokensHistoryRoute", {
+				params: { token: tokenSymbol, chain: chainName },
+			});
+			console.log("//////////////////////////////////", res.data[0]);
+
+			return res.data[0] || [];
+		};
 
 		const fetchData = async () => {
 			try {
@@ -327,6 +340,9 @@ const useTokenInformation = (contractMeta) => {
 				const axiosConfig = {
 					headers: axiosHeaders,
 				};
+				const resStock = await fetchTokenStock();
+
+				console.log(resStock);
 
 				const requestPayload = {
 					network: apiNetwork,
@@ -535,6 +551,8 @@ const useTokenInformation = (contractMeta) => {
 					}
 					return baseline;
 				})();
+				const { bottles_stock, pending_redeems, last_data_cid } =
+					await fetchTokenStock(baseData?.symbol, baseData?.network);
 
 				setTokenInfo((prev) => ({
 					...prev,
@@ -580,6 +598,9 @@ const useTokenInformation = (contractMeta) => {
 						prev.vcoSourceNetworkLabel ??
 						NETWORK_CONFIG[effectiveNetwork]?.label ??
 						effectiveNetwork,
+					bottlesStock: bottles_stock,
+					pendingRedeems: pending_redeems,
+					lastDataCid: last_data_cid,
 				}));
 
 				setTransferEvents(apiDerived.events);

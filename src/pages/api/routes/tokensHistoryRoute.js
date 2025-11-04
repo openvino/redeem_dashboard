@@ -3,6 +3,10 @@ import {
 	updateLaunchingToken,
 	createLaunchingToken,
 } from "../controllers/tokensController";
+import {
+	tokensHistory,
+	tokenStock,
+} from "../controllers/tokensHistoryController";
 import tokenVerify from "../helpers/tokenVerify";
 
 export default async function handler(req, res) {
@@ -12,11 +16,14 @@ export default async function handler(req, res) {
 	}
 
 	if (req.method === "GET") {
-		const { winery_id } = req.query;
+		const { token, chain } = req.query;
+		console.log(token, chain);
 
 		try {
-			const tokenInfo = await tokensHistory(winery_id);
-			return res.status(200).json(tokenInfo);
+			const tokenRemainingStock = await tokenStock(token, chain);
+			console.log(tokenRemainingStock);
+
+			return res.status(200).json(tokenRemainingStock);
 		} catch (error) {
 			console.error("Error en GET:", error);
 			return res.status(400).json({ error: error.message });

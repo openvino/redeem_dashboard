@@ -88,14 +88,18 @@ const TokenInfoComponent = ({
 		archived,
 		tokensToBurn,
 		vcoSourceNetworkLabel,
+		bottlesStock,
+		pendingRedeems,
+		lastDataCid,
 	} = tokenInfo;
 
 	const availableSupply = useMemo(() => {
-		const supply = Number(totalSupply) || 0;
-		const pendingBurn = Number(tokensToBurn) || 0;
+		const supply = Number(bottlesStock) || 0;
+		const pendingBurn = Number(pendingRedeems) || 0;
+		const lastData = Number(lastDataCid) || 0;
 		if (pendingBurn <= 0) return supply;
 		return Math.max(supply - pendingBurn, 0);
-	}, [totalSupply, tokensToBurn]);
+	}, [bottlesStock, pendingRedeems]);
 
 	const [sales, setSales] = useState([]);
 	const [loadingSales, setLoadingSales] = useState(false);
