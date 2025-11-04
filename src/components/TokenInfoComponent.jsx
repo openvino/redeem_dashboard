@@ -2,9 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useTranslation } from "react-i18next";
+import { FaPencilAlt } from "react-icons/fa";
 import { VCOPrices, contracts, NETWORK_CONFIG } from "../../contracts";
+import { isAdminUser } from "@/utils/authUtils";
 import PoolHistoryChart from "./PoolHistoryChart";
+import TokenHistoryEditModal from "./TokenHistoryEditModal";
 
 const norm = (s) =>
 	(s || "")
@@ -64,6 +68,7 @@ const TokenInfoComponent = ({
 	selectedContractAddress,
 	pairHistory,
 	holdersDetail,
+	refreshTokenHistory,
 }) => {
 	const { t } = useTranslation();
 
@@ -91,15 +96,8 @@ const TokenInfoComponent = ({
 		bottlesStock,
 		pendingRedeems,
 		lastDataCid,
+		historyRow,
 	} = tokenInfo;
-
-	const availableSupply = useMemo(() => {
-		const supply = Number(bottlesStock) || 0;
-		const pendingBurn = Number(pendingRedeems) || 0;
-		const lastData = Number(lastDataCid) || 0;
-		if (pendingBurn <= 0) return supply;
-		return Math.max(supply - pendingBurn, 0);
-	}, [bottlesStock, pendingRedeems]);
 
 	const [sales, setSales] = useState([]);
 	const [loadingSales, setLoadingSales] = useState(false);
@@ -126,6 +124,161 @@ const TokenInfoComponent = ({
 
 	const [reservesPage, setReservesPage] = useState(1);
 	const [reservesPageSize, setReservesPageSize] = useState(5);
+
+	const session = useSession();
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [historyRecord, setHistoryRecord] = useState(null);
+	const [savingHistory, setSavingHistory] = useState(false);
+
+	const synchronizeNumeric = (value, preserveString = false) => {
+		if (value === null || value === undefined || value === "") return null;
+		if (preserveString) return value;
+		const parsed = Number(value);
+		return Number.isFinite(parsed) ? parsed : value;
+	};
+
+	const applySyncedFields = (record) => {
+		if (!record) return record;
+		const next = { ...record };
+		const syncField = (snake, camel, preserveString = false) => {
+			const candidate =
+				next[snake] !== undefined && next[snake] !== null
+					? next[snake]
+					: next[camel];
+			const normalized = synchronizeNumeric(candidate, preserveString);
+			next[snake] = normalized;
+			next[camel] = normalized;
+		};
+
+		syncField("bottles_stock", "bottlesStock");
+		syncField("pending_redeems", "pendingRedeems");
+		syncField("last_data_cid", "lastDataCid", true);
+
+		return next;
+	};
+
+	const buildHistoryRecordFromRow = (row) => {
+		if (!row) return null;
+		return applySyncedFields({
+			...row,
+			bottlesStock:
+				row?.bottles_stock ?? row?.bottlesStock ?? bottlesStock ?? null,
+			pendingRedeems:
+				row?.pending_redeems ?? row?.pendingRedeems ?? pendingRedeems ?? null,
+			lastDataCid:
+				row?.last_data_cid ?? row?.lastDataCid ?? lastDataCid ?? null,
+		});
+	};
+
+	useEffect(() => {
+		if (historyRow) {
+			setHistoryRecord(buildHistoryRecordFromRow(historyRow));
+		} else {
+			setHistoryRecord(null);
+		}
+	}, [historyRow, bottlesStock, pendingRedeems, lastDataCid]);
+
+	const canEditToken = isAdminUser(session);
+
+	const historySource = useMemo(() => {
+		if (historyRecord) return historyRecord;
+		if (historyRow) {
+			return buildHistoryRecordFromRow(historyRow);
+		}
+		return null;
+	}, [historyRecord, historyRow, bottlesStock, pendingRedeems, lastDataCid]);
+
+	const resolvedBottlesStock =
+		historySource?.bottlesStock ?? historySource?.bottles_stock ?? bottlesStock;
+	const resolvedPendingRedeems =
+		historySource?.pendingRedeems ??
+		historySource?.pending_redeems ??
+		pendingRedeems;
+	const resolvedLastDataCid =
+		historySource?.lastDataCid ?? historySource?.last_data_cid ?? lastDataCid;
+
+	const handleOpenHistoryEdit = () => {
+		if (!historySource) return;
+		setHistoryRecord(applySyncedFields(historySource));
+		setIsEditModalOpen(true);
+	};
+
+	const handleCloseHistoryEdit = () => {
+		if (savingHistory) return;
+		setIsEditModalOpen(false);
+	};
+
+	const handleSaveHistoryEdit = async (values) => {
+		if (!historySource && !historyRecord) return;
+		if (!symbol) {
+			console.warn("Token symbol not available for update");
+			return;
+		}
+
+		const mergedRecord = {
+			...(historySource ?? {}),
+			...values,
+		};
+		const nextRecord = applySyncedFields(mergedRecord);
+
+		const updatesPayload = {
+			bottles_stock: nextRecord?.bottles_stock ?? null,
+			pending_redeems: nextRecord?.pending_redeems ?? null,
+			last_data_cid: nextRecord?.last_data_cid ?? null,
+		};
+
+		const targetChain =
+			historySource?.chain ??
+			historySource?.network ??
+			nextRecord?.chain ??
+			nextRecord?.network ??
+			network ??
+			null;
+
+		setSavingHistory(true);
+
+		try {
+			const response = await axios.patch("/api/routes/tokensHistoryRoute", {
+				token: symbol,
+				chain: targetChain,
+				values: updatesPayload,
+			});
+
+			const updatedRow =
+				response?.data?.record && Object.keys(response.data.record).length
+					? response.data.record
+					: null;
+
+			let refreshedRow = null;
+			if (typeof refreshTokenHistory === "function") {
+				try {
+					refreshedRow = await refreshTokenHistory();
+				} catch (refreshError) {
+					console.error("Failed to refresh token history", refreshError);
+				}
+			}
+
+			const finalRecord = applySyncedFields({
+				...(historySource ?? {}),
+				...nextRecord,
+				...(updatedRow ?? {}),
+				...(refreshedRow ?? {}),
+			});
+			setHistoryRecord(finalRecord);
+			setIsEditModalOpen(false);
+		} catch (error) {
+			console.error("Failed to update token history", error);
+		} finally {
+			setSavingHistory(false);
+		}
+	};
+
+	const displayTokensValue =
+		totalSupply != null ? totalSupply : tokenInfo?.totalSupply;
+	const displayBottlesValue =
+		resolvedBottlesStock != null ? resolvedBottlesStock : totalSupply;
+	const displayPendingRedeemsValue =
+		resolvedPendingRedeems != null ? resolvedPendingRedeems : tokensToBurn;
 
 	const sumAmounts = (rows = []) =>
 		rows.reduce((acc, r) => acc + Number(r.amount || 0), 0);
@@ -714,7 +867,19 @@ const TokenInfoComponent = ({
 						className="w-20 h-20 object-contain"
 					/>
 					<div>
-						<h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+						<div className="flex items-center gap-2">
+							<h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+							{canEditToken && historySource && (
+								<button
+									type="button"
+									onClick={handleOpenHistoryEdit}
+									className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-600 transition hover:border-[#840C4A] hover:text-[#840C4A]"
+									title="Edit token data"
+								>
+									<FaPencilAlt className="h-3.5 w-3.5" />
+								</button>
+							)}
+						</div>
 						<p className="text-gray-600 uppercase tracking-wide">{symbol}</p>
 						{networkDisplay && (
 							<span className="inline-flex items-center gap-2 text-xs font-medium text-gray-600 uppercase">
@@ -750,19 +915,23 @@ const TokenInfoComponent = ({
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-				{[
-					{ label: t("token_issuance"), value: availableSupply },
-					{
-						label: t("bottles_remaining"),
-						value: archived ? totalSupply : availableSupply,
-					},
-					{ label: "REDEEMS", value: burnedTokens },
-					!archived && tokensToBurn !== null && tokensToBurn !== undefined
-						? { label: "REDEEMS LEGADOS PENDIENTES", value: tokensToBurn }
-						: null,
-				]
-					.filter(Boolean)
-					.map((card) => (
+		{[
+			{ label: t("token_issuance"), value: displayTokensValue },
+			{
+				label: t("bottles_remaining"),
+				value: displayBottlesValue,
+			},
+			{ label: "REDEEMS", value: burnedTokens },
+			displayPendingRedeemsValue !== null &&
+			displayPendingRedeemsValue !== undefined
+				? {
+					label: "REDEEMS LEGADOS PENDIENTES",
+					value: displayPendingRedeemsValue,
+				}
+				: null,
+		]
+			.filter(Boolean)
+			.map((card) => (
 						<div
 							key={card.label}
 							className="bg-white/70 rounded-lg p-4 shadow-sm flex flex-col gap-1"
@@ -1211,6 +1380,14 @@ const TokenInfoComponent = ({
 						))}
 				</div>
 			</div>
+			<TokenHistoryEditModal
+				open={isEditModalOpen}
+				onClose={handleCloseHistoryEdit}
+				onSubmit={handleSaveHistoryEdit}
+				record={historyRecord ?? historySource ?? {}}
+				editableFields={["bottles_stock", "pending_redeems", "last_data_cid"]}
+				isSubmitting={savingHistory}
+			/>
 		</div>
 	);
 };

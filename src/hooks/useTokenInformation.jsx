@@ -279,7 +279,8 @@ const useTokenInformation = (contractMeta) => {
 		vcoSourceNetworkLabel: null,
 		bottlesStock: null,
 		pendingRedeems: null,
-		last_data_cid: null,
+		lastDataCid: null,
+		historyRow: null,
 	});
 
 	const [holdersDetail, setHoldersDetail] = useState([]);
@@ -287,6 +288,21 @@ const useTokenInformation = (contractMeta) => {
 	const [priceHistory, setPriceHistory] = useState([]);
 	const [tokenHistoryApiData, setTokenHistoryApiData] = useState(null);
 	const [pairHistoryApiData, setPairHistoryApiData] = useState(null);
+
+	const fetchTokenStockRow = useCallback(async (tokenSymbol, chainName) => {
+		if (!tokenSymbol) return null;
+		try {
+			const res = await axios.get("/api/routes/tokensHistoryRoute", {
+				params: { token: tokenSymbol, chain: chainName },
+			});
+			return Array.isArray(res.data) && res.data.length > 0
+				? res.data[0]
+				: null;
+		} catch (error) {
+			console.error("Failed to fetch token history row", error);
+			return null;
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!contractAddress) return;
@@ -313,16 +329,6 @@ const useTokenInformation = (contractMeta) => {
 
 		const provider = new ethers.providers.JsonRpcProvider(providerUri);
 		const contract = new ethers.Contract(contractAddress, OVT_ABI, provider);
-		const fetchTokenStock = async (tokenSymbol, chainName) => {
-			if (!tokenSymbol) return null;
-
-			const res = await axios.get("/api/routes/tokensHistoryRoute", {
-				params: { token: tokenSymbol, chain: chainName },
-			});
-			console.log("//////////////////////////////////", res.data[0]);
-
-			return res.data[0] || [];
-		};
 
 		const fetchData = async () => {
 			try {
@@ -340,9 +346,6 @@ const useTokenInformation = (contractMeta) => {
 				const axiosConfig = {
 					headers: axiosHeaders,
 				};
-				const resStock = await fetchTokenStock();
-
-				console.log(resStock);
 
 				const requestPayload = {
 					network: apiNetwork,
@@ -551,8 +554,15 @@ const useTokenInformation = (contractMeta) => {
 					}
 					return baseline;
 				})();
-				const { bottles_stock, pending_redeems, last_data_cid } =
-					await fetchTokenStock(baseData?.symbol, baseData?.network);
+				const stockRow = await fetchTokenStockRow(
+					baseData?.symbol,
+					baseData?.network
+				);
+				const {
+					bottles_stock,
+					pending_redeems,
+					last_data_cid,
+				} = stockRow ?? {};
 
 				setTokenInfo((prev) => ({
 					...prev,
@@ -601,6 +611,7 @@ const useTokenInformation = (contractMeta) => {
 					bottlesStock: bottles_stock,
 					pendingRedeems: pending_redeems,
 					lastDataCid: last_data_cid,
+					historyRow: stockRow,
 				}));
 
 				setTransferEvents(apiDerived.events);
@@ -625,7 +636,13 @@ const useTokenInformation = (contractMeta) => {
 		return () => {
 			isActive = false;
 		};
-	}, [contractAddress, contractPairAddress, contractMeta, archivedFlag]);
+	}, [
+		contractAddress,
+		contractPairAddress,
+		contractMeta,
+		archivedFlag,
+		fetchTokenStockRow,
+	]);
 
 	const knownAddresses = useMemo(
 		() => ({
@@ -680,6 +697,30 @@ const useTokenInformation = (contractMeta) => {
 		tokenInfo.vcoEndDate,
 	]);
 
+	const tokenSymbol = tokenInfo?.symbol;
+	const tokenNetwork = tokenInfo?.network;
+
+	const refreshTokenHistory = useCallback(async () => {
+		if (!tokenSymbol) return null;
+		const row = await fetchTokenStockRow(tokenSymbol, tokenNetwork);
+		setTokenInfo((prev) => {
+			if (!row) {
+				return {
+					...prev,
+					historyRow: row,
+				};
+			}
+			return {
+				...prev,
+				bottlesStock: row.bottles_stock ?? prev.bottlesStock,
+				pendingRedeems: row.pending_redeems ?? prev.pendingRedeems,
+				lastDataCid: row.last_data_cid ?? prev.lastDataCid,
+				historyRow: row,
+			};
+		});
+		return row;
+	}, [fetchTokenStockRow, tokenSymbol, tokenNetwork]);
+
 	return {
 		tokenInfo,
 		loading,
@@ -692,6 +733,7 @@ const useTokenInformation = (contractMeta) => {
 		getTokensSoldForYear,
 		tokensSoldDuringVco,
 		knownAddresses,
+		refreshTokenHistory,
 	};
 };
 

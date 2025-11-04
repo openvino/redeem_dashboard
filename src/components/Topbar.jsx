@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { FaSearch } from "react-icons/fa";
 import { useState, useRef } from "react";
@@ -58,6 +58,13 @@ const Topbar = () => {
 	const showModal = useSelector((state) => state.notification.showModal);
 	const [loading, setLoading] = useState(false);
 	const [walletBalance, setWalletBalance] = useState(0);
+	const formattedWalletBalance = useMemo(() => {
+		const numeric = Number(walletBalance);
+		if (!Number.isFinite(numeric)) {
+			return walletBalance ?? "--";
+		}
+		return numeric.toFixed(6);
+	}, [walletBalance]);
 
 	const reloadRedeems = () => {
 		dispatch(getRedeems(session.data.is_admin));
@@ -175,9 +182,9 @@ const Topbar = () => {
 			{loading && <Loader />}
 			<div className="bg-[#F1EDE2] px-4 md:bg-transparent  md:py-3">
 				<div className="flex flex-col md:flex-row gap-3 ">
-					<div className="hidden md:flex bg-[#F1EDE2]  bg-opacity-70  shadow-xl border  p-4 md:rounded-lg flex-1 ">
+					<div className="hidden px-16 md:flex bg-[#F1EDE2]  bg-opacity-70  shadow-xl border  p-4 md:rounded-lg flex-1 ">
 						<div className="flex flex-col w-full  pb-4 text-lg">
-							<p className=" font-bold">{walletBalance} ETH</p>
+							<p className=" font-bold">{formattedWalletBalance} ETH</p>
 							<p className="text-gray-600  text-[16px]">{t("deuda")}</p>
 						</div>
 					</div>

@@ -6,6 +6,7 @@ import {
 import {
 	tokensHistory,
 	tokenStock,
+	updateTokenHistory,
 } from "../controllers/tokensHistoryController";
 import tokenVerify from "../helpers/tokenVerify";
 
@@ -15,14 +16,55 @@ export default async function handler(req, res) {
 		return res.status(401).json("INVALID CREDENTIALS");
 	}
 
+	if (req.method === "PATCH") {
+		try {
+			const { token, chain, values = {} } = req.body ?? {};
+			if (!token) {
+				return res.status(400).json({ error: "token is required" });
+			}
+
+			const fieldMap = {
+				bottlesStock: "bottles_stock",
+				bottles_stock: "bottles_stock",
+				pendingRedeems: "pending_redeems",
+				pending_redeems: "pending_redeems",
+				lastDataCid: "last_data_cid",
+				last_data_cid: "last_data_cid",
+			};
+
+			const updates = {};
+			const source = { ...values };
+
+			for (const [key, mapped] of Object.entries(fieldMap)) {
+				const value =
+					source[key] !== undefined
+						? source[key]
+						: req.body?.[key] !== undefined
+						? req.body[key]
+						: undefined;
+				if (value !== undefined) {
+					updates[mapped] = value;
+				}
+			}
+
+			const updatedRow = await updateTokenHistory({
+				symbol: token,
+				chain,
+				updates,
+			});
+
+			return res.status(200).json({ success: true, record: updatedRow });
+		} catch (error) {
+			console.error("Error en PATCH:", error);
+			return res.status(400).json({ error: error.message });
+		}
+	}
+
 	if (req.method === "GET") {
 		const { token, chain } = req.query;
-		console.log(token, chain);
 
 		try {
 			const tokenRemainingStock = await tokenStock(token, chain);
-			console.log(tokenRemainingStock);
-
 			return res.status(200).json(tokenRemainingStock);
 		} catch (error) {
 			console.error("Error en GET:", error);
