@@ -182,7 +182,7 @@ const Topbar = () => {
 						</div>
 					</div>
 
-					<div className="px-8 md:px-20 w-calc-full-6rem md:w-full bg-[#F1EDE2]  bg-opacity-70 md:shadow-xl flex flex-col gap-1 border p-2 md:p-4 rounded-lg items-center flex-1 md:flex-row md:items-center md:justify-between">
+					<div className="px-8 md:px-20 w-calc-full-6rem md:w-full bg-[#F1EDE2]  bg-opacity-70 shadow-xl flex flex-col gap-1 border p-2 md:p-4 rounded-lg items-center flex-1 md:flex-row md:items-center md:justify-between">
 						<div className="flex w-full items-center justify-between gap-3 md:w-auto md:justify-start">
 							<SidebarMobile />
 
