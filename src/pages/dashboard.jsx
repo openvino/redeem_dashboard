@@ -50,7 +50,12 @@ const Dashboard = () => {
 			<div>
 				<h1 className=" text-xl font-bold m-2">Redeems</h1>
 				<div className=" overflow-x-scroll custom-scroll">
-					<Table data={data} columnas={columnas} n={50} />
+					<Table
+						data={data}
+						columnas={columnas}
+						n={50}
+						copyExcludedFields={["shipping_paid_status", "pickup"]}
+					/>
 				</div>
 			</div>
 		</HomeLayout>

@@ -20,7 +20,13 @@ import { isAdminUser } from "@/utils/authUtils";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 
-const Table = ({ data, columnas, n, route = "/detail" }) => {
+const Table = ({
+	data,
+	columnas,
+	n,
+	route = "/detail",
+	copyExcludedFields = [],
+}) => {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const showModal = useSelector((state) => state.notification.showModal);
@@ -107,6 +113,13 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 		},
 		[handleTouchStart, isInteractiveElement]
 	);
+	const copyExcludedFieldSet = useMemo(() => {
+		const fromColumns =
+			columnas
+				?.filter((col) => col && col.disableCopy)
+				.map((col) => col.field) ?? [];
+		return new Set([...(copyExcludedFields ?? []), ...fromColumns]);
+	}, [columnas, copyExcludedFields]);
 
 	useEffect(() => {
 		setActiveFilterColumn(defaultFilterColumn);
@@ -205,7 +218,21 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 			return;
 		}
 
-		const normalizeCsvValue = (value) => {
+		const normalizeCsvValue = (value, field) => {
+			if (copyExcludedFieldSet.has(field)) {
+				if (React.isValidElement(value)) {
+					if (value.type === FaCheck)
+						return t("tabla_si", { defaultValue: "Sí" });
+					if (value.type === IoMdClose)
+						return t("tabla_no", { defaultValue: "No" });
+					return "";
+				}
+				if (typeof value === "boolean") {
+					return value
+						? t("tabla_si", { defaultValue: "Sí" })
+						: t("tabla_no", { defaultValue: "No" });
+				}
+			}
 			if (value == null) return "";
 			if (React.isValidElement(value)) {
 				if (value.type === FaCheck) return t("tabla_si", { defaultValue: "Sí" });
@@ -245,7 +272,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 					const value =
 						col.field === "created_at"
 							? new Date(cell).toLocaleDateString("es-AR")
-							: normalizeCsvValue(cell);
+							: normalizeCsvValue(cell, col.field);
 					const str = String(value);
 					return str.includes(",") || str.includes('"')
 						? `"${str.replace(/"/g, '""')}"`
@@ -274,7 +301,7 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 				defaultValue: "Archivo CSV exportado con éxito",
 			})
 		);
-	}, [columnas, selectedRowsData, t]);
+	}, [columnas, selectedRowsData, t, copyExcludedFieldSet]);
 
 	const handleClearFilters = useCallback(() => {
 		clearFilters();
@@ -573,6 +600,13 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 														: fila[columna.field];
 												const cellKey = `${rowId}-${columna.field}`;
 												const isCopied = copiedCellKey === cellKey;
+												const isCopyAllowed =
+													!copyExcludedFieldSet.has(columna.field) &&
+													cellValue != null &&
+													cellValue !== "" &&
+													!React.isValidElement(
+														fila[columna.field]
+													);
 
 													return (
 														<td
@@ -584,12 +618,12 @@ const Table = ({ data, columnas, n, route = "/detail" }) => {
 																<span className="flex-1 truncate text-center">
 																	{cellValue ?? "-"}
 																</span>
-																{cellValue != null && cellValue !== "" && (
+																{isCopyAllowed && (
 																	<button
 																		type="button"
-																	onClick={() =>
-																		handleCopyValue(cellValue, cellKey)
-																	}
+																		onClick={() =>
+																			handleCopyValue(cellValue, cellKey)
+																		}
 																	className="opacity-0 transition-opacity duration-150 group-hover:opacity-100 text-gray-400 hover:text-gray-600"
 																	title={t("tabla_copiar", {
 																		defaultValue: "Copiar contenido",
