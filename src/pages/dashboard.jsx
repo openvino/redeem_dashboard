@@ -8,12 +8,7 @@ import { getRedeems } from "@/redux/actions/winaryActions";
 import { useTranslation } from "react-i18next";
 import { getCountries, getProvinces } from "../redux/actions/winaryActions";
 import HomeLayout from "@/components/HomeLayout";
-import {
-	buildColumnas,
-	columnas,
-	countryAndProvinceNames,
-	filterData,
-} from "@/utils";
+import { buildColumns, countryAndProvinceNames, filterData } from "@/utils";
 let flag = true;
 
 const Dashboard = () => {
@@ -22,7 +17,7 @@ const Dashboard = () => {
 	const filters = useSelector((state) => state.filter);
 	const countries = useSelector((state) => state.winaryAdress.countries);
 	const provinces = useSelector((state) => state.winaryAdress.provinces);
-	const columnas = buildColumnas(t);
+	const columns = buildColumns(t);
 
 	useEffect(() => {
 		if (session.status === "authenticated" && flag) {
@@ -52,7 +47,7 @@ const Dashboard = () => {
 				<div className=" overflow-x-scroll custom-scroll">
 					<Table
 						data={data}
-						columnas={columnas}
+						columns={columns}
 						n={50}
 						copyExcludedFields={["shipping_paid_status", "pickup"]}
 					/>

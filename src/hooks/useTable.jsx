@@ -84,11 +84,11 @@ export function useTable(
 		setSelectedRowIds(new Set());
 	}, [data]);
 
-	const handleOrdenarColumna = (columna) => {
-		if (columnOrder === columna) {
+	const handleSortColumn = (column) => {
+		if (columnOrder === column) {
 			setAscOrder(!ascOrder);
 		} else {
-			setColumnOrder(columna);
+			setColumnOrder(column);
 			setAscOrder(true);
 		}
 	};
@@ -187,7 +187,7 @@ export function useTable(
 		setCurrentPage(page);
 	};
 
-	const renderbuttonsPages = () => {
+	const renderPageButtons = () => {
 		const buttons = [];
 		const start = Math.max(currentPage - 4, 1);
 		const end = Math.min(currentPage + 4, totalPages);
@@ -272,7 +272,7 @@ export function useTable(
 
 	const handleClickTooltip = (content) => {
 		navigator.clipboard.writeText(content);
-		toast.success(`Contenido copiado: ${content}`);
+		toast.success(`Content copied: ${content}`);
 	};
 
 	const handleShowTooltip = () => {
@@ -422,9 +422,9 @@ export function useTable(
 		handleTouchStart,
 		handleTouchMove,
 		handleTouchEnd,
-		handleOrdenarColumna,
+		handleSortColumn,
 		orderPagedData,
-		renderbuttonsPages,
+		renderPageButtons,
 		filters,
 		setFilterValue,
 		clearFilters,

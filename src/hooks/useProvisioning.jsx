@@ -9,7 +9,7 @@ const useProvisioning = () => {
 	const rows = [
 		{
 			title: t("action"),
-			field: "acciones",
+			field: "actions",
 		},
 		{
 			title: t("token_symbol"),

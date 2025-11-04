@@ -139,5 +139,19 @@
 	"finalize_failed": "Finalize failed",
 	"update_crowdsale": "Update Crowdsale",
 	"ventas": "Sales",
-	"Settings:": "Settings:"
+	"Settings:": "Settings:",
+	"tabla_filtrar_por": "Filter by",
+	"tabla_filtrar_placeholder": "Type to filter",
+	"tabla_limpiar": "Clear",
+	"tabla_resultados": "Results",
+	"tabla_seleccionados": "Selected",
+	"tabla_exportar_csv": "Export CSV",
+	"tabla_nada_para_copiar": "Nothing to copy",
+	"tabla_copiado": "Value copied to clipboard",
+	"tabla_error_copiar": "Unable to copy value",
+	"tabla_selecciona_para_exportar": "Select at least one record",
+	"tabla_si": "Yes",
+	"tabla_no": "No",
+	"tabla_exportacion_ok": "CSV exported successfully",
+	"tabla_copiar": "Copy content"
 }

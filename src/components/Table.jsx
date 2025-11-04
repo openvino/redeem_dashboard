@@ -22,28 +22,34 @@ import { toast } from "react-toastify";
 
 const Table = ({
 	data,
-	columnas,
+	columns,
 	n,
 	route = "/detail",
 	copyExcludedFields = [],
 }) => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const router = useRouter();
 	const showModal = useSelector((state) => state.notification.showModal);
 	const session = useSession();
+	const currentLanguage = i18n?.language ?? "";
+	const resolvedDateLocale = useMemo(() => {
+		if (!currentLanguage) return undefined;
+		if (currentLanguage.startsWith("es")) return "es-AR";
+		return currentLanguage;
+	}, [currentLanguage]);
 
 	const defaultFilterColumn = useMemo(
 		() =>
-			columnas?.find((col) => col.field && col.field !== "acciones")?.field ??
-			columnas?.[0]?.field ??
+			columns?.find((col) => col.field && col.field !== "actions")?.field ??
+			columns?.[0]?.field ??
 			"",
-		[columnas]
+		[columns]
 	);
 	const rowIdAccessor = useCallback(
 		(row, index) => {
 			if (row?.id != null) return String(row.id);
-			const firstRelevant = columnas?.find(
-				(col) => col.field && col.field !== "acciones"
+			const firstRelevant = columns?.find(
+				(col) => col.field && col.field !== "actions"
 			);
 			if (firstRelevant) {
 				const value = row?.[firstRelevant.field];
@@ -51,7 +57,7 @@ const Table = ({
 			}
 			return `row-${index}`;
 		},
-		[columnas]
+		[columns]
 	);
 
 	const {
@@ -62,9 +68,9 @@ const Table = ({
 		handleTouchStart,
 		handleTouchMove,
 		handleTouchEnd,
-		renderbuttonsPages,
+		renderPageButtons,
 		orderPagedData,
-		handleOrdenarColumna,
+		handleSortColumn,
 		filters,
 		setFilterValue,
 		clearFilters,
@@ -78,10 +84,10 @@ const Table = ({
 		isDragging,
 	} = useTable({
 		data,
-		columns: columnas ?? [],
+		columns: columns ?? [],
 		elementsPerPage: n,
 		rowIdAccessor,
-		defaultOrder: columnas?.[0]?.field,
+		defaultOrder: columns?.[0]?.field,
 	});
 
 	const [activeFilterColumn, setActiveFilterColumn] =
@@ -115,29 +121,42 @@ const Table = ({
 	);
 	const copyExcludedFieldSet = useMemo(() => {
 		const fromColumns =
-			columnas
+			columns
 				?.filter((col) => col && col.disableCopy)
 				.map((col) => col.field) ?? [];
 		return new Set([...(copyExcludedFields ?? []), ...fromColumns]);
-	}, [columnas, copyExcludedFields]);
+	}, [columns, copyExcludedFields]);
+	const formatDateCell = useCallback(
+		(value) => {
+			if (!value) return null;
+			const date = new Date(value);
+			if (Number.isNaN(date.getTime())) return null;
+			try {
+				return date.toLocaleDateString(resolvedDateLocale ?? undefined);
+			} catch {
+				return date.toLocaleDateString();
+			}
+		},
+		[resolvedDateLocale]
+	);
 
 	useEffect(() => {
 		setActiveFilterColumn(defaultFilterColumn);
 	}, [defaultFilterColumn]);
 
 	useEffect(() => {
-		if (!columnas) {
+		if (!columns) {
 			setColumnWidths([]);
 			return;
 		}
 		setColumnWidths((prev) =>
-			columnas.map((col, idx) => {
+			columns.map((col, idx) => {
 				if (prev && typeof prev[idx] === "number") return prev[idx];
-				if (col.field === "acciones") return 100;
+				if (col.field === "actions") return 100;
 				return 160;
 			})
 		);
-	}, [columnas]);
+	}, [columns]);
 
 	useEffect(() => {
 		return () => {
@@ -169,7 +188,7 @@ const Table = ({
 		(value, key) => {
 			if (value == null || value === "") {
 				toast.info(
-					t("tabla_nada_para_copiar", { defaultValue: "Nada para copiar" })
+					t("tabla_nada_para_copiar", { defaultValue: "Nothing to copy" })
 				);
 				return;
 			}
@@ -185,14 +204,14 @@ const Table = ({
 					}, 1200);
 					toast.success(
 						t("tabla_copiado", {
-							defaultValue: "Valor copiado al portapapeles",
+							defaultValue: "Value copied to clipboard",
 						})
 					);
 				})
 				.catch(() => {
 					toast.error(
 						t("tabla_error_copiar", {
-							defaultValue: "No se pudo copiar el valor",
+							defaultValue: "Unable to copy value",
 						})
 					);
 				});
@@ -212,30 +231,34 @@ const Table = ({
 		if (!selectedRowsData.length) {
 			toast.info(
 				t("tabla_selecciona_para_exportar", {
-					defaultValue: "Seleccioná al menos un registro",
+					defaultValue: "Select at least one record",
 				})
 			);
 			return;
 		}
 
 		const normalizeCsvValue = (value, field) => {
+			if (field === "created_at") {
+				const formattedDate = formatDateCell(value);
+				return formattedDate ?? "";
+			}
 			if (copyExcludedFieldSet.has(field)) {
 				if (React.isValidElement(value)) {
 					if (value.type === FaCheck)
-						return t("tabla_si", { defaultValue: "Sí" });
+						return t("tabla_si", { defaultValue: "Yes" });
 					if (value.type === IoMdClose)
 						return t("tabla_no", { defaultValue: "No" });
 					return "";
 				}
 				if (typeof value === "boolean") {
 					return value
-						? t("tabla_si", { defaultValue: "Sí" })
+						? t("tabla_si", { defaultValue: "Yes" })
 						: t("tabla_no", { defaultValue: "No" });
 				}
 			}
 			if (value == null) return "";
 			if (React.isValidElement(value)) {
-				if (value.type === FaCheck) return t("tabla_si", { defaultValue: "Sí" });
+				if (value.type === FaCheck) return t("tabla_si", { defaultValue: "Yes" });
 				if (value.type === IoMdClose)
 					return t("tabla_no", { defaultValue: "No" });
 				const childText = value.props?.children;
@@ -246,7 +269,7 @@ const Table = ({
 			}
 			if (typeof value === "boolean") {
 				return value
-					? t("tabla_si", { defaultValue: "Sí" })
+					? t("tabla_si", { defaultValue: "Yes" })
 					: t("tabla_no", { defaultValue: "No" });
 			}
 			if (typeof value === "object") {
@@ -259,21 +282,18 @@ const Table = ({
 			return String(value);
 		};
 
-		const headers = columnas
-			.filter((col) => col.field !== "acciones")
+		const headers = columns
+			.filter((col) => col.field !== "actions")
 			.map((col) => col.title ?? col.field);
 
 		const rows = selectedRowsData.map((row) =>
-			columnas
-				.filter((col) => col.field !== "acciones")
+			columns
+				.filter((col) => col.field !== "actions")
 				.map((col) => {
 					const cell = row?.[col.field];
-					if (cell == null) return "";
-					const value =
-						col.field === "created_at"
-							? new Date(cell).toLocaleDateString("es-AR")
-							: normalizeCsvValue(cell, col.field);
-					const str = String(value);
+					const value = normalizeCsvValue(cell, col.field);
+					const normalized = value ?? "";
+					const str = String(normalized);
 					return str.includes(",") || str.includes('"')
 						? `"${str.replace(/"/g, '""')}"`
 						: str;
@@ -298,10 +318,10 @@ const Table = ({
 		URL.revokeObjectURL(url);
 		toast.success(
 			t("tabla_exportacion_ok", {
-				defaultValue: "Archivo CSV exportado con éxito",
+				defaultValue: "CSV exported successfully",
 			})
 		);
-	}, [columnas, selectedRowsData, t, copyExcludedFieldSet]);
+	}, [columns, selectedRowsData, t, copyExcludedFieldSet, formatDateCell]);
 
 	const handleClearFilters = useCallback(() => {
 		clearFilters();
@@ -369,18 +389,18 @@ const Table = ({
 			<div className=" mb-4 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-wrap items-center gap-2">
 					<label className="text-gray-600">
-						{t("tabla_filtrar_por", { defaultValue: "Filtrar por" })}
+						{t("tabla_filtrar_por", { defaultValue: "Filter by" })}
 					</label>
 					<select
 						className="rounded border border-gray-300 px-2 py-1"
 						value={activeFilterColumn}
 						onChange={(e) => setActiveFilterColumn(e.target.value)}
 					>
-						{columnas
-							?.filter((col) => col.field !== "acciones")
-							.map((columna) => (
-								<option key={columna.field} value={columna.field}>
-									{columna.title}
+						{columns
+							?.filter((col) => col.field !== "actions")
+							.map((column) => (
+								<option key={column.field} value={column.field}>
+									{column.title}
 								</option>
 							))}
 					</select>
@@ -388,7 +408,7 @@ const Table = ({
 						type="text"
 						className="rounded border border-gray-300 px-2 py-1"
 						placeholder={t("tabla_filtrar_placeholder", {
-							defaultValue: "Escribí para filtrar",
+							defaultValue: "Type to filter",
 						})}
 						value={filterValue}
 						onChange={(e) =>
@@ -401,17 +421,17 @@ const Table = ({
 						className="rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300"
 						onClick={handleClearFilters}
 					>
-						{t("tabla_limpiar", { defaultValue: "Limpiar" })}
+						{t("tabla_limpiar", { defaultValue: "Clear" })}
 					</button>
 					<span className="text-gray-500">
-						{t("tabla_resultados", { defaultValue: "Resultados" })}:{" "}
+						{t("tabla_resultados", { defaultValue: "Results" })}:{" "}
 						{filteredData.length}
 					</span>
 				</div>
 
 				<div className="flex items-center gap-2">
 					<span className="text-gray-600">
-						{t("tabla_seleccionados", { defaultValue: "Seleccionados" })}:{" "}
+						{t("tabla_seleccionados", { defaultValue: "Selected" })}:{" "}
 						{selectedRowsData.length}
 					</span>
 					<button
@@ -420,7 +440,7 @@ const Table = ({
 						onClick={handleExportCsv}
 						disabled={!selectedRowsData.length}
 					>
-						{t("tabla_exportar_csv", { defaultValue: "Exportar CSV" })}
+						{t("tabla_exportar_csv", { defaultValue: "Export CSV" })}
 					</button>
 				</div>
 			</div>
@@ -432,7 +452,7 @@ const Table = ({
 							key={field}
 							className="inline-flex items-center gap-1 rounded bg-gray-200 px-2 py-1"
 						>
-							{columnas.find((col) => col.field === field)?.title ?? field}
+							{columns.find((col) => col.field === field)?.title ?? field}
 							<span className="font-semibold">=</span>
 							{value}
 						</span>
@@ -472,17 +492,17 @@ const Table = ({
 										className="h-4 w-4 cursor-pointer"
 									/>
 								</th>
-								{columnas?.map((columna, colIndex) => {
+								{columns?.map((column, colIndex) => {
 									const columnWidth =
 										typeof columnWidths[colIndex] === "number"
 											? columnWidths[colIndex]
 											: 160;
 									return (
 										<th
-											key={columna.field}
-											onClick={() => handleOrdenarColumna(columna.field)}
+											key={column.field}
+											onClick={() => handleSortColumn(column.field)}
 											className={`relative px-2 py-2 bg-[#840C4A] text-[0.75rem] text-white font-medium tracking-wider text-center cursor-pointer select-none border-r border-white/20 last:border-r-0 ${
-												columna.field === "acciones" ? "w-12 sm:w-16" : ""
+												column.field === "actions" ? "w-12 sm:w-16" : ""
 											}`}
 											style={{
 												width: `${columnWidth}px`,
@@ -491,7 +511,7 @@ const Table = ({
 											}}
 										>
 											<div className="whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal sm:break-words">
-												{columna.title}
+												{column.title}
 											</div>
 											<span
 												onMouseDown={(event) =>
@@ -511,29 +531,29 @@ const Table = ({
 							{!hasRows ? (
 								<tr>
 									<td
-										colSpan={(columnas?.length ?? 0) + 1}
+										colSpan={(columns?.length ?? 0) + 1}
 										className="text-center py-4 text-gray-500 italic"
 									>
 										{t("ups_no_hay_nada_aqui")}
 									</td>
 								</tr>
 							) : (
-								paginatedRows.map((fila, rowIndex) => {
+								paginatedRows.map((row, rowIndex) => {
 									const globalIndex =
 										(Math.max(currentPage, 1) - 1) * pageSize + rowIndex;
-									const rowId = rowIdAccessor(fila, globalIndex);
+									const rowId = rowIdAccessor(row, globalIndex);
 									return (
-											<tr
-												key={rowId}
-												className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-100"}
-											>
-												<td
-													className="px-2 py-1 text-center border-r border-gray-200 overflow-hidden"
-													style={{
-														width: "48px",
-														minWidth: "48px",
-														maxWidth: "48px",
-													}}
+										<tr
+											key={rowId}
+											className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-100"}
+										>
+											<td
+												className="px-2 py-1 text-center border-r border-gray-200 overflow-hidden"
+												style={{
+													width: "48px",
+													minWidth: "48px",
+													maxWidth: "48px",
+												}}
 											>
 												<input
 													type="checkbox"
@@ -542,7 +562,7 @@ const Table = ({
 													onChange={() => toggleRowSelection(rowId)}
 												/>
 											</td>
-											{columnas?.map((columna, colIndex) => {
+											{columns?.map((column, colIndex) => {
 												const columnWidth =
 													typeof columnWidths[colIndex] === "number"
 														? columnWidths[colIndex]
@@ -552,23 +572,21 @@ const Table = ({
 													minWidth: `${columnWidth}px`,
 													maxWidth: `${columnWidth}px`,
 												};
-													if (columna.field === "acciones") {
-														return (
-															<td
-																key={`${rowId}-${columna.field}`}
-																className="px-0 py-1 text-[0.75rem] text-gray-900 text-center border-r border-gray-200 last:border-r-0 overflow-hidden"
-																style={widthStyle}
-															>
-																<div className="inline-flex items-center justify-center gap-2">
-																{route !==
-																	ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
-																	<Link href={`${route}/${fila.id}`}>
+												if (column.field === "actions") {
+													return (
+														<td
+															key={`${rowId}-${column.field}`}
+															className="px-0 py-1 text-[0.75rem] text-gray-900 text-center border-r border-gray-200 last:border-r-0 overflow-hidden"
+															style={widthStyle}
+														>
+															<div className="inline-flex items-center justify-center gap-2">
+																{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																	<Link href={`${route}/${row.id}`}>
 																		<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
 																	</Link>
 																)}
-																{route ===
-																	ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
-																	<Link href={`${route}/${fila.id}`}>
+																{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																	<Link href={`${route}/${row.id}`}>
 																		<FaRocket
 																			className="text-gray-400 cursor-pointer hover:text-gray-700"
 																			title="Launch Token"
@@ -578,9 +596,7 @@ const Table = ({
 
 																{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
 																	isAdminUser(session) && (
-																		<Link
-																			href={`${route}/${fila.id}?edit=true`}
-																		>
+																		<Link href={`${route}/${row.id}?edit=true`}>
 																			<FaPencilAlt
 																				className="text-gray-400 cursor-pointer hover:text-gray-700"
 																				title="Edit Token"
@@ -592,52 +608,49 @@ const Table = ({
 													);
 												}
 
+												const rawCellValue = row[column.field];
 												const cellValue =
-													columna.field === "created_at"
-														? new Date(fila[columna.field]).toLocaleDateString(
-																"es-AR"
-														  )
-														: fila[columna.field];
-												const cellKey = `${rowId}-${columna.field}`;
+													column.field === "created_at"
+														? formatDateCell(rawCellValue)
+														: rawCellValue;
+												const cellKey = `${rowId}-${column.field}`;
 												const isCopied = copiedCellKey === cellKey;
 												const isCopyAllowed =
-													!copyExcludedFieldSet.has(columna.field) &&
+													!copyExcludedFieldSet.has(column.field) &&
 													cellValue != null &&
 													cellValue !== "" &&
-													!React.isValidElement(
-														fila[columna.field]
-													);
+													!React.isValidElement(row[column.field]);
 
-													return (
-														<td
-															key={cellKey}
-															className="px-2 py-1 text-[0.9rem] text-gray-900 text-center border-r border-gray-200 last:border-r-0 overflow-hidden"
-															style={widthStyle}
-														>
-															<div className="group flex w-full items-center justify-center gap-1">
-																<span className="flex-1 truncate text-center">
-																	{cellValue ?? "-"}
-																</span>
-																{isCopyAllowed && (
-																	<button
-																		type="button"
-																		onClick={() =>
-																			handleCopyValue(cellValue, cellKey)
-																		}
+												return (
+													<td
+														key={cellKey}
+														className="px-2 py-1 text-[0.9rem] text-gray-900 text-center border-r border-gray-200 last:border-r-0 overflow-hidden"
+														style={widthStyle}
+													>
+														<div className="group flex w-full items-center justify-center gap-1">
+															<span className="flex-1 truncate text-center">
+																{cellValue ?? "-"}
+															</span>
+															{isCopyAllowed && (
+																<button
+																	type="button"
+																	onClick={() =>
+																		handleCopyValue(cellValue, cellKey)
+																	}
 																	className="opacity-0 transition-opacity duration-150 group-hover:opacity-100 text-gray-400 hover:text-gray-600"
 																	title={t("tabla_copiar", {
-																		defaultValue: "Copiar contenido",
-																		})}
-																	>
-																		{isCopied ? (
-																			<FaCheck className="text-green-500" />
-																		) : (
-																			<FaRegCopy className="shrink-0" />
-																		)}
-																	</button>
-																)}
-															</div>
-														</td>
+																		defaultValue: "Copy content",
+																	})}
+																>
+																	{isCopied ? (
+																		<FaCheck className="text-green-500" />
+																	) : (
+																		<FaRegCopy className="shrink-0" />
+																	)}
+																</button>
+															)}
+														</div>
+													</td>
 												);
 											})}
 										</tr>
@@ -656,7 +669,7 @@ const Table = ({
 						: "hidden"
 				}
 			>
-				{renderbuttonsPages()}
+				{renderPageButtons()}
 
 				{route !== ROUTE_CONSTANTS.DETAIL_ROUTE &&
 					route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&

@@ -138,5 +138,19 @@
 	"finalize_failed": "Finalizar falló",
 	"update_crowdsale": "Actualizar Crowdsale",
 	"ventas": "Sales",
-	"Settings": "Config"
+	"Settings": "Config",
+	"tabla_filtrar_por": "Filtrar por",
+	"tabla_filtrar_placeholder": "Escribí para filtrar",
+	"tabla_limpiar": "Limpiar",
+	"tabla_resultados": "Resultados",
+	"tabla_seleccionados": "Seleccionados",
+	"tabla_exportar_csv": "Exportar CSV",
+	"tabla_nada_para_copiar": "Nada para copiar",
+	"tabla_copiado": "Valor copiado al portapapeles",
+	"tabla_error_copiar": "No se pudo copiar el valor",
+	"tabla_selecciona_para_exportar": "Seleccioná al menos un registro",
+	"tabla_si": "Sí",
+	"tabla_no": "No",
+	"tabla_exportacion_ok": "Archivo CSV exportado con éxito",
+	"tabla_copiar": "Copiar contenido"
 }

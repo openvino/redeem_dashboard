@@ -27,8 +27,8 @@ const index = () => {
 
   console.log(session.data)
 
-  const columnas = [
-    // { title: "", field: "acciones" },
+  const columns = [
+    // { title: "", field: "actions" },
     { title: t("creado"), field: "created_at" },
     { title: t("token"), field: "token" },
     { title: "Email", field: "email" },
@@ -38,7 +38,7 @@ const index = () => {
 
   return (
     <HomeLayout>
-      {<Table data={orders} columnas={columnas} n={50} />}
+      {<Table data={orders} columns={columns} n={50} />}
     </HomeLayout>
   );
 };

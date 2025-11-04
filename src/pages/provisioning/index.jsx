@@ -18,7 +18,7 @@ const Provisioning = () => {
 	const { rows, tokens, setTokens, session } = useProvisioning();
 
 	const winery_id = session.data?.winery_id;
-	let columnas = rows;
+	const columns = rows;
 
 	useEffect(() => {
 		const styleElement = document.createElement("style");
@@ -47,7 +47,7 @@ const Provisioning = () => {
 			{tokens?.length > 0 ? (
 				<div className="border rounded-lg overflow-x-scroll custom-scroll">
 					<Table
-						columnas={columnas}
+						columns={columns}
 						data={tokens}
 						n={10}
 						route={ROUTE_CONSTANTS.PROVISIONING_ROUTE}
