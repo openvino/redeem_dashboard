@@ -8,7 +8,8 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useLoginButton from "../components/useLoginButton";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
-import { client } from "@/config/thirdwebClient";
+import { chain, client } from "@/config/thirdwebClient";
+import { defineChain } from "thirdweb";
 
 const aBeeZee = ABeeZee({ subsets: ["latin"], weight: "400" });
 export default function Home() {
@@ -55,6 +56,7 @@ export default function Home() {
 
 				{/* <LoginButton /> */}
 				<ConnectButton
+				chain={defineChain(chain)}
 					client={client}
 					locale="es_ES"
 					connectModal={{

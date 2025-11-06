@@ -26,7 +26,9 @@ import { getBalance } from "../../helpers";
 import FormField from "./FormField";
 import SidebarMobile from "./SidebarMobile";
 import { ConnectButton, useActiveAccount } from "thirdweb/react";
-import { client } from "../config/thirdwebClient";
+import { chain, client } from "../config/thirdwebClient";
+import { defineChain } from "thirdweb";
+import { activeNetwork } from "@/config";
 
 const BellIconWithNotification = ({ notificationCount }) => (
 	<div className="relative">
@@ -195,6 +197,7 @@ const Topbar = () => {
 
 							<div className="flex items-center">
 								<ConnectButton
+								chain={defineChain(chain)}
 									client={client}
 									locale="es_ES"
 									connectModal={{
