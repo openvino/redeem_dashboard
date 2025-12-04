@@ -13,6 +13,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
+import { isCostafloresAdmin } from "@/utils/authUtils";
 const Sidebar = () => {
 	const session = useSession();
 	const { t } = useTranslation();
@@ -56,6 +57,23 @@ const Sidebar = () => {
 			title: "Tokens",
 		},
 	];
+
+	if (isCostafloresAdmin(session)) {
+		menuItems.splice(4, 0, {
+			href: "/dao-provisioning",
+			icon: (
+				<div className="w-6 h-6 relative">
+					<Image
+						src="/assets/ovi-logo.png"
+						fill
+						alt="OVI"
+						className="object-contain"
+					/>
+				</div>
+			),
+			title: t("dao_provisioning_short", { defaultValue: "DAO" }),
+		});
+	}
 
 	if (session.data?.is_admin) {
 		menuItems.push({

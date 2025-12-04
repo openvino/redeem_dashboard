@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { ROUTE_CONSTANTS, tableRoutes } from "@/utils/tableUtils";
 import { useTable } from "@/hooks/useTable";
-import { isAdminUser } from "@/utils/authUtils";
+import { isAdminUser, isCostafloresAdmin } from "@/utils/authUtils";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 
@@ -384,6 +384,10 @@ const Table = ({
 		[columnWidths, getPointerClientX]
 	);
 
+	const isProvisioningRoute = route === ROUTE_CONSTANTS.PROVISIONING_ROUTE;
+	const isDaoProvisioningRoute =
+		route === ROUTE_CONSTANTS.DAO_PROVISIONING_ROUTE;
+
 	return (
 		<>
 			<div className=" mb-4 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
@@ -580,26 +584,47 @@ const Table = ({
 															style={widthStyle}
 														>
 															<div className="inline-flex items-center justify-center gap-2">
-																{route !== ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																{!isProvisioningRoute &&
+																	!isDaoProvisioningRoute && (
 																	<Link href={`${route}/${row.id}`}>
 																		<FaPencilAlt className="text-gray-400 cursor-pointer text-center hover:text-gray-700" />
 																	</Link>
 																)}
-																{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE && (
+																{(isProvisioningRoute ||
+																	isDaoProvisioningRoute) && (
 																	<Link href={`${route}/${row.id}`}>
 																		<FaRocket
 																			className="text-gray-400 cursor-pointer hover:text-gray-700"
-																			title="Launch Token"
+																			title={
+																				isDaoProvisioningRoute
+																					? t("deploy_ovi", {
+																							defaultValue: "Deploy OVI",
+																					  })
+																					: t("deploy_contracts", {
+																							defaultValue: "Deploy!",
+																					  })
+																			}
 																		/>
 																	</Link>
 																)}
 
-																{route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
+																{isProvisioningRoute &&
 																	isAdminUser(session) && (
 																		<Link href={`${route}/${row.id}?edit=true`}>
 																			<FaPencilAlt
 																				className="text-gray-400 cursor-pointer hover:text-gray-700"
 																				title="Edit Token"
+																			/>
+																		</Link>
+																	)}
+																{isDaoProvisioningRoute &&
+																	isCostafloresAdmin(session) && (
+																		<Link href={`${route}/${row.id}?edit=true`}>
+																			<FaPencilAlt
+																				className="text-gray-400 cursor-pointer hover:text-gray-700"
+																				title={t("edit_admin", {
+																					defaultValue: "Edit",
+																				})}
 																			/>
 																		</Link>
 																	)}
@@ -672,8 +697,8 @@ const Table = ({
 				{renderPageButtons()}
 
 				{route !== ROUTE_CONSTANTS.DETAIL_ROUTE &&
-					route === ROUTE_CONSTANTS.PROVISIONING_ROUTE &&
-					isAdminUser(session) && (
+					((isProvisioningRoute && isAdminUser(session)) ||
+						(isDaoProvisioningRoute && isCostafloresAdmin(session))) && (
 						<button
 							className="mx-1 px-2 py-1 rounded bg-[#840C4A] text-white ml-4"
 							onClick={() => router.push(tableRoutes[route]?.actionRoute)}
