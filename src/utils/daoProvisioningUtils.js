@@ -19,6 +19,14 @@ export const DAO_DEFAULT_VALUES = {
 	token_image: DAO_DEFAULT_LOGO,
 	token_address: "",
 	crowdsale_address: "",
+	crowdsale_wallet: "",
+	crowdsale_capWei: "",
+	crowdsale_opening_time: "",
+	crowdsale_closing_time: "",
+	crowdsale_phase_one_cap: "",
+	crowdsale_rate_phase_one_usd: "",
+	crowdsale_rate_phase_two_usd: "",
+	crowdsale_price_feed: "",
 };
 
 const normalizeRecord = (record) => ({
@@ -47,8 +55,6 @@ export const getDaoProvisioningRecord = async (id) => {
 export const updateDaoProvisioningRecord = async (id, fields) => {
 	if (!id) throw new Error("ID is required");
 	const payload = { id, ...fields };
-	const response = await clientAxios.patch(`/daoLaunch`, {
-		params: payload,
-	});
+	const response = await clientAxios.patch(`/daoLaunch`, payload);
 	return response.data;
 };
