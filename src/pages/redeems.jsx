@@ -35,8 +35,8 @@ const redeems = ({ redeems }) => {
 
     return newData;
   };
-  const columnas = [
-    { title: "", field: "acciones" },
+  const columns = [
+    { title: "", field: "actions" },
     { title: t("nombre"), field: "name" },
     { title: t("monto"), field: "amount" },
     { title: t("pais"), field: "country_id" },
@@ -75,7 +75,7 @@ const redeems = ({ redeems }) => {
       </Head>
       <div className="">
         <div className=" custom-scroll ">
-          <Table data={data} columnas={columnas} n={15} />
+          <Table data={data} columns={columns} n={15} />
         </div>
       </div>
     </HomeLayout>

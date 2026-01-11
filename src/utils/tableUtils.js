@@ -15,6 +15,10 @@ export const ROUTE_CONSTANTS = {
 	PROVISIONING_ROUTE: "/provisioning",
 	NEW_PROVISIONING_ROUTE: "/launch",
 	LABEL_NEW_PROVISIONING: "launch",
+
+	DAO_PROVISIONING_ROUTE: "/dao-provisioning",
+	NEW_DAO_PROVISIONING_ROUTE: "/launch",
+	LABEL_NEW_DAO_PROVISIONING: "dao_launch",
 };
 
 const routeKeys = Object.keys(ROUTE_CONSTANTS)

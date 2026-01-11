@@ -6,3 +6,4 @@ export * from "./tableUtils";
 export * from "./winaryDataFormater";
 export * from "./dateUtils";
 export * from "./provisioningUtils";
+export * from "./daoProvisioningUtils";

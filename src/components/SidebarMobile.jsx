@@ -8,6 +8,7 @@ import { IoMdSettings } from "react-icons/io";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { FaUser, FaWineGlass } from "react-icons/fa";
 import Image from "next/image";
+import { isCostafloresAdmin } from "@/utils/authUtils";
 
 export default function SidebarMobile() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -42,6 +43,23 @@ export default function SidebarMobile() {
 			title: "Tokens",
 		},
 	];
+
+	if (isCostafloresAdmin(session)) {
+		menuItems.splice(4, 0, {
+			href: "/dao-provisioning",
+			icon: (
+				<div className="w-6 h-6 relative">
+					<Image
+						src="/assets/ovi-logo.png"
+						fill
+						alt="OVI"
+						className="object-contain"
+					/>
+				</div>
+			),
+			title: "DAO",
+		});
+	}
 
 	if (session.data?.is_admin) {
 		menuItems.push({

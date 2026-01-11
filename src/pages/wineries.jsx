@@ -14,8 +14,8 @@ const Winarys = ({ winarys }) => {
 	const { t } = useTranslation();
 	const filters = useSelector((state) => state.filter);
 
-	const columnas = [
-		{ title: "", field: "acciones" },
+	const columns = [
+		{ title: "", field: "actions" },
 		{ title: "Id", field: "id" },
 		{ title: t("nombre"), field: "name" },
 		{ title: t("website"), field: "website" },
@@ -56,7 +56,7 @@ const Winarys = ({ winarys }) => {
 			</Head>
 			<div className="">
 				<div className=" top-4 overflow-x-scroll custom-scroll ">
-					<Table data={data} columnas={columnas} route="/wineryDetail" n={15} />
+					<Table data={data} columns={columns} route="/wineryDetail" n={15} />
 				</div>
 			</div>
 		</HomeLayout>

@@ -12,8 +12,8 @@ const TokenShippingInfo = () => {
   const { id } = router.query;
   const { tokens } = useTokenShipping(id);
 
-  const columnas = [
-    { title: "", field: "acciones" },
+  const columns = [
+    { title: "", field: "actions" },
     { title: t("province"), field: "province_id" },
     { title: t("base_cost"), field: "base_cost" },
     { title: t("cost_per_unit"), field: "cost_per_unit" },
@@ -29,7 +29,7 @@ const TokenShippingInfo = () => {
       {/* <h1 className="text-xl font-bold m-2">{tokens[0]?.token_id}</h1> */}
 
       <div className="w-full overflow-x-scrolllg: overflow-x-hidden">
-        {tokens && <Table data={tokens} columnas={columnas} route="/shipping/edit" n={50} />}
+        {tokens && <Table data={tokens} columns={columns} route="/shipping/edit" n={50} />}
       </div>
     </HomeLayout>
   );

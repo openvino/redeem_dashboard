@@ -12,22 +12,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-
+import { useTranslation } from "react-i18next";
+import { isCostafloresAdmin } from "@/utils/authUtils";
 const Sidebar = () => {
 	const session = useSession();
+	const { t } = useTranslation();
 
 	const wineryId = session.data?.winery_id;
 
 	const router = useRouter();
 
 	const menuItems = [
-		{ href: "/dashboard", icon: <FaWineGlass size={20} />, title: "Home" },
+		{ href: "/dashboard", icon: <FaWineGlass size={20} />, title: "Redeems" },
 		{ href: "/admin", icon: <FaUser size={20} />, title: "Admin" },
 
 		{
 			href: "/orders",
 			icon: <RiMoneyDollarCircleLine size={20} />,
-			title: "Orders",
+			title: t("Ventas"),
 		},
 		{
 			// href: `/provisioning/${wineryId}`,
@@ -56,11 +58,28 @@ const Sidebar = () => {
 		},
 	];
 
+	if (isCostafloresAdmin(session)) {
+		menuItems.splice(4, 0, {
+			href: "/dao-provisioning",
+			icon: (
+				<div className="w-6 h-6 relative">
+					<Image
+						src="/assets/ovi-logo.png"
+						fill
+						alt="OVI"
+						className="object-contain"
+					/>
+				</div>
+			),
+			title: t("dao_provisioning_short", { defaultValue: "DAO" }),
+		});
+	}
+
 	if (session.data?.is_admin) {
 		menuItems.push({
 			href: "/wineries",
 			icon: <IoMdSettings size={20} />,
-			title: "Settings",
+			title: t("Settings"),
 		});
 	}
 

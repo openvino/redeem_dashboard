@@ -12,10 +12,10 @@ const Admin = () => {
 
 
 
-  const columnas = [
+  const columns = [
     {
       title: t("action"),
-      field: "acciones",
+      field: "actions",
     },
     {
       title: t("clave"),
@@ -59,7 +59,7 @@ const Admin = () => {
       </Head>
       <div className="border rounded-lg overflow-x-scroll custom-scroll">
         {admins?.length && (
-          <Table columnas={columnas} data={admins} n={10} route="/admin" />
+          <Table columns={columns} data={admins} n={10} route="/admin" />
         )}
       </div>
     </HomeLayout>

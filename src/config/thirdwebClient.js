@@ -9,6 +9,8 @@ const activeChain = activeNetwork === "baseSepolia" ? baseSepolia : base;
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID;
 export const chain = activeChain;
 
+console.log("chain", chain);
+
 export const client = createThirdwebClient({
 	clientId: clientId,
 });

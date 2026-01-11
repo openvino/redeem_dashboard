@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import {
 	MdSkipNext,
@@ -7,14 +7,67 @@ import {
 	MdNavigateBefore,
 } from "react-icons/md";
 
+const DEFAULT_ROW_ID = (row, index) => {
+	if (row?.id != null) return String(row.id);
+	const firstValue = row ? Object.values(row)[0] : null;
+	return `${firstValue ?? "row"}-${index}`;
+};
+
 export function useTable(
-	data,
-	elementsPerPage = 10,
-	defaultOrder = "created_at"
+	input,
+	fallbackElementsPerPage = 10,
+	fallbackDefaultOrder = "created_at"
 ) {
+	const config = useMemo(() => {
+		if (Array.isArray(input) || input == null) {
+			return {
+				data: Array.isArray(input) ? input : [],
+				columns: [],
+				elementsPerPage: fallbackElementsPerPage,
+				defaultOrder: fallbackDefaultOrder,
+			};
+		}
+		return {
+			data: Array.isArray(input.data) ? input.data : [],
+			columns: Array.isArray(input.columns) ? input.columns : [],
+			elementsPerPage:
+				input.elementsPerPage ?? fallbackElementsPerPage ?? 10,
+			defaultOrder: input.defaultOrder ?? fallbackDefaultOrder ?? "created_at",
+			rowIdAccessor: input.rowIdAccessor ?? DEFAULT_ROW_ID,
+		};
+	}, [input, fallbackElementsPerPage, fallbackDefaultOrder]);
+
+	const {
+		data,
+		columns,
+		elementsPerPage,
+		defaultOrder,
+		rowIdAccessor = DEFAULT_ROW_ID,
+	} = config;
+
 	const [currentPage, setCurrentPage] = useState(1);
-	const [columnOrder, setColumnOrder] = useState(defaultOrder);
-	const [ascOrder, setAscOrder] = useState(false);
+	const [columnOrder, setColumnOrder] = useState(
+		defaultOrder ?? columns?.[0]?.field ?? null
+	);
+	const [ascOrder, setAscOrder] = useState(true);
+
+	const [filters, setFilters] = useState(() =>
+		columns.reduce((acc, column) => {
+			acc[column.field] = "";
+			return acc;
+		}, {})
+	);
+
+	useEffect(() => {
+		setFilters((prev) => {
+			const next = {};
+			columns.forEach((column) => {
+				next[column.field] = prev?.[column.field] ?? "";
+			});
+			return next;
+		});
+	}, [columns]);
+
 	const [tooltip, setTooltip] = useState({
 		visible: false,
 		content: "",
@@ -25,11 +78,17 @@ export function useTable(
 	const [dragStartX, setDragStartX] = useState(0);
 	const [scrollStartX, setScrollStartX] = useState(0);
 
-	const handleOrdenarColumna = (columna) => {
-		if (columnOrder === columna) {
+	const [selectedRowIds, setSelectedRowIds] = useState(new Set());
+
+	useEffect(() => {
+		setSelectedRowIds(new Set());
+	}, [data]);
+
+	const handleSortColumn = (column) => {
+		if (columnOrder === column) {
 			setAscOrder(!ascOrder);
 		} else {
-			setColumnOrder(columna);
+			setColumnOrder(column);
 			setAscOrder(true);
 		}
 	};
@@ -39,9 +98,26 @@ export function useTable(
 			String(val).replace(" ", "T").replace(/\+00$/, "+00:00")
 		).getTime();
 
-	const orderData = () => {
-		if (!columnOrder) return data;
-		return [...data].sort((a, b) => {
+	const filteredData = useMemo(() => {
+		const hasFilters = Object.values(filters ?? {}).some((value) => value);
+		if (!hasFilters) return data;
+
+		return data.filter((row) =>
+			columns.every((column) => {
+				const filterValue = filters[column.field];
+				if (!filterValue) return true;
+				const cellValue = row?.[column.field];
+				if (cellValue == null) return false;
+				return String(cellValue)
+					.toLowerCase()
+					.includes(String(filterValue).toLowerCase());
+			})
+		);
+	}, [columns, data, filters]);
+
+	const orderedData = useMemo(() => {
+		if (!columnOrder) return filteredData;
+		return [...filteredData].sort((a, b) => {
 			const valA = a[columnOrder];
 			const valB = b[columnOrder];
 
@@ -80,23 +156,30 @@ export function useTable(
 				? String(valA).localeCompare(String(valB))
 				: String(valB).localeCompare(String(valA));
 		});
-	};
+	}, [ascOrder, columnOrder, filteredData]);
 
-	const orderPagedData = () => {
-		const ordered = orderData();
-		const totalPages = Math.ceil(ordered.length / elementsPerPage);
+	const totalPages = useMemo(() => {
+		const value = Math.ceil(orderedData.length / elementsPerPage);
+		return value > 0 ? value : 1;
+	}, [elementsPerPage, orderedData.length]);
+
+	useEffect(() => {
+		setCurrentPage((prev) => Math.min(prev, totalPages));
+	}, [totalPages]);
+
+	const orderPagedData = useCallback(() => {
+		if (orderedData.length === 0) return [];
 		const validPage = Math.max(1, Math.min(currentPage, totalPages));
 		const initIndex = (validPage - 1) * elementsPerPage;
 		const finalIndex = initIndex + elementsPerPage;
-		return ordered.slice(initIndex, finalIndex);
-	};
+		return orderedData.slice(initIndex, finalIndex);
+	}, [currentPage, elementsPerPage, orderedData, totalPages]);
 
 	const handlePrevPage = () => {
 		if (currentPage > 1) setCurrentPage(currentPage - 1);
 	};
 
 	const handleNextPage = () => {
-		const totalPages = Math.ceil(data.length / elementsPerPage);
 		if (currentPage < totalPages) setCurrentPage(currentPage + 1);
 	};
 
@@ -104,8 +187,7 @@ export function useTable(
 		setCurrentPage(page);
 	};
 
-	const renderbuttonsPages = () => {
-		const totalPages = Math.ceil(data.length / elementsPerPage);
+	const renderPageButtons = () => {
 		const buttons = [];
 		const start = Math.max(currentPage - 4, 1);
 		const end = Math.min(currentPage + 4, totalPages);
@@ -190,28 +272,142 @@ export function useTable(
 
 	const handleClickTooltip = (content) => {
 		navigator.clipboard.writeText(content);
-		toast.success(`Contenido copiado: ${content}`);
+		toast.success(`Content copied: ${content}`);
 	};
 
 	const handleShowTooltip = () => {
 		setTooltip((prev) => ({ ...prev, visible: true }));
 	};
 
-	const handleMouseDown = (e) => {
-		setIsDragging(true);
-		setDragStartX(e.clientX);
-		setScrollStartX(e.currentTarget.scrollLeft);
+	const getClientX = (event) => {
+		if (!event) return 0;
+		if (event.touches && event.touches.length > 0) {
+			return event.touches[0].clientX;
+		}
+		if (event.changedTouches && event.changedTouches.length > 0) {
+			return event.changedTouches[0].clientX;
+		}
+		return event.clientX ?? 0;
 	};
 
-	const handleMouseMove = (e) => {
+	const handleMouseDown = (event) => {
+		if (event?.button != null && event.button !== 0) return;
+		setIsDragging(true);
+		setDragStartX(getClientX(event));
+		setScrollStartX(event.currentTarget.scrollLeft);
+	};
+
+	const handleMouseMove = (event) => {
 		if (!isDragging) return;
-		const dx = e.clientX - dragStartX;
-		e.currentTarget.scrollLeft = scrollStartX - dx;
+		const dx = getClientX(event) - dragStartX;
+		if (event.cancelable) {
+			event.preventDefault();
+		}
+		event.currentTarget.scrollLeft = scrollStartX - dx;
 	};
 
 	const handleMouseUp = () => {
 		setIsDragging(false);
 	};
+
+	const handleTouchStart = (event) => {
+		setIsDragging(true);
+		setDragStartX(getClientX(event));
+		setScrollStartX(event.currentTarget.scrollLeft);
+	};
+
+	const handleTouchMove = (event) => {
+		if (!isDragging) return;
+		const dx = getClientX(event) - dragStartX;
+		if (event.cancelable) {
+			event.preventDefault();
+		}
+		event.currentTarget.scrollLeft = scrollStartX - dx;
+	};
+
+	const handleTouchEnd = () => {
+		setIsDragging(false);
+	};
+
+	const setFilterValue = useCallback((field, value) => {
+		setFilters((prev) => ({ ...prev, [field]: value }));
+		setCurrentPage(1);
+	}, []);
+
+	const clearFilters = useCallback(() => {
+		setFilters((prev) =>
+			Object.keys(prev).reduce((acc, key) => {
+				acc[key] = "";
+				return acc;
+			}, {})
+		);
+		setCurrentPage(1);
+	}, []);
+
+	const rowIdsMap = useMemo(() => {
+		const map = new Map();
+		orderedData.forEach((row, index) => {
+			map.set(rowIdAccessor(row, index), row);
+		});
+		return map;
+	}, [orderedData, rowIdAccessor]);
+
+	const pagedRowIds = useMemo(() => {
+		const validPage = Math.max(1, Math.min(currentPage, totalPages));
+		const startIndex = (validPage - 1) * elementsPerPage;
+		const rows = orderPagedData();
+		return rows.map((row, idx) => rowIdAccessor(row, startIndex + idx));
+	}, [
+		currentPage,
+		elementsPerPage,
+		orderPagedData,
+		rowIdAccessor,
+		totalPages,
+	]);
+
+	const toggleRowSelection = useCallback((rowId) => {
+		setSelectedRowIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(rowId)) {
+				next.delete(rowId);
+			} else {
+				next.add(rowId);
+			}
+			return next;
+		});
+	}, []);
+
+	const isRowSelected = useCallback(
+		(rowId) => selectedRowIds.has(rowId),
+		[selectedRowIds]
+	);
+
+	const toggleSelectAllCurrentPage = useCallback(() => {
+		setSelectedRowIds((prev) => {
+			const next = new Set(prev);
+			const allSelected = pagedRowIds.every((id) => next.has(id));
+			if (allSelected) {
+				pagedRowIds.forEach((id) => next.delete(id));
+			} else {
+				pagedRowIds.forEach((id) => next.add(id));
+			}
+			return next;
+		});
+	}, [pagedRowIds]);
+
+	const clearSelection = useCallback(() => {
+		setSelectedRowIds(new Set());
+	}, []);
+
+	const isAllCurrentPageSelected =
+		pagedRowIds.length > 0 &&
+		pagedRowIds.every((id) => selectedRowIds.has(id));
+
+	const selectedRowsData = useMemo(() => {
+		return Array.from(selectedRowIds)
+			.map((id) => rowIdsMap.get(id))
+			.filter(Boolean);
+	}, [rowIdsMap, selectedRowIds]);
 
 	return {
 		currentPage,
@@ -223,8 +419,22 @@ export function useTable(
 		handleMouseDown,
 		handleMouseMove,
 		handleMouseUp,
-		handleOrdenarColumna,
+		handleTouchStart,
+		handleTouchMove,
+		handleTouchEnd,
+		handleSortColumn,
 		orderPagedData,
-		renderbuttonsPages,
+		renderPageButtons,
+		filters,
+		setFilterValue,
+		clearFilters,
+		filteredData,
+		toggleRowSelection,
+		isRowSelected,
+		toggleSelectAllCurrentPage,
+		isAllCurrentPageSelected,
+		selectedRowsData,
+		clearSelection,
+		isDragging,
 	};
 }

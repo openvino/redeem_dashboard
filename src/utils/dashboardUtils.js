@@ -1,6 +1,6 @@
-export const buildColumnas = (t, fields) => {
+export const buildColumns = (t, fields) => {
 	return [
-		{ title: "", field: "acciones" },
+		{ title: "", field: "actions" },
 		{ title: t("creado"), field: "created_at" },
 		{ title: t("año"), field: "year" },
 		{ title: t("nombre"), field: "name" },
