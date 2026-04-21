@@ -2,8 +2,6 @@ import { useSession, signOut, getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import clientAxios from '@/config/clientAxios';
-import Topbar from '@/components/Topbar';
-import Sidebar from '@/components/Sidebar';
 import { useForm } from 'react-hook-form';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { getRedeems, getWinarys } from '@/redux/actions/winaryActions';
 import Head from 'next/head';
+import HomeLayout from '@/components/HomeLayout';
 let winary;
 function Detail({ winarys }) {
   const { t } = useTranslation();
@@ -119,7 +118,7 @@ function Detail({ winarys }) {
   }, [session]);
 
   return (
-    <>
+    <HomeLayout>
       <Head>
         <title>OpenVino - Winery Detail</title>
       </Head>
@@ -137,18 +136,7 @@ function Detail({ winarys }) {
       />
       {/* Same as */}
       <ToastContainer />
-      <Topbar />
-      <Sidebar />
-      <div
-        className="
-      
-      z-1
-      mt-[10rem]
-      ml-[6rem]
-      overflow-x-scroll
-      lg:overflow-x-hidden
-    "
-      >
+      <div className="z-1 overflow-x-scroll lg:overflow-x-hidden">
         <h1 className="text-2xl font-bold text-center mb-4">
           {t('detalle_de_la_vinería')}
         </h1>
@@ -276,7 +264,7 @@ function Detail({ winarys }) {
           </div>
         </form>
       </div>
-    </>
+    </HomeLayout>
   );
 }
 
