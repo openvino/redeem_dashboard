@@ -16,6 +16,7 @@ const KEY_ALIAS = {
 	bottlesStock: "bottles_stock",
 	pendingRedeems: "pending_redeems",
 	lastDataCid: "last_data_cid",
+	reserveAddresses: "reserve_addresses",
 };
 
 const DEFAULT_FIELD_ORDER = [
@@ -23,8 +24,8 @@ const DEFAULT_FIELD_ORDER = [
 	{ key: "symbol", label: "Symbol" },
 	{ key: "chain", label: "Chain" },
 	{ key: "winary", label: "Winary" },
-	{ key: "bottles_stock", label: "Bottles Stock", editable: true },
-	{ key: "pending_redeems", label: "Pending Redeems", editable: true },
+	{ key: "pending_redeems", label: "Tokens a quemar", editable: true },
+	{ key: "reserve_addresses", label: "Wallets reserva OpenVino (separadas por coma)", editable: true },
 	{ key: "last_data_cid", label: "Last Data Cid", editable: true },
 ];
 
@@ -56,8 +57,8 @@ const TokenHistoryEditModal = ({
 
 	const editableSet = useMemo(() => {
 		const set = new Set([
-			"bottles_stock",
 			"pending_redeems",
+			"reserve_addresses",
 			"last_data_cid",
 			...editableFields,
 		]);

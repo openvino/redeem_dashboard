@@ -96,6 +96,7 @@ const TokenInfoComponent = ({
 		bottlesStock,
 		pendingRedeems,
 		lastDataCid,
+		reserveAddresses,
 		historyRow,
 	} = tokenInfo;
 
@@ -129,6 +130,9 @@ const TokenInfoComponent = ({
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [historyRecord, setHistoryRecord] = useState(null);
 	const [savingHistory, setSavingHistory] = useState(false);
+	const [isSellP2PModalOpen, setIsSellP2PModalOpen] = useState(false);
+	const [p2pSellAmount, setP2pSellAmount] = useState("");
+	const [p2pSellError, setP2pSellError] = useState("");
 
 	const synchronizeNumeric = (value, preserveString = false) => {
 		if (value === null || value === undefined || value === "") return null;
@@ -153,6 +157,7 @@ const TokenInfoComponent = ({
 		syncField("bottles_stock", "bottlesStock");
 		syncField("pending_redeems", "pendingRedeems");
 		syncField("last_data_cid", "lastDataCid", true);
+		syncField("reserve_addresses", "reserveAddresses", true);
 
 		return next;
 	};
@@ -167,6 +172,8 @@ const TokenInfoComponent = ({
 				row?.pending_redeems ?? row?.pendingRedeems ?? pendingRedeems ?? null,
 			lastDataCid:
 				row?.last_data_cid ?? row?.lastDataCid ?? lastDataCid ?? null,
+			reserveAddresses:
+				row?.reserve_addresses ?? row?.reserveAddresses ?? reserveAddresses ?? null,
 		});
 	};
 
@@ -176,7 +183,7 @@ const TokenInfoComponent = ({
 		} else {
 			setHistoryRecord(null);
 		}
-	}, [historyRow, bottlesStock, pendingRedeems, lastDataCid]);
+	}, [historyRow, bottlesStock, pendingRedeems, lastDataCid, reserveAddresses]);
 
 	const canEditToken = isAdminUser(session);
 
@@ -186,16 +193,18 @@ const TokenInfoComponent = ({
 			return buildHistoryRecordFromRow(historyRow);
 		}
 		return null;
-	}, [historyRecord, historyRow, bottlesStock, pendingRedeems, lastDataCid]);
+	}, [historyRecord, historyRow, bottlesStock, pendingRedeems, lastDataCid, reserveAddresses]);
 
-	const resolvedBottlesStock =
-		historySource?.bottlesStock ?? historySource?.bottles_stock ?? bottlesStock;
 	const resolvedPendingRedeems =
 		historySource?.pendingRedeems ??
 		historySource?.pending_redeems ??
 		pendingRedeems;
 	const resolvedLastDataCid =
 		historySource?.lastDataCid ?? historySource?.last_data_cid ?? lastDataCid;
+	const resolvedReserveAddresses =
+		historySource?.reserveAddresses ??
+		historySource?.reserve_addresses ??
+		reserveAddresses;
 
 	const handleOpenHistoryEdit = () => {
 		if (!historySource) return;
@@ -209,10 +218,10 @@ const TokenInfoComponent = ({
 	};
 
 	const handleSaveHistoryEdit = async (values) => {
-		if (!historySource && !historyRecord) return;
+		if (!historySource && !historyRecord) return false;
 		if (!symbol) {
 			console.warn("Token symbol not available for update");
-			return;
+			return false;
 		}
 
 		const mergedRecord = {
@@ -225,6 +234,7 @@ const TokenInfoComponent = ({
 			bottles_stock: nextRecord?.bottles_stock ?? null,
 			pending_redeems: nextRecord?.pending_redeems ?? null,
 			last_data_cid: nextRecord?.last_data_cid ?? null,
+			reserve_addresses: nextRecord?.reserve_addresses ?? null,
 		};
 
 		const targetChain =
@@ -266,8 +276,10 @@ const TokenInfoComponent = ({
 			});
 			setHistoryRecord(finalRecord);
 			setIsEditModalOpen(false);
+			return true;
 		} catch (error) {
 			console.error("Failed to update token history", error);
+			return false;
 		} finally {
 			setSavingHistory(false);
 		}
@@ -275,10 +287,32 @@ const TokenInfoComponent = ({
 
 	const displayTokensValue =
 		totalSupply != null ? totalSupply : tokenInfo?.totalSupply;
-	const displayBottlesValue =
-		resolvedBottlesStock != null ? resolvedBottlesStock : totalSupply;
+	const pendingForStock =
+		resolvedPendingRedeems != null ? Number(resolvedPendingRedeems) : 0;
 	const displayPendingRedeemsValue =
 		resolvedPendingRedeems != null ? resolvedPendingRedeems : tokensToBurn;
+
+	const handleOpenSellP2PModal = () => {
+		if (!historySource && !historyRecord) return;
+		setP2pSellAmount("");
+		setP2pSellError("");
+		setIsSellP2PModalOpen(true);
+	};
+
+	const handleCloseSellP2PModal = () => {
+		if (savingHistory) return;
+		setIsSellP2PModalOpen(false);
+		setP2pSellAmount("");
+		setP2pSellError("");
+	};
+
+	const reserveAddressList = useMemo(() => {
+		if (!resolvedReserveAddresses) return [];
+		return resolvedReserveAddresses
+			.split(",")
+			.map((a) => a.trim().toLowerCase())
+			.filter(Boolean);
+	}, [resolvedReserveAddresses]);
 
 	const sumAmounts = (rows = []) =>
 		rows.reduce((acc, r) => acc + Number(r.amount || 0), 0);
@@ -503,6 +537,7 @@ const TokenInfoComponent = ({
 		tokenPairAddressLower === tokenAddressLower;
 	const token0Decimals = Number(pairHistory?.pair?.token0?.decimals ?? 18);
 	const token1Decimals = Number(pairHistory?.pair?.token1?.decimals ?? 18);
+	const primaryTokenDecimals = tokenIsToken0 ? token0Decimals : token1Decimals;
 
 	const primarySymbolLabel = normalizeTokenSymbol(
 		tokenIsToken0 ? token0Meta.symbol : token1Meta.symbol,
@@ -638,6 +673,7 @@ const TokenInfoComponent = ({
 					currentReservesMeta.blockNumber ?? currentReservesMeta.block ?? null,
 		  }
 		: null;
+	const lpBalance = currentReserves?.tokenReserve ?? null;
 
 	const combinedReserves = useMemo(() => {
 		const currentYear = new Date().getFullYear();
@@ -786,6 +822,88 @@ const TokenInfoComponent = ({
 		return [];
 	}, [holdersDetail, tokenInfo]);
 
+	const normalizeDisplayTokenBalance = (value) => {
+		const numeric = toNumeric(value);
+		if (numeric === null) return null;
+
+		const supplyReference = toNumeric(displayTokensValue);
+		if (
+			supplyReference !== null &&
+			supplyReference > 0 &&
+			primaryTokenDecimals > 0 &&
+			numeric > supplyReference * 1.5
+		) {
+			return numeric / Math.pow(10, primaryTokenDecimals);
+		}
+
+		return numeric;
+	};
+
+	const reserveBalance = useMemo(() => {
+		if (reserveAddressList.length === 0) return null;
+		return holders
+			.filter((h) => reserveAddressList.includes(h.address?.toLowerCase()))
+			.reduce(
+				(acc, h) =>
+					acc +
+					(normalizeDisplayTokenBalance(
+						h.balanceFormatted ?? h.balance ?? h.balanceRaw ?? h.amount
+					) ?? 0),
+				0
+				);
+	}, [reserveAddressList, holders, displayTokensValue, primaryTokenDecimals]);
+
+	const externalHoldersBalance =
+		displayTokensValue !== null &&
+		displayTokensValue !== undefined &&
+		reserveBalance !== null &&
+		lpBalance !== null
+			? Math.max(displayTokensValue - reserveBalance - lpBalance, 0)
+			: null;
+
+	const physicalStockToKeep =
+		lpBalance !== null &&
+		externalHoldersBalance !== null &&
+		displayPendingRedeemsValue !== null &&
+		displayPendingRedeemsValue !== undefined
+			? lpBalance + externalHoldersBalance + Number(displayPendingRedeemsValue)
+			: null;
+
+	const p2pAvailable =
+		reserveBalance !== null
+			? Math.max(reserveBalance - pendingForStock, 0)
+			: null;
+
+	const formatFormulaValue = (value) =>
+		value === null || value === undefined ? "—" : formatNumber(value);
+
+	const handleSubmitSellP2P = async (event) => {
+		event.preventDefault();
+		if (savingHistory) return;
+
+		const sellAmount = toNumeric(p2pSellAmount);
+		if (sellAmount === null || sellAmount <= 0) {
+			setP2pSellError("Ingresá una cantidad de tokens mayor a 0.");
+			return;
+		}
+
+		if (p2pAvailable !== null && sellAmount > p2pAvailable) {
+			setP2pSellError("El monto supera el disponible actual para venta P2P.");
+			return;
+		}
+
+		const currentPendingRedeems = toNumeric(resolvedPendingRedeems) ?? 0;
+		const saved = await handleSaveHistoryEdit({
+			pending_redeems: currentPendingRedeems + sellAmount,
+		});
+
+		if (saved) {
+			handleCloseSellP2PModal();
+		} else {
+			setP2pSellError("No se pudo registrar la venta P2P.");
+		}
+	};
+
 	const totalTransfersRows = transferEvents.length;
 	const totalTransfersPages = Math.max(
 		1,
@@ -918,14 +1036,14 @@ const TokenInfoComponent = ({
 		{[
 			{ label: t("token_issuance"), value: displayTokensValue },
 			{
-				label: t("bottles_remaining"),
-				value: displayBottlesValue,
+				label: "Botellas a guardar",
+				value: physicalStockToKeep,
 			},
-			{ label: "REDEEMS", value: burnedTokens },
+			{ label: t("burned_tokens") || "Redeems realizados", value: burnedTokens },
 			displayPendingRedeemsValue !== null &&
 			displayPendingRedeemsValue !== undefined
 				? {
-					label: "REDEEMS LEGADOS PENDIENTES",
+					label: "Tokens a quemar",
 					value: displayPendingRedeemsValue,
 				}
 				: null,
@@ -945,6 +1063,81 @@ const TokenInfoComponent = ({
 						</div>
 					))}
 			</div>
+
+			{(p2pAvailable !== null || lpBalance !== null) && (
+				<div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-3">
+					<div className="flex items-center justify-between gap-3">
+						<h2 className="text-lg font-semibold text-gray-900">Distribución de tokens</h2>
+						{canEditToken && historySource && (
+							<button
+								type="button"
+								onClick={handleOpenSellP2PModal}
+								className="rounded-lg bg-[#840C4A] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#6d0a3d]"
+							>
+								Vender P2P
+							</button>
+						)}
+						</div>
+						<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 text-sm">
+							{reserveBalance !== null && (
+								<div>
+									<span className="uppercase text-xs text-gray-500 block">Reserva OpenVino</span>
+									<span className="font-semibold text-gray-900">{formatNumber(reserveBalance)}</span>
+								</div>
+						)}
+						{lpBalance !== null && (
+							<div>
+								<span className="uppercase text-xs text-gray-500 block">En el LP</span>
+									<span className="font-semibold text-gray-900">{formatNumber(lpBalance)}</span>
+								</div>
+							)}
+							{externalHoldersBalance !== null && (
+								<div>
+									<span className="uppercase text-xs text-gray-500 block">En holders externos</span>
+									<span className="font-semibold text-gray-900">{formatNumber(externalHoldersBalance)}</span>
+								</div>
+							)}
+							{p2pAvailable !== null && (
+								<div>
+									<span className="uppercase text-xs text-gray-500 block">Disponible para venta P2P</span>
+									<span className="font-semibold text-[#840C4A]">{formatNumber(p2pAvailable)}</span>
+								</div>
+							)}
+						</div>
+						<div className="rounded-lg border border-[#840C4A]/20 bg-[#840C4A]/5 p-4 text-sm text-gray-700 space-y-3">
+							<div>
+								<span className="block text-xs uppercase text-gray-500">Cómo se calcula botellas a guardar</span>
+								<span className="block font-semibold text-gray-900">
+									Botellas a guardar = En LP + Holders externos + Tokens a quemar
+								</span>
+								<span className="block text-gray-600">
+									{formatFormulaValue(physicalStockToKeep)} = {formatFormulaValue(lpBalance)} + {formatFormulaValue(externalHoldersBalance)} + {formatFormulaValue(displayPendingRedeemsValue)}
+								</span>
+							</div>
+							<div>
+								<span className="block text-xs uppercase text-gray-500">Cómo se calcula holders externos</span>
+								<span className="block font-semibold text-gray-900">
+									Holders externos = Tokens emitidos - Reserva OpenVino - En LP
+								</span>
+								<span className="block text-gray-600">
+									{formatFormulaValue(externalHoldersBalance)} = {formatFormulaValue(displayTokensValue)} - {formatFormulaValue(reserveBalance)} - {formatFormulaValue(lpBalance)}
+								</span>
+							</div>
+							<div>
+								<span className="block text-xs uppercase text-gray-500">Cómo se calcula disponible P2P</span>
+								<span className="block font-semibold text-gray-900">
+									Disponible P2P = Tokens emitidos - Botellas a guardar
+								</span>
+								<span className="block text-gray-600">
+									{formatFormulaValue(p2pAvailable)} = {formatFormulaValue(displayTokensValue)} - {formatFormulaValue(physicalStockToKeep)}
+								</span>
+								<span className="block text-gray-500">
+									Equivale a: {formatFormulaValue(p2pAvailable)} = {formatFormulaValue(reserveBalance)} - {formatFormulaValue(displayPendingRedeemsValue)}
+								</span>
+							</div>
+						</div>
+					</div>
+				)}
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				<div className="bg-white/70 rounded-lg p-4 shadow-sm space-y-3">
@@ -1323,10 +1516,10 @@ const TokenInfoComponent = ({
 				</div>
 			</div>
 
-			<div className="bg-white/70 rounded-lg p-4 shadow-sm">
-				<div className="mb-3 flex items-center justify-between">
-					<h2 className="text-lg font-semibold text-gray-900">
-						{t("addresses") || "Direcciones"}
+				<div className="bg-white/70 rounded-lg p-4 shadow-sm">
+					<div className="mb-3 flex items-center justify-between">
+						<h2 className="text-lg font-semibold text-gray-900">
+							{t("addresses") || "Direcciones"}
 					</h2>
 					{networkDisplay && (
 						<span className="text-sm font-medium text-gray-700">
@@ -1377,17 +1570,97 @@ const TokenInfoComponent = ({
 									)}
 								</span>
 							</div>
-						))}
+							))}
+					</div>
+					{reserveAddressList.length > 0 && (
+						<div className="mt-4 border-t border-gray-200 pt-4">
+							<span className="text-xs uppercase text-gray-500">
+								Wallets OpenVino
+							</span>
+							<div className="mt-2 grid grid-cols-1 gap-2 text-sm text-gray-700">
+								{reserveAddressList.map((walletAddress) => (
+									<Link
+										key={walletAddress}
+										href={getExplorerUrl(walletAddress) ?? "#"}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="font-mono break-all text-[#840C4A] underline"
+									>
+										{walletAddress}
+									</Link>
+								))}
+							</div>
+						</div>
+					)}
 				</div>
-			</div>
 			<TokenHistoryEditModal
 				open={isEditModalOpen}
 				onClose={handleCloseHistoryEdit}
 				onSubmit={handleSaveHistoryEdit}
 				record={historyRecord ?? historySource ?? {}}
-				editableFields={["bottles_stock", "pending_redeems", "last_data_cid"]}
+				editableFields={["pending_redeems", "reserve_addresses", "last_data_cid"]}
 				isSubmitting={savingHistory}
 			/>
+			{isSellP2PModalOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div
+						className="absolute inset-0 bg-black/40"
+						onClick={handleCloseSellP2PModal}
+						role="presentation"
+					/>
+					<div className="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+						<h2 className="text-xl font-semibold text-gray-900">Vender P2P</h2>
+						<p className="mt-2 text-sm text-gray-600">
+							Esto suma el monto vendido a <strong>Tokens a quemar</strong>. El
+							disponible P2P se recalcula automáticamente.
+						</p>
+						<form onSubmit={handleSubmitSellP2P} className="mt-6 space-y-4">
+							<label className="flex flex-col gap-1 text-sm text-gray-700">
+								<span className="font-medium text-gray-600">
+									Monto vendido
+								</span>
+								<input
+									type="number"
+									min="0"
+									step="any"
+									value={p2pSellAmount}
+									onChange={(event) => {
+										setP2pSellAmount(event.target.value);
+										if (p2pSellError) setP2pSellError("");
+									}}
+									disabled={savingHistory}
+									className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#840C4A] focus:outline-none focus:ring-2 focus:ring-[#840C4A]/20"
+								/>
+							</label>
+							{p2pAvailable !== null && (
+								<p className="text-sm text-gray-500">
+									Disponible actual: {formatNumber(p2pAvailable)} tokens
+								</p>
+							)}
+							{p2pSellError && (
+								<p className="text-sm text-red-600">{p2pSellError}</p>
+							)}
+							<div className="flex justify-end gap-3">
+								<button
+									type="button"
+									onClick={handleCloseSellP2PModal}
+									disabled={savingHistory}
+									className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+								>
+									Cancelar
+								</button>
+								<button
+									type="submit"
+									disabled={savingHistory}
+									className="rounded-lg bg-[#840C4A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#6d0a3d] disabled:cursor-not-allowed disabled:opacity-60"
+								>
+									{savingHistory ? "Guardando..." : "Registrar venta"}
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
