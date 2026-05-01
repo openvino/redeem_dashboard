@@ -863,10 +863,8 @@ const TokenInfoComponent = ({
 
 	const physicalStockToKeep =
 		lpBalance !== null &&
-		externalHoldersBalance !== null &&
-		displayPendingRedeemsValue !== null &&
-		displayPendingRedeemsValue !== undefined
-			? lpBalance + externalHoldersBalance + Number(displayPendingRedeemsValue)
+		externalHoldersBalance !== null
+			? lpBalance + externalHoldersBalance
 			: null;
 
 	const p2pAvailable =
@@ -1108,10 +1106,10 @@ const TokenInfoComponent = ({
 							<div>
 								<span className="block text-xs uppercase text-gray-500">Cómo se calcula botellas a guardar</span>
 								<span className="block font-semibold text-gray-900">
-									Botellas a guardar = En LP + Holders externos + Tokens a quemar
+									Botellas a guardar = En LP + Holders externos
 								</span>
 								<span className="block text-gray-600">
-									{formatFormulaValue(physicalStockToKeep)} = {formatFormulaValue(lpBalance)} + {formatFormulaValue(externalHoldersBalance)} + {formatFormulaValue(displayPendingRedeemsValue)}
+									{formatFormulaValue(physicalStockToKeep)} = {formatFormulaValue(lpBalance)} + {formatFormulaValue(externalHoldersBalance)}
 								</span>
 							</div>
 							<div>
@@ -1126,13 +1124,10 @@ const TokenInfoComponent = ({
 							<div>
 								<span className="block text-xs uppercase text-gray-500">Cómo se calcula disponible P2P</span>
 								<span className="block font-semibold text-gray-900">
-									Disponible P2P = Tokens emitidos - Botellas a guardar
+									Disponible P2P = Reserva OpenVino - Tokens a quemar
 								</span>
 								<span className="block text-gray-600">
-									{formatFormulaValue(p2pAvailable)} = {formatFormulaValue(displayTokensValue)} - {formatFormulaValue(physicalStockToKeep)}
-								</span>
-								<span className="block text-gray-500">
-									Equivale a: {formatFormulaValue(p2pAvailable)} = {formatFormulaValue(reserveBalance)} - {formatFormulaValue(displayPendingRedeemsValue)}
+									{formatFormulaValue(p2pAvailable)} = {formatFormulaValue(reserveBalance)} - {formatFormulaValue(displayPendingRedeemsValue)}
 								</span>
 							</div>
 						</div>
