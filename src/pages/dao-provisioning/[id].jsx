@@ -82,6 +82,7 @@ const DaoProvisioningDetail = () => {
       "crowdsale_rate_phase_one_usd",
       "crowdsale_rate_phase_two_usd",
       "crowdsale_price_feed",
+      "crowdsale_transfer_amount",
       // address mapped below
     ];
     const effectiveId = record?.id ?? (id && id !== "launch" ? id : null);
