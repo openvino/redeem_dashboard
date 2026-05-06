@@ -117,6 +117,7 @@
 	"closing_time": "Fecha de finalización",
 	"tokens_to_crowdsale": "Tokens en crowdsale",
 	"deploy_contracts": "Desplegar!",
+	"resume_crowdsale_deploy": "Desplegar crowdsale",
 	"crowdsale_config": "Crowdsale",
 	"token_config": "Parámetros del token",
 	"rate": "Tokens / ETH",

@@ -70,7 +70,9 @@ const LaunchActionButton = ({
                     : "bg-green-700"
                 }`}
               >
-                {t("deploy_contracts")}
+                {token?.token_address && !token?.crowdsale_address
+                  ? t("resume_crowdsale_deploy")
+                  : t("deploy_contracts")}
               </button>
 
               <button
