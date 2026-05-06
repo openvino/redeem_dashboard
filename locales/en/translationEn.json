@@ -177,5 +177,14 @@
 	"deploy_ovi": "Deploy OVI",
 	"deploy_ovi_crowdsale": "Deploy tiered crowdsale",
 	"deploy_dao_contracts": "Deploy DAO contracts",
-	"dao_provisioning_short": "DAO"
+	"dao_provisioning_short": "DAO",
+	"crowdsale_wallet": "Wallet (funds receiver)",
+	"crowdsale_cap": "Cap (ETH)",
+	"crowdsale_opening_time": "Opening time (unix)",
+	"crowdsale_closing_time": "Closing time (unix)",
+	"crowdsale_phase_one_cap": "Phase 1 token cap",
+	"crowdsale_rate_phase_one": "Price per token — phase 1 (USD)",
+	"crowdsale_rate_phase_two": "Price per token — phase 2 (USD)",
+	"crowdsale_price_feed": "Price feed oracle",
+	"crowdsale_transfer_amount": "Tokens to transfer to crowdsale"
 }
