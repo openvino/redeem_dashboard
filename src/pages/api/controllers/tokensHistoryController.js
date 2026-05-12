@@ -51,6 +51,7 @@ export const updateTokenHistory = async ({ symbol, chain, updates }) => {
 		"bottles_stock",
 		"pending_redeems",
 		"last_data_cid",
+		"reserve_addresses",
 	]);
 
 	const setFragments = [];

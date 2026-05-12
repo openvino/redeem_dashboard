@@ -30,6 +30,8 @@ export default async function handler(req, res) {
 				pending_redeems: "pending_redeems",
 				lastDataCid: "last_data_cid",
 				last_data_cid: "last_data_cid",
+				reserveAddresses: "reserve_addresses",
+				reserve_addresses: "reserve_addresses",
 			};
 
 			const updates = {};

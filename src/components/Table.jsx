@@ -45,6 +45,14 @@ const Table = ({
 			"",
 		[columns]
 	);
+	const defaultSortColumn = useMemo(
+		() =>
+			columns?.find((col) => col.field === "created_at")?.field ??
+			columns?.find((col) => col.field && col.field !== "actions")?.field ??
+			columns?.[0]?.field ??
+			"",
+		[columns]
+	);
 	const rowIdAccessor = useCallback(
 		(row, index) => {
 			if (row?.id != null) return String(row.id);
@@ -87,7 +95,7 @@ const Table = ({
 		columns: columns ?? [],
 		elementsPerPage: n,
 		rowIdAccessor,
-		defaultOrder: columns?.[0]?.field,
+		defaultOrder: defaultSortColumn,
 	});
 
 	const [activeFilterColumn, setActiveFilterColumn] =

@@ -88,9 +88,12 @@ const Launch = () => {
 			if (token.transfered_to_crowdsale) {
 				setDisableDeploy(true);
 				setTransferDisabled(true);
-			} else if (token.tokenAddress && token.crowdsaleAddress) {
+			} else if (token.token_address && token.crowdsale_address) {
 				setDisableDeploy(true);
 				setTransferDisabled(false);
+			} else if (token.token_address && !token.crowdsale_address) {
+				setDisableDeploy(false);
+				setTransferDisabled(true);
 			}
 			reset({
 				id: token.id,

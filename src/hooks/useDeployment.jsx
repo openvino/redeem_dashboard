@@ -48,6 +48,8 @@ const useDeployment = (
 				const token = await tokenLaunching(id);
 				setSelectedWinery(token.winery_id);
 				setToken(token);
+				setTokenAddress(token.token_address || "");
+				setCrowdsaleAddress(token.crowdsale_address || "");
 			}
 		};
 		fetchTokens();
@@ -141,6 +143,8 @@ const useDeployment = (
 		const v = getValues();
 		const symbol = v.symbol?.trim();
 		const walletAddress = v.wallet_address?.trim();
+		const deployedTokenAddress = token?.address || token?.token_address;
+		if (!deployedTokenAddress) throw new Error("Token address missing");
 		if (!walletAddress) throw new Error("Wallet address missing");
 
 		const rate = parseInt(String(v.rate || "").trim());
@@ -162,7 +166,7 @@ const useDeployment = (
 
 		const crowdsale = await deployContract(crowdAbi, crowdBytecode, signer, [
 			walletAddress,
-			token.address,
+			deployedTokenAddress,
 			weiCapBN,
 			openingTs,
 			closingTs,
@@ -181,7 +185,7 @@ const useDeployment = (
 		const crowdCtorEncoded = ethers.utils.defaultAbiCoder
 			.encode(
 				["address", "address", "uint256", "uint256", "uint256", "uint256"],
-				[walletAddress, token.address, weiCapBN, openingTs, closingTs, rate]
+				[walletAddress, deployedTokenAddress, weiCapBN, openingTs, closingTs, rate]
 			)
 			.replace(/^0x/, "");
 
@@ -588,7 +592,8 @@ const useDeployment = (
 		setLoading(true);
 
 		try {
-			const code = await signer.provider.getCode(crowdsaleAddress);
+			const activeCrowdsaleAddress = crowdsaleAddress || token?.crowdsale_address;
+			const code = await signer.provider.getCode(activeCrowdsaleAddress);
 			if (code === "0x") {
 				throw new Error("Crowdsale contract not found on-chain.");
 			}
@@ -604,7 +609,7 @@ const useDeployment = (
 			);
 
 			try {
-				await tokenContract.estimateGas.transfer(crowdsaleAddress, tokensBN);
+				await tokenContract.estimateGas.transfer(activeCrowdsaleAddress, tokensBN);
 				console.log("Gas estimation succeeded, proceeding to transfer");
 			} catch (err) {
 				console.error("Gas estimation failed:", err);
@@ -614,7 +619,7 @@ const useDeployment = (
 			}
 
 			showLoadingToast(toastId, t("Transferring tokens to crowdsale..."));
-			const tx = await tokenContract.transfer(crowdsaleAddress, tokensBN);
+			const tx = await tokenContract.transfer(activeCrowdsaleAddress, tokensBN);
 			await tx.wait();
 			updateSuccessToast(toastId, t("tokens_transferred"));
 
@@ -719,21 +724,34 @@ const useDeployment = (
 				account: account,
 			});
 
-			// Deploy token
-			const token = await deployToken(toastId);
-			setTokenAddress(token.address);
+			const existingTokenAddress = token?.token_address || tokenAddress;
+			let deployedToken = token;
+
+			if (existingTokenAddress) {
+				showLoadingToast(toastId, "Token already deployed. Resuming crowdsale deployment...");
+				deployedToken = {
+					...token,
+					address: existingTokenAddress,
+					token_address: existingTokenAddress,
+				};
+				setTokenAddress(existingTokenAddress);
+			} else {
+				// Deploy token
+				deployedToken = await deployToken(toastId);
+				setTokenAddress(deployedToken.address);
+			}
 
 			// Confirm token deployment
 			showLoadingToast(toastId, t("Wait please..."));
 
 			while (true) {
-				const code = await provider.getCode(token.address);
+				const code = await provider.getCode(deployedToken.address || deployedToken.token_address);
 				if (code !== "0x") break;
 				await new Promise((res) => setTimeout(res, 4000));
 			}
 
 			// Deploy crowdsale
-			const crowdsale = await deployCrowdsale(token, toastId);
+			const crowdsale = await deployCrowdsale(deployedToken, toastId);
 			setCrowdsaleAddress(crowdsale.address);
 
 			// Confirm crowdsale deployment

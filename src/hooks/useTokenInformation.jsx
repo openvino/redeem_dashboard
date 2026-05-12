@@ -280,6 +280,7 @@ const useTokenInformation = (contractMeta) => {
 		bottlesStock: null,
 		pendingRedeems: null,
 		lastDataCid: null,
+		reserveAddresses: null,
 		historyRow: null,
 	});
 
@@ -537,23 +538,10 @@ const useTokenInformation = (contractMeta) => {
 						? Number(tokensToBurnValue)
 						: tokensToBurnValue;
 
-				const burnedTokensValue = (() => {
-					const baseline =
-						burnedFromSupply === null || burnedFromSupply === undefined
-							? burnedOnChainNumeric ?? 0
-							: Number(burnedFromSupply);
-					if (!archivedFlag) {
-						const pending = Number(normalizedTokensToBurn ?? 0);
-						if (pending > 0 && Number.isFinite(baseline)) {
-							const floor = burnedOnChainNumeric ?? 0;
-							const adjusted = baseline - pending;
-							if (Number.isFinite(adjusted)) {
-								return Math.max(adjusted, floor, 0);
-							}
-						}
-					}
-					return baseline;
-				})();
+				const burnedTokensValue =
+					burnedFromSupply !== null && burnedFromSupply !== undefined
+						? Number(burnedFromSupply)
+						: burnedOnChainNumeric ?? 0;
 				const stockRow = await fetchTokenStockRow(
 					baseData?.symbol,
 					baseData?.network
@@ -562,6 +550,7 @@ const useTokenInformation = (contractMeta) => {
 					bottles_stock,
 					pending_redeems,
 					last_data_cid,
+					reserve_addresses,
 				} = stockRow ?? {};
 
 				setTokenInfo((prev) => ({
@@ -611,6 +600,7 @@ const useTokenInformation = (contractMeta) => {
 					bottlesStock: bottles_stock,
 					pendingRedeems: pending_redeems,
 					lastDataCid: last_data_cid,
+					reserveAddresses: reserve_addresses ?? null,
 					historyRow: stockRow,
 				}));
 
@@ -715,6 +705,7 @@ const useTokenInformation = (contractMeta) => {
 				bottlesStock: row.bottles_stock ?? prev.bottlesStock,
 				pendingRedeems: row.pending_redeems ?? prev.pendingRedeems,
 				lastDataCid: row.last_data_cid ?? prev.lastDataCid,
+				reserveAddresses: row.reserve_addresses ?? prev.reserveAddresses,
 				historyRow: row,
 			};
 		});

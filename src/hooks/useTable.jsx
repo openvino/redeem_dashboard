@@ -18,6 +18,10 @@ export function useTable(
 	fallbackElementsPerPage = 10,
 	fallbackDefaultOrder = "created_at"
 ) {
+	const isDateColumn = (columnName) =>
+		typeof columnName === "string" &&
+		(columnName.toLowerCase().includes("date") || columnName === "created_at");
+
 	const config = useMemo(() => {
 		if (Array.isArray(input) || input == null) {
 			return {
@@ -25,6 +29,7 @@ export function useTable(
 				columns: [],
 				elementsPerPage: fallbackElementsPerPage,
 				defaultOrder: fallbackDefaultOrder,
+				defaultAscOrder: !isDateColumn(fallbackDefaultOrder),
 			};
 		}
 		return {
@@ -33,6 +38,9 @@ export function useTable(
 			elementsPerPage:
 				input.elementsPerPage ?? fallbackElementsPerPage ?? 10,
 			defaultOrder: input.defaultOrder ?? fallbackDefaultOrder ?? "created_at",
+			defaultAscOrder:
+				input.defaultAscOrder ??
+				!isDateColumn(input.defaultOrder ?? fallbackDefaultOrder ?? "created_at"),
 			rowIdAccessor: input.rowIdAccessor ?? DEFAULT_ROW_ID,
 		};
 	}, [input, fallbackElementsPerPage, fallbackDefaultOrder]);
@@ -42,6 +50,7 @@ export function useTable(
 		columns,
 		elementsPerPage,
 		defaultOrder,
+		defaultAscOrder,
 		rowIdAccessor = DEFAULT_ROW_ID,
 	} = config;
 
@@ -49,7 +58,12 @@ export function useTable(
 	const [columnOrder, setColumnOrder] = useState(
 		defaultOrder ?? columns?.[0]?.field ?? null
 	);
-	const [ascOrder, setAscOrder] = useState(true);
+	const [ascOrder, setAscOrder] = useState(defaultAscOrder ?? true);
+
+	useEffect(() => {
+		setColumnOrder(defaultOrder ?? columns?.[0]?.field ?? null);
+		setAscOrder(defaultAscOrder ?? true);
+	}, [columns, defaultAscOrder, defaultOrder]);
 
 	const [filters, setFilters] = useState(() =>
 		columns.reduce((acc, column) => {
@@ -125,10 +139,7 @@ export function useTable(
 			if (valA != null && valB == null) return ascOrder ? 1 : -1;
 			if (valA == null && valB == null) return 0;
 
-			if (
-				columnOrder.toLowerCase().includes("date") ||
-				columnOrder === "created_at"
-			) {
+			if (isDateColumn(columnOrder)) {
 				const dateA = normalizeDate(valA);
 				const dateB = normalizeDate(valB);
 				return ascOrder ? dateA - dateB : dateB - dateA;

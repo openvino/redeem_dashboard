@@ -1,10 +1,13 @@
-import React, { useEffect } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { useActiveAccount } from "thirdweb/react";
 import { chain as desiredChain } from "@/config/thirdwebClient";
 
+const HomeLayoutContext = createContext(false);
+
 const HomeLayout = ({ children }) => {
+	const isNestedLayout = useContext(HomeLayoutContext);
 	const account = useActiveAccount();
 
 	useEffect(() => {
@@ -26,14 +29,20 @@ const HomeLayout = ({ children }) => {
 		switchToDesiredChain();
 	}, [account]);
 
+	if (isNestedLayout) {
+		return children;
+	}
+
 	return (
-		<div className="flex min-h-screen overflow-x-hidden">
-			<Sidebar />
-			<div className="flex flex-col flex-1 min-w-0">
-				<Topbar />
-				<main className="p-4 min-w-0 overflow-x-auto">{children}</main>
+		<HomeLayoutContext.Provider value={true}>
+			<div className="flex min-h-screen overflow-x-hidden">
+				<Sidebar />
+				<div className="flex flex-col flex-1 min-w-0">
+					<Topbar />
+					<main className="p-4 min-w-0 overflow-x-auto">{children}</main>
+				</div>
 			</div>
-		</div>
+		</HomeLayoutContext.Provider>
 	);
 };
 
