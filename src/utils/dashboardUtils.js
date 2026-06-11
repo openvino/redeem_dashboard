@@ -7,7 +7,7 @@ export const buildColumns = (t, fields) => {
 		{ title: t("monto"), field: "amount" },
 		{ title: t("shipping_paid_status"), field: "shipping_paid_status" },
 		{ title: t("pickup"), field: "pickup" },
-		{ title: t("estado"), field: "status" },
+		{ title: t("estado"), field: "status", enumOptions: ["pending", "completed", "rejected"] },
 		{ title: t("pais"), field: "country_id" },
 		{ title: t("provincia"), field: "province_id" },
 		{ title: t("ciudad"), field: "city" },

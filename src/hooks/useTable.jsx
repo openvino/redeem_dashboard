@@ -72,6 +72,8 @@ export function useTable(
 		}, {})
 	);
 
+	const [enumFilters, setEnumFiltersState] = useState({});
+
 	useEffect(() => {
 		setFilters((prev) => {
 			const next = {};
@@ -113,11 +115,12 @@ export function useTable(
 		).getTime();
 
 	const filteredData = useMemo(() => {
-		const hasFilters = Object.values(filters ?? {}).some((value) => value);
-		if (!hasFilters) return data;
+		const hasTextFilters = Object.values(filters ?? {}).some((value) => value);
+		const hasEnumFilters = Object.values(enumFilters).some((s) => s && s.size > 0);
+		if (!hasTextFilters && !hasEnumFilters) return data;
 
-		return data.filter((row) =>
-			columns.every((column) => {
+		return data.filter((row) => {
+			const passesText = columns.every((column) => {
 				const filterValue = filters[column.field];
 				if (!filterValue) return true;
 				const cellValue = row?.[column.field];
@@ -125,9 +128,15 @@ export function useTable(
 				return String(cellValue)
 					.toLowerCase()
 					.includes(String(filterValue).toLowerCase());
-			})
-		);
-	}, [columns, data, filters]);
+			});
+			if (!passesText) return false;
+			for (const [field, allowed] of Object.entries(enumFilters)) {
+				if (!allowed || allowed.size === 0) continue;
+				if (!allowed.has(String(row?.[field] ?? ""))) return false;
+			}
+			return true;
+		});
+	}, [columns, data, filters, enumFilters]);
 
 	const toSortable = (val) => {
 		if (isValidElement(val)) return val.type?.displayName ?? val.type?.name ?? "";
@@ -350,6 +359,25 @@ export function useTable(
 		setCurrentPage(1);
 	}, []);
 
+	const setEnumFilter = useCallback((field, value, checked) => {
+		setEnumFiltersState((prev) => {
+			const current = new Set(prev[field] ?? []);
+			if (checked) current.add(value);
+			else current.delete(value);
+			return { ...prev, [field]: current };
+		});
+		setCurrentPage(1);
+	}, []);
+
+	const clearEnumFilter = useCallback((field) => {
+		setEnumFiltersState((prev) => {
+			const next = { ...prev };
+			delete next[field];
+			return next;
+		});
+		setCurrentPage(1);
+	}, []);
+
 	const clearFilters = useCallback(() => {
 		setFilters((prev) =>
 			Object.keys(prev).reduce((acc, key) => {
@@ -357,6 +385,7 @@ export function useTable(
 				return acc;
 			}, {})
 		);
+		setEnumFiltersState({});
 		setCurrentPage(1);
 	}, []);
 
@@ -445,6 +474,9 @@ export function useTable(
 		setFilterValue,
 		clearFilters,
 		filteredData,
+		enumFilters,
+		setEnumFilter,
+		clearEnumFilter,
 		toggleRowSelection,
 		isRowSelected,
 		toggleSelectAllCurrentPage,

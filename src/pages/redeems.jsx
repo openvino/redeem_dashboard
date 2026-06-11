@@ -50,7 +50,7 @@ const redeems = ({ redeems }) => {
     { title: t("cp"), field: "zip" },
     { title: t("año"), field: "year" },
     { title: t("creado"), field: "created_at" },
-    { title: t("estado"), field: "status" },
+    { title: t("estado"), field: "status", enumOptions: ["pending", "completed", "rejected"] }, // filter
   ];
 
   const filterData = (data) => {

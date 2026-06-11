@@ -8,7 +8,7 @@ import React, {
 	useState,
 } from "react";
 import Link from "next/link";
-import { FaPencilAlt, FaRocket, FaRegCopy, FaCheck } from "react-icons/fa";
+import { FaPencilAlt, FaRocket, FaRegCopy, FaCheck, FaFilter } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 
 import { useSelector } from "react-redux";
@@ -83,6 +83,9 @@ const Table = ({
 		setFilterValue,
 		clearFilters,
 		filteredData,
+		enumFilters,
+		setEnumFilter,
+		clearEnumFilter,
 		toggleRowSelection,
 		isRowSelected,
 		toggleSelectAllCurrentPage,
@@ -105,6 +108,21 @@ const Table = ({
 	const [columnWidths, setColumnWidths] = useState([]);
 	const resizeHandlersRef = useRef(null);
 	const [copiedCellKey, setCopiedCellKey] = useState(null);
+	const [enumDropdown, setEnumDropdown] = useState(null);
+
+	useEffect(() => {
+		if (!enumDropdown) return;
+		const handler = (e) => {
+			if (
+				!e.target.closest("[data-enum-dropdown]") &&
+				!e.target.closest("[data-enum-trigger]")
+			) {
+				setEnumDropdown(null);
+			}
+		};
+		document.addEventListener("mousedown", handler);
+		return () => document.removeEventListener("mousedown", handler);
+	}, [enumDropdown]);
 	const clearCopyTimeoutRef = useRef(null);
 	const isInteractiveElement = useCallback((target) => {
 		if (!target) return false;
@@ -514,7 +532,18 @@ const Table = ({
 									return (
 										<th
 											key={column.field}
-											onClick={() => handleSortColumn(column.field)}
+											data-prevent-drag={column.enumOptions ? true : undefined}
+											onClick={() => {
+												if (column.enumOptions) {
+													const field = column.field;
+													const options = column.enumOptions;
+													setEnumDropdown((prev) =>
+														prev?.field === field ? null : { field, options }
+													);
+												} else {
+													handleSortColumn(column.field);
+												}
+											}}
 											className={`relative px-2 py-2 bg-[#840C4A] text-[0.75rem] text-white font-medium tracking-wider text-center cursor-pointer select-none border-r border-white/20 last:border-r-0 ${
 												column.field === "actions" ? "w-12 sm:w-16" : ""
 											}`}
@@ -526,14 +555,68 @@ const Table = ({
 										>
 											<div className="flex items-center justify-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal sm:break-words">
 												<span>{column.title}</span>
-												{column.field !== "actions" && (
+												{column.field !== "actions" && !column.enumOptions && (
 													<span className={`shrink-0 text-[0.5rem] ${columnOrder === column.field ? "text-white" : "text-white/40"}`}>
 														{columnOrder === column.field
 															? ascOrder ? "▲" : "▼"
 															: "⇅"}
 													</span>
 												)}
+												{column.enumOptions && (
+													<span className={`shrink-0 text-[0.6rem] ${(enumFilters[column.field]?.size ?? 0) > 0 ? "text-yellow-300" : "text-white/60"}`}>
+														<FaFilter size={9} />
+													</span>
+												)}
 											</div>
+											{column.enumOptions && enumDropdown?.field === column.field && (
+												<div
+													data-enum-dropdown
+													className="absolute left-0 top-full z-50 bg-white border border-gray-200 rounded shadow-lg py-1 min-w-[160px]"
+													style={{ marginTop: "2px" }}
+													onMouseDown={(e) => e.stopPropagation()}
+													onClick={(e) => e.stopPropagation()}
+												>
+													<div className="px-3 py-1.5 border-b border-gray-100 flex gap-2">
+														<button
+															type="button"
+															className="flex-1 text-xs text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1"
+															onClick={() => { handleSortColumn(column.field); setEnumDropdown(null); }}
+														>
+															▲ A→Z
+														</button>
+														<button
+															type="button"
+															className="flex-1 text-xs text-gray-500 hover:text-gray-800 flex items-center justify-center gap-1"
+															onClick={() => { handleSortColumn(column.field); setEnumDropdown(null); }}
+														>
+															▼ Z→A
+														</button>
+													</div>
+													{enumDropdown.options.map((option) => (
+														<label
+															key={option}
+															className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 cursor-pointer text-sm text-gray-700"
+														>
+															<input
+																type="checkbox"
+																checked={enumFilters[enumDropdown.field]?.has(option) ?? false}
+																onChange={(e) => setEnumFilter(enumDropdown.field, option, e.target.checked)}
+																className="h-3 w-3 cursor-pointer"
+															/>
+															{option}
+														</label>
+													))}
+													{(enumFilters[enumDropdown.field]?.size ?? 0) > 0 && (
+														<button
+															type="button"
+															className="w-full text-left px-3 py-1.5 text-xs text-[#840C4A] hover:bg-gray-50 border-t border-gray-200"
+															onClick={() => { clearEnumFilter(enumDropdown.field); setEnumDropdown(null); }}
+														>
+															{t("tabla_limpiar", { defaultValue: "Clear" })}
+														</button>
+													)}
+												</div>
+											)}
 											<span
 												onMouseDown={(event) =>
 													handleResizeStart(colIndex, event)
@@ -724,7 +807,9 @@ const Table = ({
 						</button>
 					)}
 			</div>
-		</>
+
+
+</>
 	);
 };
 
