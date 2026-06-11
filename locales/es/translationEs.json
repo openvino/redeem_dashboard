@@ -121,7 +121,7 @@
 	"crowdsale_config": "Crowdsale",
 	"token_config": "Parámetros del token",
 	"rate": "Tokens / ETH",
-	"cap": "Cap",
+	"cap": "Cap (Tokens emitidos)",
 	"ups_no_hay_nada_aqui": "Ups! no hay nada aquí...",
 	"save_token": "Guardar token",
 	"transfer_tokens_to_crowdsale": "Transferir tokens",
