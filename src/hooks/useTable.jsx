@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, isValidElement } from "react";
 import { toast } from "react-toastify";
 import {
 	MdSkipNext,
@@ -129,11 +129,16 @@ export function useTable(
 		);
 	}, [columns, data, filters]);
 
+	const toSortable = (val) => {
+		if (isValidElement(val)) return val.type?.displayName ?? val.type?.name ?? "";
+		return val;
+	};
+
 	const orderedData = useMemo(() => {
 		if (!columnOrder) return filteredData;
 		return [...filteredData].sort((a, b) => {
-			const valA = a[columnOrder];
-			const valB = b[columnOrder];
+			const valA = toSortable(a[columnOrder]);
+			const valB = toSortable(b[columnOrder]);
 
 			if (valA == null && valB != null) return ascOrder ? -1 : 1;
 			if (valA != null && valB == null) return ascOrder ? 1 : -1;
@@ -447,5 +452,7 @@ export function useTable(
 		selectedRowsData,
 		clearSelection,
 		isDragging,
+		columnOrder,
+		ascOrder,
 	};
 }

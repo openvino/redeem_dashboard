@@ -34,7 +34,7 @@ const Launch = () => {
 	const router = useRouter();
 	const { t } = useTranslation();
 
-	const { register, handleSubmit, setValue, getValues, reset } = useForm({
+	const { register, handleSubmit, setValue, getValues, reset, control } = useForm({
 		defaultValues: DEFAULT_VALUES,
 	});
 
@@ -230,6 +230,7 @@ const Launch = () => {
 					<h2 className="text-xl font-semibold">{t("token_config")}</h2>
 					<TokenConfigurationForm
 						register={register}
+						control={control}
 						isFieldDisabled={isFieldDisabled}
 						uploadImage={uploadImage}
 						tokenPreview={tokenImage}

@@ -90,6 +90,8 @@ const Table = ({
 		selectedRowsData,
 		clearSelection,
 		isDragging,
+		columnOrder,
+		ascOrder,
 	} = useTable({
 		data,
 		columns: columns ?? [],
@@ -522,8 +524,15 @@ const Table = ({
 												maxWidth: `${columnWidth}px`,
 											}}
 										>
-											<div className="whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal sm:break-words">
-												{column.title}
+											<div className="flex items-center justify-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis sm:whitespace-normal sm:break-words">
+												<span>{column.title}</span>
+												{column.field !== "actions" && (
+													<span className={`shrink-0 text-[0.5rem] ${columnOrder === column.field ? "text-white" : "text-white/40"}`}>
+														{columnOrder === column.field
+															? ascOrder ? "▲" : "▼"
+															: "⇅"}
+													</span>
+												)}
 											</div>
 											<span
 												onMouseDown={(event) =>
