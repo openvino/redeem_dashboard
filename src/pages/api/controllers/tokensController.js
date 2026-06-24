@@ -40,23 +40,32 @@ export async function getTokenShippingInfoById(shippingId) {
 	return tokens;
 }
 export async function updateShipping(body) {
-	const { id, base_cost, cost_per_unit, active } = body;
+	const { id, base_cost, cost_per_unit, active, stock_country } = body;
 
 	const toFloatOrNull = (val) => (val === "" ? null : parseFloat(val));
 
 	const query = `
     UPDATE token_shipping_cost
-    SET base_cost = $1, cost_per_unit = $2, active = $3
-    WHERE id = $4;
+    SET base_cost = $1, cost_per_unit = $2, active = $3, stock_country = $4
+    WHERE id = $5;
   `;
 
 	await conn.query(query, [
 		toFloatOrNull(base_cost),
 		toFloatOrNull(cost_per_unit),
 		active,
+		stock_country || null,
 		id,
 	]);
 
+	return true;
+}
+
+export async function updateShippingStockCountry({ province_id, token_id, stock_country }) {
+	await conn.query(
+		`UPDATE token_shipping_cost SET stock_country = $1 WHERE LOWER(province_id) = LOWER($2) AND LOWER(token_id) = LOWER($3)`,
+		[stock_country || null, province_id, token_id]
+	);
 	return true;
 }
 

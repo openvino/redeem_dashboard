@@ -9,17 +9,21 @@ import FormField from "@/components/FormField";
 import { toast } from "react-toastify";
 import clientAxios from "@/config/clientAxios";
 import { useTranslation } from "react-i18next";
+import { useSelector, useDispatch } from "react-redux";
+import { getCountries } from "@/redux/actions/winaryActions";
 
 const EditShipping = () => {
   const [loading, setLoading] = useState(false);
-
+  const [stockZones, setStockZones] = useState([]);
   const { t } = useTranslation();
-
+  const dispatch = useDispatch();
+  const countriesRaw = useSelector((s) => s.winaryAdress.countries);
+  const countries = Array.isArray(countriesRaw) ? countriesRaw : [];
   const router = useRouter();
   const { id } = router.query;
   const { tokens } = useTokenShippingById(id);
 
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       id: "",
       token_id: "",
@@ -27,8 +31,13 @@ const EditShipping = () => {
       base_cost: "",
       cost_per_unit: "",
       active: "",
+      stock_country: "",
     },
   });
+
+  useEffect(() => {
+    if (!countries.length) dispatch(getCountries());
+  }, []);
 
   useEffect(() => {
     if (tokens) {
@@ -39,106 +48,92 @@ const EditShipping = () => {
         base_cost: tokens.base_cost || "",
         cost_per_unit: tokens.cost_per_unit || "",
         active: tokens.active || "",
+        stock_country: tokens.stock_country || "",
       });
+      Promise.all([
+        clientAxios.get(`/tokenStockByCountryRoute?token_id=${tokens.token_id}`),
+        clientAxios.get(`/tokenShippingRoute?tokenId=${tokens.token_id}`),
+      ])
+        .then(([stockRes, zonesRes]) => {
+          const dbZones = Array.isArray(stockRes.data) ? stockRes.data : [];
+          const shippingZones = Array.isArray(zonesRes.data) ? zonesRes.data : [];
+          const inferred = [...new Set(
+            shippingZones.map((z) => z.province_id?.split("-")[0]).filter(Boolean)
+          )];
+          const merged = [...dbZones];
+          inferred.forEach((cid) => {
+            if (!merged.find((r) => r.country_id === cid)) {
+              merged.push({ country_id: cid, stock: 0 });
+            }
+          });
+          setStockZones(merged);
+          // Re-apply stock_country value now that options exist in DOM
+          setValue("stock_country", tokens.stock_country || "");
+        })
+        .catch(() => {});
     }
   }, [tokens, reset]);
 
   const onSubmit = async (data) => {
-    console.log(data);
-
-    if (
-      !data.province_id ||
-      !data.base_cost ||
-      !data.cost_per_unit ||
-      !data.active
-    ) {
-      return toast.error("All fields are required");
+    if (!data.province_id) {
+      return toast.error("province_id is required");
     }
-
-    const toastId = toast("Updating shipping data...", {
-      position: "top-right",
-      autoClose: false,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      isLoading: true,
-    });
 
     try {
       setLoading(true);
-      await clientAxios.put("/tokenShippingRoute", {
-        data,
-      });
-
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.SUCCESS,
-        render: "Shipping updated success",
-        autoClose: 5000,
-      });
-
-      return router.back();
-    } catch (error) {
-      toast.update(toastId, {
-        isLoading: false,
-        type: toast.TYPE.ERROR,
-        render: "Error ",
-        autoClose: 5000,
-      });
-    } finally {
+      await clientAxios.put("/tokenShippingRoute", { data });
+      router.back();
+    } catch {
+      toast.error("Error al guardar");
       setLoading(false);
     }
   };
 
   return (
     <HomeLayout>
-      <Head>
-        <title>Openvino - Edit Shipping</title>
-      </Head>
-
+      <Head><title>Openvino - Edit Shipping</title></Head>
       <div>
         <form
           className="space-y-6 max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md"
           onSubmit={handleSubmit(onSubmit)}
         >
-          {/* ID */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField label={t("id")} {...register("id")} disabled />
-            <FormField
-              label={t("token_id")}
-              {...register("token_id")}
-              disabled
-            />
+            <FormField label={t("token_id")} {...register("token_id")} disabled />
           </div>
 
-          {/* Apellido + Email */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("province_id")}
-              {...register("province_id")}
-              disabled
-            />
-            <FormField
-              label={t("base_cost")}
-              type="number"
-              {...register("base_cost")}
-            />
+            <FormField label={t("province_id")} {...register("province_id")} disabled />
+            <FormField label={t("base_cost")} type="number" {...register("base_cost")} />
           </div>
 
-          {/* Imagen de perfil + Bodega (condicional) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
-              label={t("cost_per_unit")}
-              type="number"
-              {...register("cost_per_unit")}
-            />
+            <FormField label={t("cost_per_unit")} type="number" {...register("cost_per_unit")} />
             <FormField label={t("active")} {...register("active")} />
           </div>
 
-          {/* Botones */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t("zona_stock")}
+              </label>
+              <select
+                {...register("stock_country")}
+                className="w-full mt-1 p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#840C4A]"
+              >
+                <option value="">{t("select")}</option>
+                {stockZones.map((z) => {
+                  const country = countries.find((c) => c.country_id === z.country_id);
+                  return (
+                    <option key={z.country_id} value={z.country_id}>
+                      {z.country_id}{country ? ` — ${country.place_description}` : ""}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+
           <div className="flex justify-center mt-6">
             <button
               type="button"
@@ -163,18 +158,10 @@ const EditShipping = () => {
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
-
   if (!session) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
+    return { redirect: { destination: "/", permanent: false } };
   }
-  return {
-    props: {},
-  };
+  return { props: {} };
 }
 
 export default EditShipping;

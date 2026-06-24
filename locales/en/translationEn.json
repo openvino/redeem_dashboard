@@ -196,5 +196,16 @@
 	"platform_content_saved": "Content saved",
 	"common_description": "Common description",
 	"token_descriptions": "Token descriptions",
-	"token_description_saved": "Token description saved"
+	"token_description_saved": "Token description saved",
+	"stock_by_country": "Stock by country",
+	"stock_available": "Available stock",
+	"stock_country": "Stock zone",
+	"zona_stock": "Stock zone",
+	"stock_saved": "Stock saved",
+	"stock_set_after_add": "Set the stock after adding",
+	"agregar": "Add",
+	"sin_asignar": "Not assigned",
+	"shipping_zones": "Shipping zones",
+	"stock_country_saved": "Stock zone updated",
+	"editar": "Edit"
 }

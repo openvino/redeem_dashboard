@@ -195,5 +195,16 @@
 	"platform_content_saved": "Contenido guardado",
 	"common_description": "Descripción común",
 	"token_descriptions": "Descripción de tokens",
-	"token_description_saved": "Descripción del token guardada"
+	"token_description_saved": "Descripción del token guardada",
+	"stock_by_country": "Stock por país",
+	"stock_available": "Stock disponible",
+	"stock_country": "Zona de stock",
+	"zona_stock": "Zona de stock",
+	"stock_saved": "Stock guardado",
+	"stock_set_after_add": "Ingresá el stock después de agregar",
+	"agregar": "Agregar",
+	"sin_asignar": "Sin asignar",
+	"shipping_zones": "Zonas de envío",
+	"stock_country_saved": "Zona de stock actualizada",
+	"editar": "Editar"
 }
