@@ -47,6 +47,8 @@
 	"REDEEM_wallet_address": "Redeeem wallet address",
 	"VCO_wallet_address": "Crowdsale wallet address",
 	"token_logo": "Token Logo",
+	"bottle_image": "Bottle image",
+	"description": "Description",
 	"price_per_token": "Price per token (ETH)",
 	"deploy_and_verify": "Deploy and verify",
 	"rate_tokens_per_eth": "Rate (tokens per ETH)",
@@ -187,5 +189,12 @@
 	"crowdsale_rate_phase_one": "Price per token — phase 1 (USD)",
 	"crowdsale_rate_phase_two": "Price per token — phase 2 (USD)",
 	"crowdsale_price_feed": "Price feed oracle",
-	"crowdsale_transfer_amount": "Tokens to transfer to crowdsale"
+	"crowdsale_transfer_amount": "Tokens to transfer to crowdsale",
+	"platform_content_title": "Exchange content",
+	"platform_content_subtitle": "Common description and texts that appear on every token page in the exchange.",
+	"platform_content_short": "Exchange",
+	"platform_content_saved": "Content saved",
+	"common_description": "Common description",
+	"token_descriptions": "Token descriptions",
+	"token_description_saved": "Token description saved"
 }

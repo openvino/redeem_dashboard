@@ -50,6 +50,11 @@ function LangEditor({ initialContent, onChange, disabled, visible }) {
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
 
+  // Sync editable state — useEditor only applies it on init
+  useEffect(() => {
+    if (editor) editor.setEditable(!disabled);
+  }, [editor, disabled]);
+
   // Set content when it arrives from DB (only once per mount)
   useEffect(() => {
     if (editor && initialContent && !contentSet.current) {
@@ -138,10 +143,12 @@ function LangEditor({ initialContent, onChange, disabled, visible }) {
           </button>
         </div>
       )}
-      <EditorContent
-        editor={editor}
-        className="min-h-[160px] px-3 py-2 prose-editor"
-      />
+      <div
+        className="min-h-[160px] px-3 py-2 prose-editor cursor-text"
+        onClick={() => editor?.commands.focus()}
+      >
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }
@@ -152,7 +159,7 @@ export function MultilingualRichTextEditor({ control, name, disabled }) {
   return (
     <>
       <style>{`
-        .prose-editor .ProseMirror { outline: none; min-height: 140px; }
+        .prose-editor .ProseMirror { outline: none; min-height: 140px; cursor: text; }
         .prose-editor .ProseMirror p { margin: 0 0 0.5em; }
         .prose-editor .ProseMirror a { color: #840C4A; text-decoration: underline; cursor: pointer; }
         .prose-editor .ProseMirror ul { list-style: disc; padding-left: 1.25em; margin: 0 0 0.5em; }

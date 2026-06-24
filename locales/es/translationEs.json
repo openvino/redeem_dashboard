@@ -48,6 +48,8 @@
 	"token_cap": "Cantidad a mintear",
 	"token_img": "Imágen del token",
 	"token_logo": "Logo del Token",
+	"bottle_image": "Imagen de la botella",
+	"description": "Descripción",
 	"deploy_and_verify": "Desplegar y verificar",
 	"price_per_token": "Precio por token (ETH)",
 	"rate_tokens_per_eth": "Rate (tokens por ETH)",
@@ -186,5 +188,12 @@
 	"crowdsale_rate_phase_one": "Precio por token — fase 1 (USD)",
 	"crowdsale_rate_phase_two": "Precio por token — fase 2 (USD)",
 	"crowdsale_price_feed": "Oráculo de precio",
-	"crowdsale_transfer_amount": "Tokens a transferir al crowdsale"
+	"crowdsale_transfer_amount": "Tokens a transferir al crowdsale",
+	"platform_content_title": "Contenido del Exchange",
+	"platform_content_subtitle": "Descripción común y textos que aparecen en todos los tokens del exchange.",
+	"platform_content_short": "Exchange",
+	"platform_content_saved": "Contenido guardado",
+	"common_description": "Descripción común",
+	"token_descriptions": "Descripción de tokens",
+	"token_description_saved": "Descripción del token guardada"
 }

@@ -60,6 +60,11 @@ const Sidebar = () => {
 
 	if (isCostafloresAdmin(session)) {
 		menuItems.splice(4, 0, {
+			href: "/platform-content",
+			icon: <IoMdSettings size={20} />,
+			title: t("platform_content_short"),
+		});
+		menuItems.splice(4, 0, {
 			href: "/dao-provisioning",
 			icon: (
 				<div className="w-6 h-6 relative">
